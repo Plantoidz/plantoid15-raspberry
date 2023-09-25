@@ -39,26 +39,37 @@ def setup_web3_provider(config):
     if config['use_goerli'] == True:
 
         # make sure that the script can listen to both events happening in mainnet and goerli, and process them accordingly !
-        goerli = setup('wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
-                                    config['use_goerli_address'],
-                                    os.getcwd(),
-                                    1000000000000000,  # one line every 0.001 ETH
-                                    "http://15goerli.plantoid.org",
-                                    1) # this set failsafe = 1 (meaning we should recycle movies)
+        goerli = setup(
+            'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
+            config['use_goerli_address'],
+            path=os.getcwd(),
+            feeding_amount=1000000000000000,  # one line every 0.001 ETH
+            reclaim_url="http://15goerli.plantoid.org",
+            failsafe=1, # this set failsafe = 1 (meaning we should recycle movies)
+        ) 
 
     if config['use_mainnet'] == True:
 
         # lorem ipsum
-        mainnet = setup('wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
-                                    config['use_mainnet_address'],
-                                    os.getcwd(),
-                                    10000000000000000,  # one line every 0.01 ETH)
-                                    "http://15.plantoid.org",
-                                    0) # this set failsafe = 0 (meaning we should generate a new movie)
+        mainnet = setup(
+            'wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
+            config['use_mainnet_address'],
+            path=os.getcwd(),
+            feeding_amount=10000000000000000,  # one line every 0.01 ETH)
+            reclaim_url="http://15.plantoid.org",
+            failsafe=0, # this set failsafe = 0 (meaning we should generate a new movie)
+        ) 
     
     return goerli, mainnet
 
-def setup(infura_websock, addr, path, feeding_amount, reclaim_url, failsafe):
+def setup(
+    infura_websock,
+    addr,
+    path=None,
+    feeding_amount=0,
+    reclaim_url=None,
+    failsafe=0,
+):
 
     # create a web3 object
     network = Web3Object();
@@ -119,7 +130,7 @@ def process_previous_tx(web3obj):
         print('processing is null')
         processing = 1
 
-    # if db exists, skip to the lastely minted item
+    # if db exists, skip to the last minted item
 
     else:
 
@@ -178,18 +189,18 @@ def create_metadata(web3obj, tID):
 
     # get the path
     path = web3obj.path
+    print('path is', path)
 
     # set variables to None
     ipfsQmp3 = None
-    movie = None
+    movie_path = None
 
     # check if the movie already exists
     if os.path.exists(path + "/videos/"+tID+"_movie.mp4"):
 
         # the movie already exists, move directly to the metadata creation
         print("skipping the production of the movie, as it already exists...");
-        movie = path + "/videos/"+tID+"_movie.mp4"
-
+        movie_path = path + "/videos/"+tID+"_movie.mp4"
 
     else:
 
@@ -201,18 +212,20 @@ def create_metadata(web3obj, tID):
             print("no Sermon associated with seed: " + tID)
             return
 
-        movie = eden.createVideoFromAudio(path, tID, web3obj.failsafe)
+        movie_path = eden.create_video_from_audio(path, tID, web3obj.failsafe)
 
     ### Pin the Video-Sermon on IPFS
-    if movie is not None:
+    if movie_path is not None:
 
-        response = pinata.pin_file(movie)
+        print("movie found, pinning to IPFS")
+
+        response = pinata.pin_file(movie_path)
         print('pinata response:', response)
 
         # TODO: this should probably check for a response code
         if(response and response.get('data')):
             ipfsQmp3 = response['data']['IpfsHash']
-            print("reording the animation_url = " + ipfsQmp3)
+            print("recording the animation_url = " + ipfsQmp3)
 
     else:
         print("movie is null, skipping pinning to IPFS")
@@ -236,6 +249,7 @@ def create_metadata(web3obj, tID):
     with open(path_meta + tID + '.json', 'w') as outfile:
         json.dump(db, outfile)
 
+    # TODO: what does this do?
     ### record in the database that this seed has been processed
     with open(path + "minted.db", 'a') as outfile:
         outfile.write(tID + "\n")

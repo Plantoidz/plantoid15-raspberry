@@ -358,8 +358,8 @@ class Plantony:
         if not os.path.exists(path + "/sermons"):
             os.makedirs(path + "/sermons");
         
-        # TODO: re-enable
-        # os.system("cp " + audiofile + " " + path + f"/sermons/{tID}_sermon.mp3")
+        # save mp3 file
+        os.system("cp " + audiofile + " " + path + f"/sermons/{tID}_sermon.mp3")
 
         # stop the background music
         self.stop_background_music()
@@ -425,5 +425,9 @@ class Plantony:
             audiofile = self.listen()
             tID = '0xABC'
             amount = 0.001
+
             # generate the oracle
             self.generate_oracle(network, audiofile, tID, amount)
+
+            # create the metadata
+            web3_utils.create_metadata(network, tID)
