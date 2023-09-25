@@ -1,6 +1,6 @@
-import lib.plantoid.serial_listen as serial_listen
+import lib.plantoid.serial_utils as serial_utils
 # import lib.plantoid.speech as speech
-import lib.plantoid.web3_connection as web3_connection
+import lib.plantoid.web3_utils as web3_utils
 # from lib.plantoid.core import *
 
 from plantoids.plantoid import Plantony
@@ -85,10 +85,10 @@ def main():
     }
 
     # setup serial
-    ser = serial_listen.setup_serial(PORT=PORT)
+    ser = serial_utils.setup_serial(PORT=PORT)
 
     # setup web3
-    goerli, mainnet = web3_connection.setup_web3_provider(web3_config)
+    goerli, mainnet = web3_utils.setup_web3_provider(web3_config)
 
     print('goerli', goerli)
     print('mainnet', mainnet)

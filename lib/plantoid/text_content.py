@@ -139,3 +139,21 @@ def get_text_content():
     ]
 
     return opening_lines, closing_lines, word_categories
+
+def get_default_sermon_transcript():
+
+    generated_transcript = "I don't know what the future looks like. Describe a solarkpunk utopia where Plantoids have taken over the world."
+    return generated_transcript
+
+def get_sermon_prompt(
+    generated_transcript,
+    selected_words_string,
+    n_lines
+):
+
+    prompt = f"You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem structured around {n_lines} short paragraph, each paragraph is composed of exactly {n_lines} lines:\n\n{generated_transcript}\n\nInclude the following words in your poem: {selected_words_string}. Remember, the poem should be exactly {n_lines} paragraphs long, with {n_lines} lines per paragraph."
+    return prompt
+
+def get_plantoid_sig(network, tID):
+    plantoid_sig = "\n\nYou can reclaim your NFT by connecting to " + network.reclaim_url + " and pressing the Reveal button for seed #" + tID + " \n"
+    return plantoid_sig

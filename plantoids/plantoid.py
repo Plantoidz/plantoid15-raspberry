@@ -5,10 +5,10 @@ import os
 import threading
 import time
 
-from lib.plantoid.text_content import get_text_content
+from lib.plantoid.text_content import *
 import lib.plantoid.speech as PlantoidSpeech
-import lib.plantoid.serial_listen as PlantoidSerial
-import lib.plantoid.web3_connection as web3_connection
+import lib.plantoid.serial_utils as PlantoidSerial
+import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
@@ -97,10 +97,10 @@ class Plantony:
             self.selected_words.append(random.choice(category['items']))
 
         # join the selected words into a comma-delimited string
-        selected_words_string = ', '.join(self.selected_words)
+        self.selected_words_string = ', '.join(self.selected_words)
 
         # print the result
-        print("Plantony is setting up. His seed words are: " + selected_words_string)
+        print("Plantony is setting up. His seed words are: " + self.selected_words_string)
 
     def play_background_music(self, filename):
         pygame.mixer.init()
@@ -272,20 +272,13 @@ class Plantony:
 
         playsound(self.reflection)
 
-    def generate_oracle(self, web3obj, audio, tID, amount):
+    def generate_oracle(self, network, audio, tID, amount):
 
         if self.use_arduino:
             PlantoidSerial.sendToArduino("thinking")
 
-        path = web3obj.path
-
-        #===== play some background noise while we wait..
-        # NOTE: the idea is to simply be able to play this sound and terminate the associated thread once done
-        # stop_event triggers before the mp3 finishes playing * this is a threading loop!
-        # stop_event = threading.Event()
-        # sound_thread = threading.Thread(target=self.ambient_background, args=(os.getcwd()+"/media/metalsound.mp3", stop_event))
-        # sound_thread.daemon = True
-        # sound_thread.start()
+        # get the path of the network
+        path = network.path
 
         # get the path to the background music
         background_music_path = os.getcwd()+"/media/ambient3.mp3"
@@ -301,7 +294,7 @@ class Plantony:
 
         # if no generated transcript, use a default
         if not generated_transcript: 
-            generated_transcript = "I don't know what the future looks like. Describe a solarkpunk utopia where Plantoids have taken over the world."
+            generated_transcript = get_default_sermon_transcript()
 
         # save the generated transcript to a file with the seed name
         if not os.path.exists(path + "/transcripts"):
@@ -325,11 +318,20 @@ class Plantony:
         n_lines = 4
 
         print("generating transcript with number of lines = " + str(n_lines))
-
-        selected_words_string = self.selected_words_string
-        prompt = f"You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem structured around {n_lines} short paragraph, each paragraph is composed of exactly {n_lines} lines:\n\n{generated_transcript}\n\nInclude the following words in your poem: {selected_words_string}. Remember, the poem should be exactly {n_lines} paragraphs long, with {n_lines} lines per paragraph."
+        
+        # generate the sermon prompt
+        prompt = get_sermon_prompt(
+            generated_transcript,
+            self.selected_words_string,
+            n_lines
+        )
+        
+        # get GPT response
         response = PlantoidSpeech.GPTmagic(prompt, call_type='completion')
         sermon_text = response.choices[0].text
+
+        print('sermon text:')
+        print(sermon_text)
 
         # save the generated response to a file with the seed name
         if not os.path.exists(path + "/responses"):
@@ -341,37 +343,30 @@ class Plantony:
             f.write(sermon_text)
 
         # now let's print to the LP0, with Plantoid signature
-        plantoid_sig = "\n\nYou can reclaim your NFT by connecting to " + web3obj.reclaim_url + " and pressing the Reveal button for seed #" + tID + " \n"
-        os.system("cat " + filename + " > /dev/usb/lp0")
-        os.system("echo '" + plantoid_sig + "' > /dev/usb/lp0")
+        # TODO: figure out what this is meant to do
+        plantoid_sig = get_plantoid_sig(network, tID)
+
+        # TODO: figure out what this is meant to do
+        # os.system("cat " + filename + " > /dev/usb/lp0")
+        # os.system("echo '" + plantoid_sig + "' > /dev/usb/lp0")
 
         # now let's read it aloud
         audiofile = PlantoidSpeech.get_text_to_speech_response(sermon_text)
         # stop_event.set() # stop the background noise
 
-        # stop the background music
-        self.stop_background_music()
-
         # save the generated sermons to a file with the seed name
         if not os.path.exists(path + "/sermons"):
             os.makedirs(path + "/sermons");
         
-        os.system("cp " + audiofile + " " + path + f"/sermons/{tID}_sermon.mp3")
+        # TODO: re-enable
+        # os.system("cp " + audiofile + " " + path + f"/sermons/{tID}_sermon.mp3")
 
-    #    PlantoidSerial.sendToArduino("speaking");
-    #    playsound(file)
+        # stop the background music
+        self.stop_background_music()
 
-    #    time.sleep(1)
+        # play the oracle
+        self.read_oracle(audiofile)
 
-    #    PlantoidSerial.sendToArduino("asleep")
-    #    cleanse = '/home/pi/PLLantoid/v6/media/cleanse.mp3'
-    #    playsound(cleanse)
-
-
-        # stop_event = threading.Event()
-        oracle_thread = threading.Thread(target=self.read_oracle, args=(audiofile,)) #, stop_event))
-        # sound_thread.daemon = True
-        oracle_thread.start()
 
     def read_oracle(self, filename):
 
@@ -380,17 +375,23 @@ class Plantony:
         
         playsound(filename)
         time.sleep(1)
-        #cleanse = '/home/pi/PLLantoid/v6/media/cleanse.mp3'
+        
+        if self.use_arduino:
+            PlantoidSerial.sendToArduino("asleep");
+        
         playsound(self.cleanse)
-        #playsound(cleanse)
+
+        print('oracle read completed!')
 
     def check_if_fed(self, network):
 
         ### this returns the token ID and the amount of wei that plantoid has been fed with
-        latest_deposit  = web3_connection.check_for_deposits(network) 
+        latest_deposit  = web3_utils.check_for_deposits(network) 
 
         # If Plantoid has been fed
         if latest_deposit is not None:  
+
+            print('deposit found!')
         
             # get the token ID and the amount of wei that plantoid has been fed with
             (tID, amount) = latest_deposit
@@ -418,4 +419,11 @@ class Plantony:
 
         else:
 
-            print("no deposits detected.")
+            print("no deposits detected. DEBUG: proceeding with oracle generation")
+
+            # listen for audio
+            audiofile = self.listen()
+            tID = '0xABC'
+            amount = 0.001
+            # generate the oracle
+            self.generate_oracle(network, audiofile, tID, amount)

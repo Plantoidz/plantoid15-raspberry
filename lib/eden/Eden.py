@@ -8,10 +8,10 @@ from dotenv import load_dotenv
 
 # args = https://github.com/abraham-ai/eden-api/blob/main/mongo-init.js
 
-EDEN_API_URL = "https://api.eden.art"
 
 load_dotenv()
 
+EDEN_API_URL = "https://api.eden.art"
 EDEN_KEY = os.environ.get("EDEN_KEY")
 EDEN_SECRET = os.environ.get("EDEN_SECRET")
 
@@ -21,9 +21,11 @@ header = {
 }
 
 
-def run_task(generatorName, config):
+def run_task(generator_name, config):
+
+    # create request object
     request = {
-        "generatorName": generatorName,
+        "generatorName": generator_name,
         "config": config
     }
 
@@ -36,45 +38,21 @@ def run_task(generatorName, config):
         headers=header
     )
 
-    if response.status_code != 200:
-        print(response.text)
-        return None
-    
-    result = response.json()
-    taskId = result['taskId']
+    if response.status_code == 200:
 
-    print("TASK ID ====  " + taskId)
+        result = response.json()
+        taskId = result['taskId']
 
+        print("TASK ID ====  " + taskId)
 
-    while(1):
-        
-        try:
- 
-
-            response = requests.get(
-                 'https://api.eden.art/tasks/' + taskId,
-                 headers=header
-            )
+        response = requests.get(
+            'https://api.eden.art/tasks/' + taskId,
+            headers=header
+        )
 
 
- #           response = requests.get(
- #               'https://api.eden.art/tasks', 
- #               json={"taskId": [taskId]},
- #               headers=header
- #           )
-
-            if response.status_code != 200:
-                print(response.text)
-                return None
-
-        except Exception as err:
-            print("An exception occurred while probing the API task " + taskId)
-            print(f"Unexpected {err=}, {type(err)=}")
-
-
-
-        try:
-
+        if response.status_code == 200:
+            
             result = response.json()
 
             pretty_json = json.dumps(result, indent=4)
@@ -94,27 +72,30 @@ def run_task(generatorName, config):
             print(progress)
 
 
-
-            if status == 'completed' and ('creation' in task):
+            if status == 'completed':
+            
+                # This is somewhat dubious
+                if 'creation' in task:
                     return task
+            
             elif status == 'failed':
-                        print("FAILED!")
-                        return None
 
+                print("FAILED!")
+                return None
+                # TODO: throw exception
 
-        except Exception as err:
-            print("An exception occurred while processing the JSON")
-            print(f"Unexpected {err=}, {type(err)=}")
-            # time.sleep(1)
+            else:
 
+                print('Something else')
+                return None
+                # TODO: throw exception
 
+        else:
+            print('An Error Occurred! The EDEN API responded with', response.status_code)
+            return None
+            # TODO: throw exception
 
-#config = {
-#    "text_input": "i am a dog"
-#}
-
-#result = run_task("create", config)
-
-#output_url = result['output'][-1]
-#print(output_url)
-  
+    else:
+        print('An Error Occurred! The EDEN API responded with', response.status_code)
+        return None
+        # TODO: throw exception

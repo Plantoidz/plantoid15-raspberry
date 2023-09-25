@@ -27,7 +27,7 @@ load_dotenv()
 
 PINATA_API_KEY = os.environ.get("PINATA_API_KEY")
 PINATA_API_SECRET = os.environ.get("PINATA_API_SECRET")
-PINATA_JWT = os.getenv('PINATA_JWT')
+PINATA_JWT = os.environ.get('PINATA_JWT')
 INFURA_API_KEY_MAINNET = os.environ.get("INFURA_MAINNET")
 INFURA_API_KEY_GOERLI = os.environ.get("INFURA_GOERLI")
 
@@ -132,16 +132,17 @@ def process_previous_tx(web3obj):
     # loop over all entries to process unprocessed Deposits
 
     for event in event_filter.get_all_entries():
-            print("looping through ---: " +str(event.args.tokenId))
 
-            if(processing == 0):
-                if(str(event.args.tokenId) == last.strip()):
-                    processing = 1;
-                    print('processing is true\n')
-                continue;
+        print("looping through ---: " +str(event.args.tokenId))
 
-            print('handling event...\n')
-            create_metadata(web3obj, str(event.args.tokenId))
+        if processing == 0:
+            if(str(event.args.tokenId) == last.strip()):
+                processing = 1;
+                print('processing is true\n')
+            continue;
+
+        print('handling event...\n')
+        create_metadata(web3obj, str(event.args.tokenId))
 
     
 def check_for_deposits(web3obj):
@@ -172,15 +173,17 @@ def check_for_deposits(web3obj):
 
 def create_metadata(web3obj, tID):
 
+    # create a pinata object
     pinata = Pinata(PINATA_API_KEY, PINATA_API_SECRET, PINATA_JWT)
 
+    # get the path
     path = web3obj.path
 
-    ### Pin the Video-Sermon on IPFS
+    # set variables to None
+    ipfsQmp3 = None
+    movie = None
 
-    ipfsQmp3 = ""
-    movie = ""
-
+    # check if the movie already exists
     if os.path.exists(path + "/videos/"+tID+"_movie.mp4"):
 
         # the movie already exists, move directly to the metadata creation
@@ -190,6 +193,7 @@ def create_metadata(web3obj, tID):
 
     else:
 
+        # the movie doesn't exist, create it
         audio = path + "/sermons/" + tID + "_sermon.mp3"
         print("creating movie for sermon file.. " + audio) 
         
@@ -198,6 +202,45 @@ def create_metadata(web3obj, tID):
             return
 
         movie = eden.createVideoFromAudio(path, tID, web3obj.failsafe)
+
+    ### Pin the Video-Sermon on IPFS
+    if movie is not None:
+
+        response = pinata.pin_file(movie)
+        print('pinata response:', response)
+
+        # TODO: this should probably check for a response code
+        if(response and response.get('data')):
+            ipfsQmp3 = response['data']['IpfsHash']
+            print("reording the animation_url = " + ipfsQmp3)
+
+    else:
+        print("movie is null, skipping pinning to IPFS")
+
+    ### Create Metadata
+    db = dict()
+
+    db['name'] = tID
+    db['description'] = "Plantoid #15 - Seed #" + tID
+    db['external_url'] = "http://plantoid.org"
+    db['image'] = "https://ipfs.io/ipfs/QmRcrcn4X6QfSwFnJQ1dNHn8YgW7pbmm6BjZn7t8FW7WFV" # ipfsQpng
+
+    if ipfsQmp3 is not None:
+        db['animation_url'] = "ipfs://" + ipfsQmp3 # ipfsQwav
+
+    path_meta = path + "/metadata/"
+
+    if not os.path.exists(path_meta):
+        os.makedirs(path_meta)
+
+    with open(path_meta + tID + '.json', 'w') as outfile:
+        json.dump(db, outfile)
+
+    ### record in the database that this seed has been processed
+    with open(path + "minted.db", 'a') as outfile:
+        outfile.write(tID + "\n")
+
+    ### NB: The metadata file will be pinned to IPFS via the node server
 
 #    file_stats = os.stat(audio)
 
@@ -209,35 +252,3 @@ def create_metadata(web3obj, tID):
 #        if not err.check_returncode():
 #            print("pinning the movie to ipfs")
 #            audio = "/home/pi/PLLantoid/v5/voicevideo/voicefile2/processing-movie.mp4"
-
-    if(movie):
-            response = pinata.pin_file(movie)
-            print(response)
-
-            if(response and response.get('data')):
-                ipfsQmp3 = response['data']['IpfsHash']
-                print("reording the animation_url = " + ipfsQmp3)
-
-    ### Create Metadata
-
-    db = {}
-    db['name'] = tID
-    db['description'] = "Plantoid #15 - Seed #" + tID
-    db['external_url'] = "http://plantoid.org"
-    db['image'] = "https://ipfs.io/ipfs/QmRcrcn4X6QfSwFnJQ1dNHn8YgW7pbmm6BjZn7t8FW7WFV" # ipfsQpng
-    if(ipfsQmp3):
-        db['animation_url'] = "ipfs://" + ipfsQmp3 # ipfsQwav
-
-    path_meta = path + "/metadata/"
-    if not os.path.exists(path_meta):
-        os.makedirs(path_meta)
-    with open(path_meta + tID + '.json', 'w') as outfile:
-        json.dump(db, outfile)
-
-    ### record in the database that this seed has been processed
-
-    with open(path + "minted.db", 'a') as outfile:
-        outfile.write(tID + "\n")
-
-    ### NB: The metadata file will be pinned to IPFS via the node server
-

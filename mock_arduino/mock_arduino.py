@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from lib.plantoid.serial_listen import setup_serial
+from lib.plantoid.serial_utils import setup_serial
 from utils.util import load_config
 
 def mock_arduino_keyboard_input(ser):
