@@ -2,6 +2,7 @@ import requests
 import time
 import json
 import os
+from tqdm import tqdm
 
 from dotenv import load_dotenv
 
@@ -12,16 +13,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 EDEN_API_URL = "https://api.eden.art"
-EDEN_KEY = os.environ.get("EDEN_KEY")
-EDEN_SECRET = os.environ.get("EDEN_SECRET")
+EDEN_API_KEY = os.environ.get("EDEN_API_KEY")
+EDEN_API_SECRET = os.environ.get("EDEN_API_SECRET")
 
 header = {
-     "x-api-key": EDEN_KEY,
-     "x-api-secret": EDEN_SECRET,
+     "x-api-key": EDEN_API_KEY,
+     "x-api-secret": EDEN_API_SECRET,
 }
 
 
 def run_task(generator_name, config):
+
+    print('running eden task...')
 
     # create request object
     request = {
@@ -29,8 +32,8 @@ def run_task(generator_name, config):
         "config": config
     }
 
-    print("json ="); print(request)
-    print("headers = "); print(header)
+    # print("json ="); print(request)
+    # print("headers = "); print(header)
 
     response = requests.post(
         f'{EDEN_API_URL}/tasks/create', 
@@ -45,57 +48,62 @@ def run_task(generator_name, config):
 
         print("TASK ID ====  " + taskId)
 
-        response = requests.get(
-            'https://api.eden.art/tasks/' + taskId,
-            headers=header
-        )
+        task_status = ''
+        current_progress = 0
 
+        use_file = os.getcwd()+"/tmp/sample.json"
 
-        if response.status_code == 200:
-            
-            result = response.json()
+        print('using output file:', use_file)
 
-            pretty_json = json.dumps(result, indent=4)
-    #        print(pretty_json)
+        # instantiate a progress bar
+        progress_bar = tqdm(total=100, desc="Eden Video Generation Progress", unit="pct")
 
-            with open("/tmp/sample.json", "w") as outfile:
-                outfile.write(pretty_json)
+        while not (task_status == 'completed'):
+                    
+            response = requests.get(
+                'https://api.eden.art/tasks/' + taskId,
+                headers=header
+            )
 
-   #         print(len(result['docs']))
-   #         task = result['docs'][-1]
-   #         status = task['status']
-            
-            task = result['task']
-            status = task['status']
-            progress = task['progress']
-            print(status)
-            print(progress)
+            if response.status_code == 200:
 
+                result = response.json()
 
-            if status == 'completed':
-            
-                # This is somewhat dubious
-                if 'creation' in task:
-                    return task
-            
-            elif status == 'failed':
+                pretty_json = json.dumps(result, indent=4)
+        #        print(pretty_json)
 
-                print("FAILED!")
-                return None
-                # TODO: throw exception
+                with open(use_file, "w") as outfile:
+                    outfile.write(pretty_json)
+
+                
+                task = result['task']
+                task_status = task['status']
+                task_progress = task['progress']
+
+                # print('task', task)
+                # print('task status', task_status)
+                # print('task progress', task_progress)
+                # print('waiting to re-request...\n')
+                time.sleep(10)
+
+                # update the progress bar, round and scale values to be relative to 100
+                progress_bar.update(100 * round(task_progress, 2) - current_progress)
+    
+                current_progress = 100 * round(task_progress, 2)
+
+                if task_status == 'completed':
+                
+                    if 'creation' in task:
+
+                        print('video generation completed, returning task')
+                        return task
+                
+                if task_status == 'failed':
+
+                    raise Exception('Status failed!', task_status)
 
             else:
-
-                print('Something else')
-                return None
-                # TODO: throw exception
-
-        else:
-            print('An Error Occurred! The EDEN API responded with', response.status_code)
-            return None
-            # TODO: throw exception
+                raise Exception('An Error Occurred! The EDEN API responded with', response.status_code)
 
     else:
-        print('An Error Occurred! The EDEN API responded with', response.status_code)
-        return None
-        # TODO: throw exception
+        raise Exception('An Error Occurred! The EDEN API responded with', response.status_code)

@@ -101,6 +101,14 @@ yarn.lock
 tmp/
 tmp/temp_reco.wav
 tmp
+
+mock_arduino/tmp_log.txt
+responses/
+sermons/
+transcripts/
+videos/
+metadata/
+descriptions/
 # ================================================
 # End of .gitignore
 # ================================================

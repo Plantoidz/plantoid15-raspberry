@@ -29,6 +29,7 @@ from ctypes import *
 from contextlib import contextmanager
 
 from utils.default_prompt_config import default_chat_completion_config, default_completion_config
+from utils.util import load_config, str_to_bool
 
 @contextmanager
 def ignoreStderr():
@@ -207,7 +208,7 @@ def compute_median(fragment, sample_width=2):
     
     return median
 
-def adjust_sound_env(stream): ## important in order to adjust the THRESHOLD based on environmental noise
+def adjust_sound_env(stream, device_bias=0): ## important in order to adjust the THRESHOLD based on environmental noise
     
     data = []
     noisy = []
@@ -227,19 +228,21 @@ def adjust_sound_env(stream): ## important in order to adjust the THRESHOLD base
         noisy.append(audioop_average)
  
     # current_noise = sum(noisy) / len(noisy)
-    current_noise = np.mean(noisy) #
+    current_noise = np.mean(noisy) 
     # current_noise = np.median(noisy)
+
+    # add device bias
+    current_noise = max(0, current_noise + device_bias)
 
     print("current noise = " + str(current_noise))
 
     return current_noise
 
 
-def return_noise_threshold(noisy):
+def return_noise_threshold(noisy, threshold_bias=0):
 
     THRESHOLD = 0
 
-    bias = -50
     multiplier = 1.5
     # ## range should be:  if noisy is 10 = 50; if noisy = 100 = 250;
     # if(noisy < 10): THRESHOLD = 50
@@ -262,14 +265,15 @@ def return_noise_threshold(noisy):
 
         if noise_ranges[i] <= noisy < noise_ranges[i + 1]:
 
-            return thresholds[i] + bias
+            return max(0, thresholds[i] + threshold_bias)
         
-    return thresholds[-1] + bias
-
-    return THRESHOLD
+    return max(0,thresholds[-1] + threshold_bias)
 
 def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
 
+    config = load_config(os.getcwd()+'/configuration.toml')
+
+    cfg = config['audio']
 
     # TEMP
     record_mode = 'continuous'
@@ -290,10 +294,10 @@ def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
     
     print('quiet! checking noise threshold...')
 
-    noisy = adjust_sound_env(stream)
-    THRESHOLD = return_noise_threshold(noisy)
+    noise_value = adjust_sound_env(stream, device_bias=cfg['device_bias'])
+    THRESHOLD = return_noise_threshold(noise_value, threshold_bias=cfg['threshold_bias'])
 
-    print("THRESHOLD", THRESHOLD)
+    print("THRESHOLD:", THRESHOLD)
 
     samples = []
 

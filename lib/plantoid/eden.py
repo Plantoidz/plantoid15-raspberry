@@ -32,6 +32,7 @@ def create_prompts(path, seed, n_prompt):
 
     f = open(path + "/responses/" +
              seed + "_response.txt", "r")
+    
     stri = f.read()
 
     prompt1 = "Can you generate a short sentence that illustrates the physical environment where the poem takes place in a very graphical manner. Starting with: A scene... "
@@ -65,14 +66,17 @@ def create_prompts(path, seed, n_prompt):
     print(descri1)
     print(descri)
 
-    # TODO: this is never saved or created anywhere
-    with open(path + "/descriptions/" + seed + "_description.txt", "w") as g:
-        g.write(descri1)
-        g.write(descri)
+    # generate descriptions dir
+    if not os.path.exists(path + "/descriptions"):
+        os.makedirs(path + "/descriptions");
+
+    # write descriton to file
+    with open(path + "/descriptions/" + seed + "_description.txt", "w") as outfile:
+        outfile.write(descri1)
+        outfile.write(descri)
 
     lines = re.split("\d.", descri)
     lines.insert(0, descri1)
-
 
     prompts = []
 
@@ -88,20 +92,8 @@ def create_prompts(path, seed, n_prompt):
             prompts.append(line)
 
     print(prompts)
+
     return prompts
-
-# prompts = [
-#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Unmanned vehicles traverse a world bustling with skyscrapers and forests of metal and machine.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
-#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: A golden glow radiates from the skyline, casting a warm hue over a diverse yet homogenous population.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
-#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Citizens, both robotic and plant-like, work together in a technosymbiotic harmony.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
-#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Gigantic vines and flower-covered motorways create a unique urban gardenscape.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
-#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Moving constructions, both metallic and organic, bridge the built environment and the mechanical ecosystem.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
-#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: A thriving metropolis is brightly illuminated by the energy generated from a vast network of plants.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
-#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Futuristic skyscrapers erupt from the landscape, pulsating with light and spires of growth.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
-#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: An ever-changing mix of flora and fauna, rooted in ancient symbologies, reflect the balanced existence of humans and their machines.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
-#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: The inhabitants move freely, unencumbered by the society they have created; a connected, unified future of plantoid harmony.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration"
-#   ]
-
 
 def build_API_request(path, seed):
 
@@ -178,53 +170,60 @@ def build_API_request(path, seed):
               "fps": fps,
               "n_frames": int(frames)}
 
-    print(config)
+    # print(config)
     return config
 
 
 def make_eden_API_call(config):
 
     s = time.time()
-    result = Eden.run_task("real2real", config)
+    task_result = Eden.run_task("real2real", config)
     e = time.time()
 
-    if not result:
-        print("Eden.run_task returned Null")
-        return
+    if task_result is not None:
 
-    print("Processing of Interpolation took: " +
-          time.strftime("%Hh%Mm%Ss", time.gmtime(e-s)))
+        print("Processing of Interpolation took: " +
+        time.strftime("%Hh%Mm%Ss", time.gmtime(e-s)))
 
-    # print(result['output']['files'])
+        # print(result['output']['files'])
 
-    j = json.dumps(result, indent=4)
+        json_result = json.dumps(task_result, indent=4)
 
-    # print(j)
+        use_output_file = os.getcwd()+"/tmp/sample2.json"
 
-    with open("/tmp/sample2.json", "w") as outfile:
-        outfile.write(j)
+        print('using output file:', use_output_file)
 
-    # outputf = result['creation']['uri']
-    outputf = result['output']['files'][0]
+        with open(use_output_file, "w") as outfile:
+            outfile.write(json_result)
 
-    print(outputf)
-    return outputf
+        # NOTE: this will be stored on replicate servers, and has to be saved locally
+        output_file = task_result['output']['files'][0]
+
+        print('output file location:', output_file)
+        return output_file
+
+    else:
+        raise Exception("Eden.run_task() did not return a valid result")
 
 
-def get_video(path, outputf, seed):
+def get_remote_video(remote_output_file, seed):
 
+    print('get video(), remote_output_file is', remote_output_file)
 
-    moviefile = "/tmp/out.mp4"
+    movie_file = os.getcwd()+"/tmp/out.mp4"
 
-    print("**** running wget with:\nwget " + outputf)
-    os.system("wget " + outputf + " -O " + moviefile)
+    # command = "wget " + outputf + " -O " + movie_file
+
+    subprocess.run(["wget", remote_output_file, "-O", movie_file])
 
     # m = re.search("\w+\.mp4", outputf)
     # moviefile = m.group()
 
     # os.system("mv " + moviefile + " "+taskId+".mp4")
 
-    return moviefile
+    print('movie file is', movie_file)
+
+    return movie_file
 
 def get_media_duration(file_path):
 
@@ -266,6 +265,12 @@ def make_video(path, video_file_path, seed):
 
     audio_file_path = path +"/sermons/" + seed + "_sermon.mp3"
     output_file_path = path +"/videos/" + seed + "_movie.mp4"
+
+    print(audio_file_path, video_file_path)
+
+    if not os.path.isfile(audio_file_path): raise Exception('Audio file not found!')
+    if not os.path.isfile(video_file_path): raise Exception('Video file not found!')
+
     fmpeg_interleave_av(video_file_path, audio_file_path, output_file_path)
 
     return output_file_path
@@ -282,7 +287,7 @@ def make_video(path, video_file_path, seed):
 def create_video_from_audio(path, tID, failsafe):
 
     # create empty output file
-    output_file = None
+    remote_output_file = None
     video_file = None
 
     # prompts = PlantoidEden.create_prompts(tID)
@@ -297,11 +302,16 @@ def create_video_from_audio(path, tID, failsafe):
         eden_config = build_API_request(path, tID)  
 
         # get the output file from the eden call
-        output_file = make_eden_API_call(eden_config)           
+        remote_output_file = make_eden_API_call(eden_config)           
 
-        if output_file is not None:
+        if remote_output_file is not None:
 
-            video_file = get_video(path, output_file, tID)
+            print('Remote output file location:', remote_output_file)
+            video_file = get_remote_video(remote_output_file, tID)
+
+        else:
+
+            raise Exception('Provided eden output file does not exist:', remote_output_file)
 
     if failsafe == 1:
 
@@ -375,7 +385,7 @@ def fallback_video(path, tID):
 #     videof = None
 
 #     if(outf):
-#         videof = get_video(outf)
+#         videof = get_remote_video(outf)
 #         print(videof)
 
 #     else:
@@ -385,3 +395,14 @@ def fallback_video(path, tID):
 
 #     print("NEW VIDEO == " + outf)
 
+# prompts = [
+#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Unmanned vehicles traverse a world bustling with skyscrapers and forests of metal and machine.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
+#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: A golden glow radiates from the skyline, casting a warm hue over a diverse yet homogenous population.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
+#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Citizens, both robotic and plant-like, work together in a technosymbiotic harmony.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
+#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Gigantic vines and flower-covered motorways create a unique urban gardenscape.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
+#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Moving constructions, both metallic and organic, bridge the built environment and the mechanical ecosystem.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
+#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: A thriving metropolis is brightly illuminated by the energy generated from a vast network of plants.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
+#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: Futuristic skyscrapers erupt from the landscape, pulsating with light and spires of growth.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
+#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: An ever-changing mix of flora and fauna, rooted in ancient symbologies, reflect the balanced existence of humans and their machines.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration",
+#     "Drawing by M. C. Escher with a strong solar-punk flavor representing: The inhabitants move freely, unencumbered by the society they have created; a connected, unified future of plantoid harmony.. Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration"
+#   ]

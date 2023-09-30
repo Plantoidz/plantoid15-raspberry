@@ -74,7 +74,6 @@ def main():
 
     use_blockchain = str_to_bool(cfg['ENABLE_BLOCKCHAIN'])
     use_arduino = str_to_bool(cfg['ENABLE_ARDUINO'])
-    PORT = cfg['SERIAL_PORT_OUTPUT']
     max_rounds = cfg['max_rounds']
 
     web3_config = {
@@ -82,7 +81,12 @@ def main():
         'use_mainnet': str_to_bool(cfg['USE_MAINNET']),
         'use_goerli_address': cfg['USE_GOERLI_ADDRESS'],
         'use_mainnet_address': cfg['USE_MAINNET_ADDRESS'],
+        'goerli_failsafe': cfg['GOERLI_FAILSAFE'],
+        'mainnet_failsafe': cfg['MAINNET_FAILSAFE'],
     }
+
+    # get output port from ENV
+    PORT = os.environ.get('SERIAL_PORT_OUTPUT')
 
     # setup serial
     ser = serial_utils.setup_serial(PORT=PORT)

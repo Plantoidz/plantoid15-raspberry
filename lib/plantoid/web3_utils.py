@@ -45,7 +45,7 @@ def setup_web3_provider(config):
             path=os.getcwd(),
             feeding_amount=1000000000000000,  # one line every 0.001 ETH
             reclaim_url="http://15goerli.plantoid.org",
-            failsafe=1, # this set failsafe = 1 (meaning we should recycle movies)
+            failsafe=config['goerli_failsafe'], # this set failsafe = 1 (meaning we should recycle movies)
         ) 
 
     if config['use_mainnet'] == True:
@@ -57,7 +57,7 @@ def setup_web3_provider(config):
             path=os.getcwd(),
             feeding_amount=10000000000000000,  # one line every 0.01 ETH)
             reclaim_url="http://15.plantoid.org",
-            failsafe=0, # this set failsafe = 0 (meaning we should generate a new movie)
+            failsafe=config['mainnet_failsafe'], # this set failsafe = 0 (meaning we should generate a new movie)
         ) 
     
     return goerli, mainnet
@@ -126,7 +126,7 @@ def process_previous_tx(web3obj):
 
     # if db doesn't exist, nothing has been minted yet
 
-    if (not os.path.exists(path + 'minted.db')):
+    if (not os.path.exists(path + '/minted.db')):
         print('processing is null')
         processing = 1
 
@@ -134,7 +134,7 @@ def process_previous_tx(web3obj):
 
     else:
 
-        with open(path + 'minted.db') as file:
+        with open(path + '/minted.db') as file:
             for line in file:
                 pass
             last = line
@@ -147,10 +147,13 @@ def process_previous_tx(web3obj):
         print("looping through ---: " +str(event.args.tokenId))
 
         if processing == 0:
+
             if(str(event.args.tokenId) == last.strip()):
-                processing = 1;
+
+                processing = 1
                 print('processing is true\n')
-            continue;
+
+            continue
 
         print('handling event...\n')
         create_metadata(web3obj, str(event.args.tokenId))
@@ -162,6 +165,8 @@ def check_for_deposits(web3obj):
     event_filter = web3obj.event_filter
 
     events = event_filter.get_new_entries()
+
+    print('transaction events', events)
 
     if len(events) > 0:
 
@@ -251,7 +256,7 @@ def create_metadata(web3obj, tID):
 
     # TODO: what does this do?
     ### record in the database that this seed has been processed
-    with open(path + "minted.db", 'a') as outfile:
+    with open(path + "/minted.db", 'a') as outfile:
         outfile.write(tID + "\n")
 
     ### NB: The metadata file will be pinned to IPFS via the node server

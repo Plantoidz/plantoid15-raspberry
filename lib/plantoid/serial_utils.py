@@ -20,6 +20,8 @@ messageComplete = False
 
 def setup_serial(PORT="/dev/ttyUSB0", baud_rate=9600):
 
+    if PORT is None: raise Exception('No Serial Port Provided!')
+
     # configure the serial connections (the parameters differs on the device you are connecting to)
     ser = serial.Serial(port=PORT, baudrate=baud_rate)
 

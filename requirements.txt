@@ -17,3 +17,6 @@ regex_spm
 toml
 pygame
 keyboard
+eth-tester
+py-evm
+oz-defender

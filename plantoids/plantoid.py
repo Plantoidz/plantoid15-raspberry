@@ -4,6 +4,7 @@ from playsound import playsound
 import os
 import threading
 import time
+import subprocess
 
 from lib.plantoid.text_content import *
 import lib.plantoid.speech as PlantoidSpeech
@@ -102,10 +103,10 @@ class Plantony:
         # print the result
         print("Plantony is setting up. His seed words are: " + self.selected_words_string)
 
-    def play_background_music(self, filename):
+    def play_background_music(self, filename, loops=-1):
         pygame.mixer.init()
         pygame.mixer.music.load(filename)
-        pygame.mixer.music.play(-1)  # Play on loop
+        pygame.mixer.music.play(loops)
 
     def stop_background_music(self):
         print('stop background music')
@@ -347,7 +348,7 @@ class Plantony:
         plantoid_sig = get_plantoid_sig(network, tID)
 
         # TODO: figure out what this is meant to do
-        # os.system("cat " + filename + " > /dev/usb/lp0")
+        # os.system("cat " + filename + " > /dev/usb/lp0") #stdout on PC, only makes sense in the gallery
         # os.system("echo '" + plantoid_sig + "' > /dev/usb/lp0")
 
         # now let's read it aloud
@@ -356,10 +357,11 @@ class Plantony:
 
         # save the generated sermons to a file with the seed name
         if not os.path.exists(path + "/sermons"):
-            os.makedirs(path + "/sermons");
+            os.makedirs(path + "/sermons")
         
         # save mp3 file
-        os.system("cp " + audiofile + " " + path + f"/sermons/{tID}_sermon.mp3")
+        subprocess.run(["cp", audiofile, f"{path}/sermons/{tID}_sermon.mp3"])
+        # os.system("cp " + audiofile + " " + path + f"/sermons/{tID}_sermon.mp3")
 
         # stop the background music
         self.stop_background_music()
@@ -367,19 +369,21 @@ class Plantony:
         # play the oracle
         self.read_oracle(audiofile)
 
-
+    # TODO: try to queue these
     def read_oracle(self, filename):
 
         if self.use_arduino:
             PlantoidSerial.sendToArduino("speaking");
         
-        playsound(filename)
+        # playsound(filename)
+        self.play_background_music(filename, loops=0)
         time.sleep(1)
         
         if self.use_arduino:
             PlantoidSerial.sendToArduino("asleep");
         
-        playsound(self.cleanse)
+        # playsound(self.cleanse)
+        self.play_background_music(self.cleanse, loops=0)
 
         print('oracle read completed!')
 
@@ -405,29 +409,30 @@ class Plantony:
 
             print('Early termination of check if fed.')
         
-            # # generate the oracle
-            # self.generate_oracle(network, audiofile, tID, amount)
-
-            # if self.use_arduino:
-            #     PlantoidSerial.sendToArduino("thinking")
-        
-            # # create the metadata
-            # web3.create_metadata(network, tID)
-
-            # if self.use_arduino:
-            #     PlantoidSerial.sendToArduino("asleep")
-
-        else:
-
-            print("no deposits detected. DEBUG: proceeding with oracle generation")
-
-            # listen for audio
-            audiofile = self.listen()
-            tID = '0xABC'
-            amount = 0.001
-
             # generate the oracle
             self.generate_oracle(network, audiofile, tID, amount)
 
+            if self.use_arduino:
+                PlantoidSerial.sendToArduino("thinking")
+        
             # create the metadata
             web3_utils.create_metadata(network, tID)
+
+            if self.use_arduino:
+                PlantoidSerial.sendToArduino("asleep")
+
+        else:
+
+            pass
+            # print("no deposits detected. DEBUG: proceeding with oracle generation")
+
+            # # listen for audio
+            # audiofile = self.listen()
+            # tID = '0xABC'
+            # amount = 0.001
+
+            # # generate the oracle
+            # self.generate_oracle(network, audiofile, tID, amount)
+
+            # # create the metadata
+            # web3_utils.create_metadata(network, tID)
