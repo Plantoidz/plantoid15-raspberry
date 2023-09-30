@@ -9,6 +9,7 @@ load_dotenv()
 
 DEFENDER_API_KEY = os.environ.get("DEFENDER_API_KEY")
 DEFENDER_API_SECRET = os.environ.get("DEFENDER_API_SECRET")
+SIGNER_PRIVATE_KEY = os.environ.get("SIGNER_PRIVATE_KEY")
 
 # from hexbytes import HexBytes
 
@@ -103,11 +104,11 @@ def test():
     plantoid_metadata_address = '0x'
 
     # https://www.herongyang.com/Ethereum/Etheruem-Account-Public-Private-Key-Example.html
-    private_key = '8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f'
+    # private_key = '8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f'
 
     msg_hash, msg_hash_hex, msg_hash_arrayified = get_msg_hash(ipfs_hash, token_Id, plantoid_address)
 
-    sig = create_signer_and_sign(msg_hash, private_key)
+    sig = create_signer_and_sign(msg_hash, SIGNER_PRIVATE_KEY)
     function_data = encodeFunctionData(plantoid_address, token_Id, ipfs_hash, sig)
 
     # send_relayer_transaction(plantoid_metadata_address, function_data)
