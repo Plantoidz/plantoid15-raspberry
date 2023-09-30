@@ -41,8 +41,9 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=4):
     print('plantony terminating...')
     plantony.terminate()
 
-    print('checking if fed...')
-    plantony.check_if_fed(network)
+    # print('checking if fed...')
+    # plantony.check_if_fed(network)
+
     # print('debug: plantony rounds...')
     # print(plantony.rounds)
 
@@ -53,13 +54,22 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=4):
 def mock_arduino_event_listen(ser, plantony, network, max_rounds=4):
 
     try:
+        
         while True:
+
+            print('checking if fed...')
+            plantony.check_if_fed(network)
+
+            print('checking if button pressed...')
             if ser.in_waiting > 0:
                 line = ser.readline().decode('utf-8').strip()
                 if line == "button_pressed":
-                    print("Button was pressed, Invoking Plantony!")
 
+                    print("Button was pressed, Invoking Plantony!")
                     plantony.trigger('Touched', plantony, network, max_rounds=max_rounds)
+
+            # only check every 10 seconds
+            time.sleep(10)
 
     except KeyboardInterrupt:
         print("Program stopped by the user.")
@@ -109,6 +119,9 @@ def main():
 
     # add listener
     plantony.add_listener('Touched', invoke_plantony)
+
+    # process previous tx
+    web3_utils.process_previous_tx(goerli)
 
     # check for keyboard press
     mock_arduino_event_listen(ser, plantony, goerli, max_rounds=max_rounds)
