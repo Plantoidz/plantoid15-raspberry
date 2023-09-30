@@ -54,7 +54,7 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=4):
 def mock_arduino_event_listen(ser, plantony, network, max_rounds=4):
 
     try:
-        
+
         while True:
 
             print('checking if fed...')
@@ -127,7 +127,13 @@ def main():
     mock_arduino_event_listen(ser, plantony, goerli, max_rounds=max_rounds)
     # serial_listen.listen_for_keyboard_press(ser)
 
+if __name__ == "__main__":
 
+    # seed = sys.argv[1]
+    # path = "/home/pi/PLLantoid/v6/GOERLI/"
+
+    # Execute main function
+    main()
 
     # trigger plantony
     # NOTE: this is a mocked event
@@ -206,17 +212,3 @@ def main():
     #                 web3.create_metadata(network, tID)
 
     #                 serial_setup.sendToArduino("asleep")
-
-
-                
-if __name__ == "__main__":
-
-    # seed = sys.argv[1]
-    # path = "/home/pi/PLLantoid/v6/GOERLI/"
-
-    # Execute main function
-    main()
-
-
-
-
