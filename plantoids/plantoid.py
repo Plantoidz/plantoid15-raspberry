@@ -5,6 +5,7 @@ import os
 import threading
 import time
 import subprocess
+import json
 
 from lib.plantoid.text_content import *
 import lib.plantoid.speech as PlantoidSpeech
@@ -373,19 +374,20 @@ class Plantony:
     def read_oracle(self, filename):
 
         if self.use_arduino:
-            PlantoidSerial.sendToArduino("speaking");
+            PlantoidSerial.sendToArduino("speaking")
         
         # playsound(filename)
         self.play_background_music(filename, loops=0)
         time.sleep(1)
         
         if self.use_arduino:
-            PlantoidSerial.sendToArduino("asleep");
+            PlantoidSerial.sendToArduino("asleep")
         
-        # playsound(self.cleanse)
-        self.play_background_music(self.cleanse, loops=0)
+        # # playsound(self.cleanse)
+        # self.play_background_music(self.cleanse, loops=0)
 
         print('oracle read completed!')
+
 
     def check_if_fed(self, network):
 
@@ -398,10 +400,11 @@ class Plantony:
             print('deposit found!')
         
             # get the token ID and the amount of wei that plantoid has been fed with
-            (tID, amount) = latest_deposit
+            (token_Id, amount) = latest_deposit
 
-            print("got amount " + str(amount) + " for id = " + tID);
+            print("got amount " + str(amount) + " for id = " + token_Id)
 
+            # do weaving
             self.weaving()
         
             # listen for audio
@@ -410,21 +413,23 @@ class Plantony:
             print('Early termination of check if fed.')
         
             # generate the oracle
-            self.generate_oracle(network, audiofile, tID, amount)
+            self.generate_oracle(network, audiofile, token_Id, amount)
 
             if self.use_arduino:
                 PlantoidSerial.sendToArduino("thinking")
         
             # create the metadata
-            web3_utils.create_metadata(network, tID)
+            web3_utils.create_seed_metadata(network, token_Id)
+
+            # pin the metadata to IPFS and enable reveal link via metatransaction
+            web3_utils.enable_seed_reveal(network, token_Id)
 
             if self.use_arduino:
                 PlantoidSerial.sendToArduino("asleep")
 
         else:
 
-            pass
-            # print("no deposits detected. DEBUG: proceeding with oracle generation")
+            print("sorry, no deposits detected. try later.")
 
             # # listen for audio
             # audiofile = self.listen()
@@ -435,4 +440,6 @@ class Plantony:
             # self.generate_oracle(network, audiofile, tID, amount)
 
             # # create the metadata
-            # web3_utils.create_metadata(network, tID)
+            # web3_utils.create_seed_metadata(network, tID)
+
+

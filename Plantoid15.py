@@ -1,17 +1,10 @@
-import lib.plantoid.serial_utils as serial_utils
-# import lib.plantoid.speech as speech
-import lib.plantoid.web3_utils as web3_utils
-# from lib.plantoid.core import *
-
-from plantoids.plantoid import Plantony
-
-from utils.util import load_config, str_to_bool
-
-from dotenv import load_dotenv
-
-import regex_spm
 import time
 import os
+import lib.plantoid.serial_utils as serial_utils
+import lib.plantoid.web3_utils as web3_utils
+from plantoids.plantoid import Plantony
+from utils.util import load_config, str_to_bool
+from dotenv import load_dotenv
 
 def invoke_plantony(plantony: Plantony, network, max_rounds=4):
 
@@ -49,7 +42,6 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=4):
 
     plantony.reset_rounds()
     plantony.reset_prompt()
-    # awake = 0
 
 def mock_arduino_event_listen(ser, plantony, network, max_rounds=4):
 
@@ -62,23 +54,33 @@ def mock_arduino_event_listen(ser, plantony, network, max_rounds=4):
 
             print('checking if button pressed...')
             if ser.in_waiting > 0:
-                line = ser.readline().decode('utf-8').strip()
-                if line == "button_pressed":
+                try:
+                    line = ser.readline().decode('utf-8').strip()
+                    if line == "button_pressed":
 
-                    print("Button was pressed, Invoking Plantony!")
-                    plantony.trigger('Touched', plantony, network, max_rounds=max_rounds)
+                        # Trigger plantony interaction
+                        print("Button was pressed, Invoking Plantony!")
+                        plantony.trigger('Touched', plantony, network, max_rounds=max_rounds)
 
-            # only check every 10 seconds
-            time.sleep(10)
+                        # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
+                        ser.reset_input_buffer()
+
+                except UnicodeDecodeError:
+                    print("Received a line that couldn't be decoded!")
+
+            # only check every 5 seconds
+            time.sleep(5)
 
     except KeyboardInterrupt:
         print("Program stopped by the user.")
+
+    finally:
         ser.close()
 
 def main():
 
     # load config
-    config = load_config('./configuration.toml')
+    config = load_config(os.getcwd()+'/configuration.toml')
 
     cfg = config['general']
 
@@ -91,6 +93,7 @@ def main():
         'use_mainnet': str_to_bool(cfg['USE_MAINNET']),
         'use_goerli_address': cfg['USE_GOERLI_ADDRESS'],
         'use_mainnet_address': cfg['USE_MAINNET_ADDRESS'],
+        'use_metadata_address': cfg['USE_METADATA_ADDRESS'],
         'goerli_failsafe': cfg['GOERLI_FAILSAFE'],
         'mainnet_failsafe': cfg['MAINNET_FAILSAFE'],
     }
@@ -129,86 +132,5 @@ def main():
 
 if __name__ == "__main__":
 
-    # seed = sys.argv[1]
-    # path = "/home/pi/PLLantoid/v6/GOERLI/"
-
     # Execute main function
     main()
-
-    # trigger plantony
-    # NOTE: this is a mocked event
-    # plantony.trigger('Touched', plantony, max_rounds=max_rounds)
-
-    # invoke plantony
-    # invoke_plantony(plantony, max_rounds=max_rounds)
-
-    # if use_blockchain and use_arduino: 
-
-    #     serial_setup.setupSerial(serialPortName=serial_port_name)
-
-    #     serial_setup.sendToArduino("thinking")
-
-    #     goerli, mainnet = web3.setup_web3_provider()
-
-    #     web3.process_previous_tx(mainnet)
-    #     web3.process_previous_tx(goerli)
-
-    #     serial_setup.sendToArduino("asleep")
-
-
-    # while True:
-
-    #     # check for a message from Arduino
-    #     if use_arduino:
-            
-    #         arduinoReply = serial_setup.recvLikeArduino()
-        
-    #         if not (arduinoReply == 'XXX'):
-    #             print("received... " + arduinoReply);
-
-    #             match regex_spm.fullmatch_in(arduinoReply):
-                
-    #                 case r"Touched" as m:
-
-    #                     if awake == 1:
-    #                         awake = 0
-    #                         serial_setup.sendToArduino("asleep")
-                    
-    #                     else:
-    #                         awake = 1
-    #                         serial_setup.sendToArduino("awake")
-
-    #                         invoke_plantony(plantony, max_rounds=max_rounds)
-    #                         awake = 0
-
-            
-    #     else:
-
-    #         print('skipping arduino usage')
-    #         invoke_plantony(plantony, max_rounds=max_rounds)
-
-    #     # check for a message from the blockchain
-    #     if use_blockchain:
-
-    #         # check for a new Deposit event
-    #         for network in (mainnet, goerli):
-
-    #             mylist  = web3.check_for_deposits(network) ### this returns the token ID and the amount of wei that plantoid has been fed with
-
-    #             if(mylist != None):  # Plantoid has been fed
-                
-    #                 (tID, amount) = mylist
-
-    #                 print("got amount " + str(amount) + " for id = " + tID);
-
-    #                 plantony.weaving()
-                
-    #                 audiofile = plantony.listen()
-                
-    #                 plantony.oracle(network, audiofile, network, tID, amount)
-
-    #                 serial_setup.sendToArduino("thinking")
-                
-    #                 web3.create_metadata(network, tID)
-
-    #                 serial_setup.sendToArduino("asleep")

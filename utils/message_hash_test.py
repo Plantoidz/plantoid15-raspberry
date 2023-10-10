@@ -6,6 +6,8 @@ import os
 import json
 from pinata import Pinata
 
+from lib.plantoid.web3_utils import *
+
 load_dotenv()
 
 DEFENDER_API_KEY = os.environ.get("DEFENDER_API_KEY")
@@ -15,108 +17,7 @@ PINATA_API_KEY = os.environ.get("PINATA_API_KEY")
 PINATA_API_SECRET = os.environ.get("PINATA_API_SECRET")
 PINATA_JWT = os.environ.get('PINATA_JWT')
 
-# from hexbytes import HexBytes
-
-def pin_metadata_to_ipfs(metadata_path):
-
-    pinata = Pinata(PINATA_API_KEY, PINATA_API_SECRET, PINATA_JWT)
-
-    print('metadata is', metadata_path)
-
-    response = pinata.pin_file(metadata_path)
-    print('pinata response:', response)
-
-    if response and response.get('data'):
-        # ipfsQmp3 = response['data']['IpfsHash']
-        seed_metadata = response['data']['IpfsHash']
-        print("the metadata url is = " + seed_metadata)
-
-    return seed_metadata
-
-def get_msg_hash(ipfsHash, tokenId, plantoidAddress):
-
-
-    tokenUri = 'ipfs://' + ipfsHash
-
-    msgHash = Web3.solidity_keccak(
-        ['uint256', 'string', 'address'],
-        [tokenId, tokenUri, plantoidAddress],
-    )
-
-    def arrayify_bytes(hbytes):
-        return [hbytes[i] for i in range(len(hbytes))]
-
-    msgHashArrayified = arrayify_bytes(msgHash)
-  
-    # print('message hash: ', msgHash, msgHash.hex(), msgHashArrayified)
-    # print('message hash arrayified: ', msgHashArrayified);
-
-    print('message hash: ', msgHash.hex())
-    print('message hash arrayified: ', msgHashArrayified)
-
-    return msgHash, msgHash.hex(), msgHashArrayified
-
-def create_signer_and_sign(msg_hash, private_key):
-
-    # # WRONG!!
-    # message = messages.encode_defunct(text=msg_hash_hex)
-    # signed_message = Account.sign_message(message, private_key=private_key)
-    # print('signed message: ', signed_message.signature.hex())
-
-    # CORRECT!!
-    prepared_message = messages.defunct_hash_message(primitive=msg_hash)
-    hash_signed_message = Account.signHash(prepared_message, '0x' + private_key)
-    sig = hash_signed_message.signature.hex()
-
-    print('signature: ', sig)
-
-    return sig
-
-def encodeFunctionData(plantoid_address, token_Id, ipfs_hash, sig):
-
-    w3 = Web3(EthereumTesterProvider())
-
-    # Define the path to the ABI file
-    abi_file_path = './abis/plantoidMetadata'
-
-    # Load the ABI
-    with open(abi_file_path, 'r') as f:
-        contract_json = json.load(f)
-        abi = contract_json#['abi']
-
-    token_Uri = 'ipfs://' + ipfs_hash
-
-    # print(abi)
-
-    # Get the contract utility using the ABI
-    contract = w3.eth.contract(abi=abi)
-
-    # Encode the function call
-    data = contract.encodeABI(fn_name="revealMetadata", args=[plantoid_address, token_Id, token_Uri, sig])
-
-    print('encoded function data: ', data)
-
-    return data
-
-def send_relayer_transaction(address, data):
-
-    # https://github.com/franklin-systems/oz-defender/blob/trunk/oz_defender/relay/client.py
-    # https://forum.openzeppelin.com/t/what-exactly-is-the-function-of-defenders-relay-when-using-metatransactions/23122/7
-    relayer = RelayerClient(api_key=DEFENDER_API_KEY, api_secret=DEFENDER_API_SECRET)
-
-    tx = {
-      'to': address,
-      'data': data,
-      'gasLimit': '100000',
-      'schedule': 'fast',
-    }
-
-    response = relayer.send_transaction(tx)
-    print(response)
-
 def test():
-
-    # w3 = Web3(EthereumTesterProvider())
 
     metadata = None
 
@@ -129,8 +30,6 @@ def test():
 
     ipfs_hash = pin_metadata_to_ipfs(metadata_path)
     #ipfs_hash = 'QmR5oZbMUjrMJt6hrerjiCRKauhsXeVfGnmYw2ojVXiakM'
-
-
 
     token_Id = int(metadata['name'])
     plantoid_address = '0x0B60EE161d7b67fa231e9565dAFF65b34553bC6F'
@@ -145,9 +44,9 @@ def test():
     msg_hash, msg_hash_hex, msg_hash_arrayified = get_msg_hash(ipfs_hash, token_Id, plantoid_address)
 
     sig = create_signer_and_sign(msg_hash, SIGNER_PRIVATE_KEY)
-    function_data = encodeFunctionData(plantoid_address, token_Id, ipfs_hash, sig)
+    function_data = encode_function_data(plantoid_address, token_Id, ipfs_hash, sig)
 
-    # # send_relayer_transaction(plantoid_metadata_address, function_data)
+    send_relayer_transaction(plantoid_metadata_address, function_data)
 
 if __name__ == "__main__":
     test()

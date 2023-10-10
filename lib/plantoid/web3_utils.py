@@ -1,4 +1,6 @@
-from web3 import Web3
+from web3 import Web3, EthereumTesterProvider
+from eth_account import Account, messages
+from oz_defender.relay import RelayClient, RelayerClient
 import subprocess
 import os
 import time
@@ -21,15 +23,18 @@ class Web3Object:
 
 load_dotenv()
 
-# API_KEY = os.getenv('API_KEY')
-# API_SECRET = os.getenv('API_SECRET')
-# JWT = os.getenv('JWT')
-
 PINATA_API_KEY = os.environ.get("PINATA_API_KEY")
 PINATA_API_SECRET = os.environ.get("PINATA_API_SECRET")
 PINATA_JWT = os.environ.get('PINATA_JWT')
+DEFENDER_API_KEY = os.environ.get("DEFENDER_API_KEY")
+DEFENDER_API_SECRET = os.environ.get("DEFENDER_API_SECRET")
+SIGNER_PRIVATE_KEY = os.environ.get("SIGNER_PRIVATE_KEY")
 INFURA_API_KEY_MAINNET = os.environ.get("INFURA_MAINNET")
 INFURA_API_KEY_GOERLI = os.environ.get("INFURA_GOERLI")
+
+def get_signer_private_key():
+
+    return SIGNER_PRIVATE_KEY
 
 def setup_web3_provider(config):
 
@@ -42,6 +47,7 @@ def setup_web3_provider(config):
         goerli = setup(
             'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
             config['use_goerli_address'],
+            config['use_metadata_address'],
             path=os.getcwd(),
             feeding_amount=1000000000000000,  # one line every 0.001 ETH
             reclaim_url="http://15goerli.plantoid.org",
@@ -54,6 +60,7 @@ def setup_web3_provider(config):
         mainnet = setup(
             'wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
             config['use_mainnet_address'],
+            config['use_metadata_address'],
             path=os.getcwd(),
             feeding_amount=10000000000000000,  # one line every 0.01 ETH)
             reclaim_url="http://15.plantoid.org",
@@ -65,6 +72,7 @@ def setup_web3_provider(config):
 def setup(
     infura_websock,
     addr,
+    metadata_address,
     path=None,
     feeding_amount=0,
     reclaim_url=None,
@@ -96,6 +104,12 @@ def setup(
     # print(abi)
     abifile.close()
 
+    # instantiate the plantoid address
+    network.plantoid_address = addr
+
+    # instantiate the metadata address
+    network.metadata_address = metadata_address
+
     # instantiate the contract
     network.plantoid_contract = network.w3.eth.contract(address=address, abi=abi)
 
@@ -117,12 +131,12 @@ def setup(
 
     return network
 
-def process_previous_tx(web3obj):
+def process_previous_tx(network):
 
     processing = 0
 
-    path = web3obj.path
-    event_filter = web3obj.event_filter
+    path = network.path
+    event_filter = network.event_filter
 
     # if db doesn't exist, nothing has been minted yet
 
@@ -134,30 +148,46 @@ def process_previous_tx(web3obj):
 
     else:
 
-        with open(path + '/minted.db') as file:
+        # with open(path + '/minted.db') as file:
+        #     for line in file:
+        #         pass
+        #     last = line
+        #     print("last line = " + last)
+
+        minted_db_token_ids = []
+
+        with open('minted.db', 'r') as file:
+            # Iterate through each line in the file
             for line in file:
-                pass
-            last = line
-            print("last line = " + last)
+                # Strip the newline character and convert the string to an integer, then append to the list
+                minted_db_token_ids.append(str(line.strip()))
 
     # loop over all entries to process unprocessed Deposits
-
     for event in event_filter.get_all_entries():
 
-        print("looping through ---: " +str(event.args.tokenId))
+        token_Id = str(event.args.tokenId)
 
-        if processing == 0:
+        print("looping through ---: " +token_Id)
 
-            if(str(event.args.tokenId) == last.strip()):
+        if token_Id not in minted_db_token_ids:
 
-                processing = 1
-                print('processing is true\n')
+            print('processing metadata for token id:', token_Id)
+            create_seed_metadata(network, token_Id)
+            enable_seed_reveal(network, token_Id)
 
-            continue
 
-        print('handling event...\n')
-        create_metadata(web3obj, str(event.args.tokenId))
+        # if processing == 0:
 
+        #     if(token_Id == last.strip()):
+
+        #         processing = 1
+        #         print('processing is true\n')
+
+        #     continue
+
+        # print('handling event...\n')
+        # create_seed_metadata(network, token_Id)
+        # enable_seed_reveal(network, token_Id)
     
 def check_for_deposits(web3obj):
 
@@ -187,37 +217,39 @@ def check_for_deposits(web3obj):
 
     #        #  return  str(event.args.tokenId) 
 
-def create_metadata(web3obj, tID):
+def create_seed_metadata(network, token_Id):
+
+    print('call create metadata.')
 
     # create a pinata object
     pinata = Pinata(PINATA_API_KEY, PINATA_API_SECRET, PINATA_JWT)
 
     # get the path
-    path = web3obj.path
-    print('path is', path)
+    path = network.path
 
     # set variables to None
     ipfsQmp3 = None
     movie_path = None
 
     # check if the movie already exists
-    if os.path.exists(path + "/videos/"+tID+"_movie.mp4"):
+    if os.path.exists(path + "/videos/"+token_Id+"_movie.mp4"):
 
         # the movie already exists, move directly to the metadata creation
         print("skipping the production of the movie, as it already exists...");
-        movie_path = path + "/videos/"+tID+"_movie.mp4"
+        movie_path = path + "/videos/"+token_Id+"_movie.mp4"
 
     else:
 
         # the movie doesn't exist, create it
-        audio = path + "/sermons/" + tID + "_sermon.mp3"
+        audio = path + "/sermons/" + token_Id + "_sermon.mp3"
         print("creating movie for sermon file.. " + audio) 
         
-        if not os.path.isfile(audio):
-            print("no Sermon associated with seed: " + tID)
-            return
+        if os.path.isfile(audio):
+            movie_path = eden.create_video_from_audio(path, token_Id, network.failsafe)
 
-        movie_path = eden.create_video_from_audio(path, tID, web3obj.failsafe)
+        else:
+            print("no Sermon audio file associated with seed: " + token_Id, 'skipping...')
+            return
 
     ### Pin the Video-Sermon on IPFS
     if movie_path is not None:
@@ -238,8 +270,8 @@ def create_metadata(web3obj, tID):
     ### Create Metadata
     db = dict()
 
-    db['name'] = tID
-    db['description'] = "Plantoid #15 - Seed #" + tID
+    db['name'] = token_Id
+    db['description'] = "Plantoid #15 - Seed #" + token_Id
     db['external_url'] = "http://plantoid.org"
     db['image'] = "https://ipfs.io/ipfs/QmRcrcn4X6QfSwFnJQ1dNHn8YgW7pbmm6BjZn7t8FW7WFV" # ipfsQpng
 
@@ -251,23 +283,172 @@ def create_metadata(web3obj, tID):
     if not os.path.exists(path_meta):
         os.makedirs(path_meta)
 
-    with open(path_meta + tID + '.json', 'w') as outfile:
+    with open(path_meta + token_Id + '.json', 'w') as outfile:
         json.dump(db, outfile)
 
-    # TODO: what does this do?
     ### record in the database that this seed has been processed
     with open(path + "/minted.db", 'a') as outfile:
-        outfile.write(tID + "\n")
+        outfile.write(token_Id + "\n")
 
-    ### NB: The metadata file will be pinned to IPFS via the node server
 
-#    file_stats = os.stat(audio)
+def pin_metadata_to_ipfs(metadata_path):
 
-#    if(file_stats.st_size):
-#        cmd_str = "xvfb-run /home/pi/PLLantoid/v5/processing/processing-java --sketch=/home/pi/PLLantoid/v6/voice2video --run " + audio
-#        print(cmd_str)
-#        err = subprocess.run(cmd_str, shell=True) # return 0 if works well
-#        print(err)
-#        if not err.check_returncode():
-#            print("pinning the movie to ipfs")
-#            audio = "/home/pi/PLLantoid/v5/voicevideo/voicefile2/processing-movie.mp4"
+    pinata = Pinata(PINATA_API_KEY, PINATA_API_SECRET, PINATA_JWT)
+
+    print('metadata is', metadata_path)
+
+    response = pinata.pin_file(metadata_path)
+    print('pinata response:', response)
+
+    is_duplicate = False
+
+    if response and response.get('data'):
+
+        seed_metadata = response['data']['IpfsHash']
+        # print("the metadata url is = " + seed_metadata)
+
+        if response['data'].get('isDuplicate') is not None:
+
+            is_duplicate = True
+
+    return seed_metadata, is_duplicate
+
+def get_msg_hash(plantoid_address, ipfs_hash, token_Id):
+
+    token_uri = 'ipfs://' + ipfs_hash
+
+    msgHash = Web3.solidity_keccak(
+        ['uint256', 'string', 'address'],
+        [token_Id, token_uri, plantoid_address],
+    )
+
+    def arrayify_bytes(hbytes):
+        return [hbytes[i] for i in range(len(hbytes))]
+
+    msgHashArrayified = arrayify_bytes(msgHash)
+  
+    # print('message hash: ', msgHash.hex())
+    # print('message hash arrayified: ', msgHashArrayified)
+
+    return msgHash, msgHash.hex(), msgHashArrayified
+
+def create_signer_and_sign(msg_hash, private_key):
+
+    # # WRONG!!
+    # message = messages.encode_defunct(text=msg_hash_hex)
+    # signed_message = Account.sign_message(message, private_key=private_key)
+    # print('signed message: ', signed_message.signature.hex())
+
+    # CORRECT!!
+    prepared_message = messages.defunct_hash_message(primitive=msg_hash)
+    hash_signed_message = Account.signHash(prepared_message, private_key) # '0x' + private_key
+    sig = hash_signed_message.signature.hex()
+
+    # print('signature: ', sig)
+
+    return sig
+
+def encode_function_data(plantoid_address, token_Id, ipfs_hash, sig):
+
+    w3 = Web3(EthereumTesterProvider())
+
+    # Define the path to the ABI file
+    abi_file_path = './abis/plantoidMetadata'
+
+    # Load the ABI
+    with open(abi_file_path, 'r') as f:
+        contract_json = json.load(f)
+        abi = contract_json#['abi']
+
+    token_Uri = 'ipfs://' + ipfs_hash
+
+    # print(abi)
+
+    # Get the contract utility using the ABI
+    contract = w3.eth.contract(abi=abi)
+
+    # Encode the function call
+    data = contract.encodeABI(fn_name="revealMetadata", args=[plantoid_address, token_Id, token_Uri, sig])
+
+    # print('encoded function data: ', data)
+
+    return data
+
+def send_relayer_transaction(metadata_address, data):
+
+    # https://github.com/franklin-systems/oz-defender/blob/trunk/oz_defender/relay/client.py
+    # https://forum.openzeppelin.com/t/what-exactly-is-the-function-of-defenders-relay-when-using-metatransactions/23122/7
+    relayer = RelayerClient(api_key=DEFENDER_API_KEY, api_secret=DEFENDER_API_SECRET)
+
+    tx = {
+      'to': metadata_address,
+      'data': data,
+      'gasLimit': '100000',
+      'schedule': 'fast',
+    }
+
+    response = relayer.send_transaction(tx)
+    # print(response)
+
+def enable_seed_reveal(network, token_Id):
+
+    print('call enable seed reveal.')
+
+    # instantiate metadata
+    metadata = None
+
+    # get the private key of the signer
+    signer_private_key = get_signer_private_key()
+
+    # get the metadata path based on the token ID
+    metadata_path = os.getcwd()+'/metadata/'+str(token_Id)+'.json'
+
+    # skip if not a file
+    if not os.path.isfile(metadata_path):
+        print('No metadata file found for seed ID', token_Id, 'skipping...')
+        return
+    
+    # read the metadata
+    with open(metadata_path, 'r') as f:
+        metadata = json.load(f)
+
+    print(metadata_path)
+
+    # pin the metadata to IPFS
+    ipfs_hash, is_duplicate = pin_metadata_to_ipfs(metadata_path)
+    #ipfs_hash = 'QmR5oZbMUjrMJt6hrerjiCRKauhsXeVfGnmYw2ojVXiakM'
+
+    if is_duplicate == True:
+        print('Duplicate IPFS hash encountered:', ipfs_hash, 'skipping...')
+        return
+
+    token_Id = int(metadata['name'])
+    # print('ipfs hash is', ipfs_hash)
+    # print('token id is', token_Id)
+
+    # get the message hash
+    msg_hash, _, _ = get_msg_hash(
+        network.plantoid_address,
+        ipfs_hash,
+        token_Id,
+    )
+
+    # get the signature
+    sig = create_signer_and_sign(
+        msg_hash,
+        signer_private_key,
+    )
+
+    # get the encoded function data
+    function_data = encode_function_data(
+        network.plantoid_address,
+        token_Id,
+        ipfs_hash,
+        sig,
+    )
+
+    # Send the metatransaction through OZ Defender
+    send_relayer_transaction(
+        network.metadata_address,
+        function_data,
+    )
