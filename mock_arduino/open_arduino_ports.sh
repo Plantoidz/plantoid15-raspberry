@@ -15,18 +15,18 @@ sleep 1
 SERIAL_PORT_INPUT=$(grep "PTY is" .tmp_log | awk 'NR==1 {print $NF}')
 SERIAL_PORT_OUTPUT=$(grep "PTY is" .tmp_log | awk 'NR==2 {print $NF}')
 
-# Overwrite or append SERIAL_PORT_INPUT to ../.env
-if grep -q "SERIAL_PORT_INPUT=" ../.env; then
-    sed -i "s|SERIAL_PORT_INPUT=.*|SERIAL_PORT_INPUT=${SERIAL_PORT_INPUT}|" ../.env
+# Overwrite or append SERIAL_PORT_INPUT to "../.env"
+if grep -q "SERIAL_PORT_INPUT=" "../.env"; then
+    sed -i .bak "s|SERIAL_PORT_INPUT=.*|SERIAL_PORT_INPUT=${SERIAL_PORT_INPUT}|" "../.env"
 else
-    echo "SERIAL_PORT_INPUT=${SERIAL_PORT_INPUT}" >> ../.env
+    echo "SERIAL_PORT_INPUT=${SERIAL_PORT_INPUT}" >> "../.env"
 fi
 
 # Overwrite or append SERIAL_PORT_OUTPUT to ../.env
-if grep -q "SERIAL_PORT_OUTPUT=" ../.env; then
-    sed -i "s|SERIAL_PORT_OUTPUT=.*|SERIAL_PORT_OUTPUT=${SERIAL_PORT_OUTPUT}|" ../.env
+if grep -q "SERIAL_PORT_OUTPUT=" "../.env"; then
+    sed -i .bak "s|SERIAL_PORT_OUTPUT=.*|SERIAL_PORT_OUTPUT=${SERIAL_PORT_OUTPUT}|" "../.env"
 else
-    echo "SERIAL_PORT_OUTPUT=${SERIAL_PORT_OUTPUT}" >> ../.env
+    echo "SERIAL_PORT_OUTPUT=${SERIAL_PORT_OUTPUT}" >> "../.env"
 fi
 
 # Optionally remove the log file
