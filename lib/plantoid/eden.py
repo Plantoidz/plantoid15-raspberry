@@ -251,9 +251,10 @@ def fmpeg_interleave_av(video_file, audio_file, output_file):
     loop_count = int(audio_duration / video_duration) + 1
 
     # Combine the looped video with audio
-    cmd_combine = ["ffmpeg", "-stream_loop", str(loop_count), "-i", video_file, "-i", audio_file, "-shortest",
-                   "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", output_file]
+   # cmd_combine = ["ffmpeg", "-stream_loop", str(loop_count), "-i", video_file, "-i", audio_file, "-shortest",
+   #                "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", output_file]
     
+    cmd_combine = ["ffmpeg", "-i", video_file, "-i", audio_file, output_file]
     subprocess.run(cmd_combine)
 
 

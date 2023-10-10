@@ -312,12 +312,12 @@ class Plantony:
         # TODO: re-enable
         # calculate the length of the poem
         # one line every 0.01 ETH for mainnet, one line every 0.001 ETH for goerli
-        # n_lines = int(amount / web3obj.min_amount)  
+        n_lines = int(amount / network.min_amount)  
         
-        # if n_lines > 7: 
-        #     n_lines = 7
+        if n_lines > 6: 
+            n_lines = 6
 
-        n_lines = 4
+        # n_lines = 4
 
         print("generating transcript with number of lines = " + str(n_lines))
         
