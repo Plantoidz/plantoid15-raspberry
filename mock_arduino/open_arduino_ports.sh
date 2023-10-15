@@ -15,19 +15,26 @@ sleep 1
 SERIAL_PORT_INPUT=$(grep "PTY is" .tmp_log | awk 'NR==1 {print $NF}')
 SERIAL_PORT_OUTPUT=$(grep "PTY is" .tmp_log | awk 'NR==2 {print $NF}')
 
+# Detect OS
+OS=$(uname)
+
+# Determine sed's inplace argument based on the OS
+if [ "$OS" == "Darwin" ]; then
+    SED_INPLACE="-i .bak"
+else
+    SED_INPLACE="-i"
+fi
+
 # Overwrite or append SERIAL_PORT_INPUT to "../.env"
 if grep -q "SERIAL_PORT_INPUT=" "../.env"; then
-    sed -i .bak "s|SERIAL_PORT_INPUT=.*|SERIAL_PORT_INPUT=${SERIAL_PORT_INPUT}|" "../.env"
+    sed $SED_INPLACE "s|SERIAL_PORT_INPUT=.*|SERIAL_PORT_INPUT=${SERIAL_PORT_INPUT}|" "../.env"
 else
     echo "SERIAL_PORT_INPUT=${SERIAL_PORT_INPUT}" >> "../.env"
 fi
 
 # Overwrite or append SERIAL_PORT_OUTPUT to ../.env
 if grep -q "SERIAL_PORT_OUTPUT=" "../.env"; then
-    sed -i .bak "s|SERIAL_PORT_OUTPUT=.*|SERIAL_PORT_OUTPUT=${SERIAL_PORT_OUTPUT}|" "../.env"
+    sed $SED_INPLACE "s|SERIAL_PORT_OUTPUT=.*|SERIAL_PORT_OUTPUT=${SERIAL_PORT_OUTPUT}|" "../.env"
 else
     echo "SERIAL_PORT_OUTPUT=${SERIAL_PORT_OUTPUT}" >> "../.env"
 fi
-
-# Optionally remove the log file
-# rm .tmp_log

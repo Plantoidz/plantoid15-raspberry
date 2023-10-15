@@ -54,7 +54,9 @@ def mock_arduino_event_listen(ser, plantony, network, max_rounds=4):
 
             print('checking if button pressed...')
             if ser.in_waiting > 0:
+
                 try:
+
                     line = ser.readline().decode('utf-8').strip()
                     if line == "button_pressed":
 
@@ -66,6 +68,7 @@ def mock_arduino_event_listen(ser, plantony, network, max_rounds=4):
                         ser.reset_input_buffer()
 
                 except UnicodeDecodeError:
+                    
                     print("Received a line that couldn't be decoded!")
 
             # only check every 5 seconds
@@ -114,8 +117,8 @@ def main():
     # if mainnet is not None: web3.process_previous_tx(mainnet)
     # if goerli is not None: web3.process_previous_tx(goerli)
 
-    # instantiate plantony
-    plantony = Plantony()
+    # instantiate plantony with serial
+    plantony = Plantony(ser)
 
     # setup plantony
     plantony.setup()

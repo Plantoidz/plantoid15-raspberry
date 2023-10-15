@@ -14,7 +14,10 @@ import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
-    def __init__(self):
+    def __init__(self, serial_connector):
+
+        # instantaite serial connector
+        self.serial_connector = serial_connector
 
         # user and agent names
         self.USER = "Human"
@@ -24,7 +27,7 @@ class Plantony:
         self._events = {}
 
         # whether to use the Arduino or not
-        self.use_arduino = False
+        self.use_arduino = True
 
         # lines for the opening and closing
         self.opening = ""
@@ -104,6 +107,11 @@ class Plantony:
         # print the result
         print("Plantony is setting up. His seed words are: " + self.selected_words_string)
 
+    def send_serial_message(self, message):
+
+        if self.use_arduino:
+            PlantoidSerial.send_to_arduino(self.serial_connector, message)
+
     def play_background_music(self, filename, loops=-1):
         pygame.mixer.init()
         pygame.mixer.music.load(filename)
@@ -118,8 +126,7 @@ class Plantony:
         print('Plantony Welcome!')
         print(self.introduction)
 
-        if self.use_arduino:
-            PlantoidSerial.sendToArduino("speaking")
+        self.send_serial_message("speaking")
 
         playsound(self.introduction)
         
@@ -131,24 +138,22 @@ class Plantony:
 
     def terminate(self):
 
-        if self.use_arduino:
-            PlantoidSerial.sendToArduino("speaking")
+        self.send_serial_message("speaking")
 
         print('plantony closing', self.closing)
         playsound(PlantoidSpeech.get_text_to_speech_response(self.closing)) 
         playsound(self.outroduction)
 
-        if self.use_arduino:
-            PlantoidSerial.sendToArduino("asleep")
+        self.send_serial_message("asleep")
 
     def listen(self):
 
-        if self.use_arduino:
-            PlantoidSerial.sendToArduino("listening")
+        self.send_serial_message("listening")
 
         audiofile = PlantoidSpeech.listen_for_speech()
 
         playsound(self.acknowledge())
+
         print("Plantony listen is returning the audiofile as:  " + audiofile)
 
         return audiofile
@@ -184,11 +189,9 @@ class Plantony:
             playsound(audio_file)
 
             # TODO: figure out if this goes here or above
-            if self.use_arduino:
-                PlantoidSerial.sendToArduino("speaking")
+            self.send_serial_message("speaking")
 
-        if self.use_arduino:
-            PlantoidSerial.sendToArduino("thinking")
+        self.send_serial_message("thinking")
 
         print("Plantony respond is receiving the audiofile as : " + audio)
 
@@ -269,15 +272,13 @@ class Plantony:
         
     def weaving(self):
         
-        if self.use_arduino:
-            PlantoidSerial.sendToArduino("speaking")
+        self.send_serial_message("speaking")
 
         playsound(self.reflection)
 
     def generate_oracle(self, network, audio, tID, amount):
 
-        if self.use_arduino:
-            PlantoidSerial.sendToArduino("thinking")
+        self.send_serial_message("thinking")
 
         # get the path of the network
         path = network.path
@@ -373,15 +374,13 @@ class Plantony:
     # TODO: try to queue these
     def read_oracle(self, filename):
 
-        if self.use_arduino:
-            PlantoidSerial.sendToArduino("speaking")
+        self.send_serial_message("speaking")
         
         # playsound(filename)
         self.play_background_music(filename, loops=0)
         time.sleep(1)
-        
-        if self.use_arduino:
-            PlantoidSerial.sendToArduino("asleep")
+
+        self.send_serial_message("asleep")
         
         # # playsound(self.cleanse)
         # self.play_background_music(self.cleanse, loops=0)
@@ -415,8 +414,7 @@ class Plantony:
             # generate the oracle
             self.generate_oracle(network, audiofile, token_Id, amount)
 
-            if self.use_arduino:
-                PlantoidSerial.sendToArduino("thinking")
+            self.send_serial_message("thinking")
         
             # create the metadata
             web3_utils.create_seed_metadata(network, token_Id)
@@ -424,8 +422,8 @@ class Plantony:
             # pin the metadata to IPFS and enable reveal link via metatransaction
             web3_utils.enable_seed_reveal(network, token_Id)
 
-            if self.use_arduino:
-                PlantoidSerial.sendToArduino("asleep")
+            self.send_serial_message("asleep")
+
 
         else:
 

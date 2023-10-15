@@ -22,6 +22,17 @@ def mock_arduino_keyboard_input(ser):
             ser.write(b'button_pressed\n')
             print("Sent 'button_pressed'")
 
+    def check_serial_buffer():
+        # Read the current serial buffer
+        data = ser.read(ser.in_waiting)
+        if data:
+            print('serial buffer data is:')
+            print(data.decode('utf-8'))
+
+        # Schedule this function to run again after 1000 milliseconds (1 second).
+        # You can adjust this value to change the frequency of checking the buffer.
+        root.after(1000, check_serial_buffer)
+
     try:
         root = tk.Tk()
         root.title('Arduino Simulator')
@@ -31,11 +42,15 @@ def mock_arduino_keyboard_input(ser):
         label = tk.Label(root, text="Press the 'a' key to make plantoid do funny stuff.", font=('', 20))
         label.pack(pady=20)
 
+        # Start checking the serial buffer immediately when the UI is displayed
+        check_serial_buffer()
+
         root.mainloop()
 
         ser.close()
-
-        kill_process('socat')
+        
+        # NOTE: this means you should run the bash script again after closing from the UI
+        kill_process('socat') 
 
     except KeyboardInterrupt:
         print("Program stopped by the user.")

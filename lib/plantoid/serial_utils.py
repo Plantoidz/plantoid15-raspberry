@@ -6,74 +6,82 @@ import random
 import regex_spm
 
 
-
-startMarker = '<'
-endMarker = '>'
-dataStarted = False
-dataBuf = ""
-messageComplete = False
-
-
-#========================
-#========================
-    # the functions
-
 def setup_serial(PORT="/dev/ttyUSB0", baud_rate=9600):
 
-    if PORT is None: raise Exception('No Serial Port Provided!')
+    try:
 
-    # configure the serial connections (the parameters differs on the device you are connecting to)
-    ser = serial.Serial(port=PORT, baudrate=baud_rate)
+        if PORT is None: raise Exception('No Serial Port Provided!')
 
-    print("Serial port " + PORT + " opened  Baudrate " + str(baud_rate))
+        # configure the serial connections (the parameters differs on the device you are connecting to)
+        ser = serial.Serial(port=PORT, baudrate=baud_rate)
 
-    return ser
-    #waitForArduino()
+        print("Serial port " + PORT + " opened  Baudrate " + str(baud_rate))
 
-#========================
+        return ser
+        #waitForArduino()
 
-def sendToArduino(stringToSend):
+    except serial.SerialException:
 
-        # this adds the start- and end-markers before sending
-    global startMarker, endMarker, serialPort
-
-    stringWithMarkers = (startMarker)
-    stringWithMarkers += stringToSend
-    stringWithMarkers += (endMarker)
-
-    serialPort.write(stringWithMarkers.encode('utf-8')) # encode needed for Python3
+        raise Exception('Cannot access provided serial port!')
 
 
-#==================
+def send_to_arduino(ser, string_to_send):
 
-def recvLikeArduino():
+    if ser is None:
+        raise Exception('Serial cannot be None!')
 
-    global startMarker, endMarker, serialPort, dataStarted, dataBuf, messageComplete
+    start_marker = '<'
+    end_marker = '>'
 
-    if serialPort.inWaiting() > 0 and messageComplete == False:
-        x = serialPort.read().decode("utf-8") # decode needed for Python3
+    string_with_markers = start_marker + string_to_send + end_marker
 
-        if dataStarted == True:
-            if x != endMarker:
-                dataBuf = dataBuf + x
+    print('serial string is:', string_with_markers)
+
+    ser.write(string_with_markers.encode('utf-8')) # encode needed for Python3
+
+
+def check_received_arduino_signal(ser):
+
+    if ser is None:
+        raise Exception('Serial cannot be None!')
+
+    start_marker = '<'
+    end_marker = '>'
+    data_started = False
+    data_buf = ""
+    message_complete = False
+
+    if ser.inWaiting() > 0 and message_complete == False:
+
+        # decode needed for Python3 
+        x = ser.read().decode("utf-8") # ser.readline().decode('utf-8').strip()
+
+        if data_started == True:
+
+            if x != end_marker:
+                data_buf = data_buf + x
             else:
-                dataStarted = False
-                messageComplete = True
-        elif x == startMarker:
-            dataBuf = ''
-            dataStarted = True
+                data_started = False
+                message_complete = True
 
-    if (messageComplete == True):
-        messageComplete = False
-        return dataBuf
+        elif x == start_marker:
+
+            data_buf = ''
+            data_started = True
+
+    if message_complete == True:
+
+        message_complete = False
+        return data_buf
 
     else:
-        return "XXX"
+
+        return None
 
 
 #==================
 
-def waitForArduino():
+def wait_for_arduino():
 
     # wait until the Arduino sends 'Arduino is ready' - allows time for Arduino reset
     # it also ensures that any bytes left over from a previous message are discarded
@@ -86,8 +94,11 @@ def waitForArduino():
 #    serialPort.read_until(start_signal)
 
     while msg.find("Arduino is ready") == -1:
-        msg = recvLikeArduino()
-        if not (msg == 'XXX'):
+
+        msg = check_received_arduino_signal()
+
+        if msg is not None:
+
             print(msg)
 
 
