@@ -1,4 +1,4 @@
-pinata
+Pinata-python
 web3
 python-dotenv
 wave
@@ -10,13 +10,13 @@ sounddevice
 numpy
 nltk
 speechrecognition
-scipy
+#scipy
 pyserial
-mutagen
-regex_spm
+#mutagen
+#regex_spm
 toml
 pygame
 keyboard
-eth-tester
-py-evm
+#eth-tester
+#py-evm
 oz-defender
