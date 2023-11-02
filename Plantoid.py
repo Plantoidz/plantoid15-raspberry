@@ -98,6 +98,7 @@ def main():
 
     cfg = config['general']
 
+    use_plantoid = 'plantoid_'+str(cfg['PLANTOID'])
     use_blockchain = str_to_bool(cfg['ENABLE_BLOCKCHAIN'])
     use_arduino = str_to_bool(cfg['ENABLE_ARDUINO'])
     max_rounds = cfg['max_rounds']
@@ -107,9 +108,9 @@ def main():
     web3_config = {
         'use_goerli': str_to_bool(cfg['USE_GOERLI']),
         'use_mainnet': str_to_bool(cfg['USE_MAINNET']),
-        'use_goerli_address': cfg['USE_GOERLI_ADDRESS'],
-        'use_mainnet_address': cfg['USE_MAINNET_ADDRESS'],
-        'use_metadata_address': cfg['USE_METADATA_ADDRESS'],
+        'use_goerli_address': cfg[use_plantoid]['USE_GOERLI_ADDRESS'],
+        'use_mainnet_address': cfg[use_plantoid]['USE_MAINNET_ADDRESS'],
+        'use_metadata_address': cfg[use_plantoid]['USE_METADATA_ADDRESS'],
         'goerli_failsafe': cfg['GOERLI_FAILSAFE'],
         'mainnet_failsafe': cfg['MAINNET_FAILSAFE'],
     }
