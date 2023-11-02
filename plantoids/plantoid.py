@@ -339,12 +339,19 @@ class Plantony:
         print('sermon text:')
         print(sermon_text)
 
-        # save the generated response to a file with the seed name
-        if not os.path.exists(path + "/responses"):
-            os.makedirs(path + "/responses");
+        responses_path = path + "/responses"
+        responses_path_network = path + "/responses/" + str(network.name)
 
         # save the generated response to a file with the seed name
-        filename = path + f"/responses/{tID}_response.txt"
+        if not os.path.exists(responses_path):
+            os.makedirs(responses_path);
+
+        # save the generated response to a file with the seed name
+        if not os.path.exists(responses_path_network):
+            os.makedirs(responses_path_network);
+        
+        # save the generated response to a file with the seed name
+        filename = path + f"/responses/{network.name}/{tID}_response.txt"
         with open(filename, "w") as f:
             f.write(sermon_text)
 

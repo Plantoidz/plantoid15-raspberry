@@ -25,12 +25,12 @@ max_tokens = 1024
 
 
 
-def create_prompts(path, seed, n_prompt):
+def create_prompts(path, seed, n_prompt, network_name):
 
     str_n_prompts = str(n_prompt)
     str_n_prompts_n = str(n_prompt - 1)
 
-    f = open(path + "/responses/" +
+    f = open(path + "/responses/" + network_name + "/" +
              seed + "_response.txt", "r")
     
     stri = f.read()
@@ -140,7 +140,7 @@ def build_API_request(path, seed, network_name):
     prompts = []
 
     while len(prompts) < 2:
-        prompts = create_prompts(path, seed, n_prompt)
+        prompts = create_prompts(path, seed, n_prompt, network_name)
 
     images = []
     i = 0
@@ -260,9 +260,16 @@ def fmpeg_interleave_av(video_file, audio_file, output_file):
 
 def make_video(path, video_file_path, seed, network_name): 
 
-    if not os.path.exists(path + "/videos"):
+    video_path = path + "/videos"
+    video_network_path = path + "/videos/" + network_name
+
+    if not os.path.exists(video_path):
         # If it doesn't exist, create it
-        os.makedirs(path + "/videos/")
+        os.makedirs(video_path)
+
+    if not os.path.exists(video_network_path):
+        # If it doesn't exist, create it
+        os.makedirs(video_network_path)
 
     audio_file_path = path +"/sermons/" + network_name + "/" + seed + "_sermon.mp3"
     output_file_path = path +"/videos/" + network_name + "/" + seed + "_movie.mp4"
@@ -276,7 +283,7 @@ def make_video(path, video_file_path, seed, network_name):
 
     return output_file_path
 
-def create_video_from_audio(path, tID, failsafe):
+def create_video_from_audio(path, tID, failsafe, network_name):
 
     # create empty output file
     remote_output_file = None
@@ -291,7 +298,7 @@ def create_video_from_audio(path, tID, failsafe):
         print('skipping failsafe, generating video file with eden')
 
         # construct the API call to Eden (this includes the making of the prompts)
-        eden_config = build_API_request(path, tID)  
+        eden_config = build_API_request(path, tID, network_name)  
 
         # get the output file from the eden call
         remote_output_file = make_eden_API_call(eden_config)           
@@ -309,9 +316,9 @@ def create_video_from_audio(path, tID, failsafe):
 
         print('using failsafe, using fallback')
         #print("PlantoidEden.make_eden_API_call return Null -- going to use a fallback video !")
-        video_file = fallback_video(path, tID)
+        video_file = fallback_video(path, tID, network_name)
 
-    video_path = make_video(path, video_file, tID)
+    video_path = make_video(path, video_file, tID, network_name)
 
     return video_path
 

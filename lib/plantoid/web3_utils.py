@@ -231,11 +231,11 @@ def create_seed_metadata(network, token_Id):
     movie_path = None
 
     # check if the movie already exists
-    if os.path.exists(path + "/videos/"+token_Id+"_movie.mp4"):
+    if os.path.exists(path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"):
 
         # the movie already exists, move directly to the metadata creation
         print("skipping the production of the movie, as it already exists...");
-        movie_path = path + "/videos/"+token_Id+"_movie.mp4"
+        movie_path = path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"
 
     else:
 
@@ -244,7 +244,7 @@ def create_seed_metadata(network, token_Id):
         print("creating movie for sermon file.. " + audio) 
         
         if os.path.isfile(audio):
-            movie_path = eden.create_video_from_audio(path, token_Id, network.failsafe)
+            movie_path = eden.create_video_from_audio(path, token_Id, network.failsafe, network.name)
 
         else:
             print("no Sermon audio file associated with seed: " + token_Id, 'skipping...')
