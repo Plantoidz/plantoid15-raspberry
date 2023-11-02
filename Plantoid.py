@@ -128,8 +128,8 @@ def main():
     goerli, mainnet = web3_utils.setup_web3_provider(web3_config)
 
     # process previous tx
-    if mainnet is not None: web3_utils.process_previous_tx(mainnet)
-    # if goerli is not None: web3_utils.process_previous_tx(goerli)
+    # if mainnet is not None: web3_utils.process_previous_tx(mainnet)
+    if goerli is not None: web3_utils.process_previous_tx(goerli)
 
     # instantiate plantony with serial
     plantony = Plantony(ser, eleven_voice_id)
