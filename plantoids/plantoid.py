@@ -14,7 +14,7 @@ import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
-    def __init__(self, serial_connector):
+    def __init__(self, serial_connector, eleven_voice_id):
 
         # instantaite serial connector
         self.serial_connector = serial_connector
@@ -33,6 +33,9 @@ class Plantony:
         self.opening = ""
         self.closing = ""
         self.prompt_text = ""
+
+        # eleven voice id
+        self.eleven_voice_id = eleven_voice_id
 
         # a round will contain a series of turns
         self.rounds = [[]]
@@ -130,7 +133,7 @@ class Plantony:
 
         playsound(self.introduction)
         
-        audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening)
+        audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.eleven_voice_id)
         print('plantony opening', self.opening)
         print("welcome plantony... opening = " + audiofile)
     
@@ -141,7 +144,7 @@ class Plantony:
         self.send_serial_message("speaking")
 
         print('plantony closing', self.closing)
-        playsound(PlantoidSpeech.get_text_to_speech_response(self.closing)) 
+        playsound(PlantoidSpeech.get_text_to_speech_response(self.closing, self.eleven_voice_id)) 
         playsound(self.outroduction)
 
         self.send_serial_message("asleep")
@@ -184,7 +187,7 @@ class Plantony:
             # append the agent's turn to the latest round
             self.append_turn_to_round(self.AGENT, agent_message)
 
-            audio_file = PlantoidSpeech.get_text_to_speech_response(agent_message, callback=callback)
+            audio_file = PlantoidSpeech.get_text_to_speech_response(agent_message, self.eleven_voice_id, callback=callback)
             # shared_response_container["audio_file"] = audio_file
             playsound(audio_file)
 
@@ -354,16 +357,22 @@ class Plantony:
         # os.system("echo '" + plantoid_sig + "' > /dev/usb/lp0")
 
         # now let's read it aloud
-        audiofile = PlantoidSpeech.get_text_to_speech_response(sermon_text)
+        audiofile = PlantoidSpeech.get_text_to_speech_response(sermon_text, self.eleven_voice_id)
         # stop_event.set() # stop the background noise
 
+        sermons_path = path + "/sermons"
+        sermons_path_network = path + "/sermons/"+str(network.name)
+
         # save the generated sermons to a file with the seed name
-        if not os.path.exists(path + "/sermons"):
-            os.makedirs(path + "/sermons")
+        if not os.path.exists(sermons_path):
+            os.makedirs(sermons_path)
+
+        if not os.path.exists(sermons_path_network):
+            os.makedirs(sermons_path_network)
         
         # save mp3 file
-        subprocess.run(["cp", audiofile, f"{path}/sermons/{tID}_sermon.mp3"])
-        # os.system("cp " + audiofile + " " + path + f"/sermons/{tID}_sermon.mp3")
+        # subprocess.run(["cp", audiofile, f"{path}/sermons/{tID}_sermon.mp3"])
+        subprocess.run(["cp", audiofile, f"{sermons_path_network}/{tID}_sermon.mp3"])
 
         # stop the background music
         self.stop_background_music()

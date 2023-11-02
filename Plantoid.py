@@ -1,10 +1,12 @@
 import time
 import os
+import re
 import lib.plantoid.serial_utils as serial_utils
 import lib.plantoid.web3_utils as web3_utils
 from plantoids.plantoid import Plantony
 from utils.util import load_config, str_to_bool
 from dotenv import load_dotenv
+import regex_spm
 
 def invoke_plantony(plantony: Plantony, network, max_rounds=4):
 
@@ -43,7 +45,11 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=4):
     plantony.reset_rounds()
     plantony.reset_prompt()
 
-def mock_arduino_event_listen(ser, plantony, network, max_rounds=4):
+def mock_arduino_event_listen(ser, plantony, network, trigger_line, max_rounds=4):
+
+
+    # temp
+    pattern = r"<(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3})>"
 
     try:
 
@@ -58,7 +64,12 @@ def mock_arduino_event_listen(ser, plantony, network, max_rounds=4):
                 try:
 
                     line = ser.readline().decode('utf-8').strip()
-                    if line == "button_pressed":
+                    print("line ====", line)
+
+                    condition = bool(re.fullmatch(pattern, line))
+                    print("condition", condition)
+
+                    if condition == True:
 
                         # Trigger plantony interaction
                         print("Button was pressed, Invoking Plantony!")
@@ -90,6 +101,8 @@ def main():
     use_blockchain = str_to_bool(cfg['ENABLE_BLOCKCHAIN'])
     use_arduino = str_to_bool(cfg['ENABLE_ARDUINO'])
     max_rounds = cfg['max_rounds']
+    trigger_line = cfg['TRIGGER_LINE']
+    eleven_voice_id = cfg['ELEVEN_VOICE_ID']
 
     web3_config = {
         'use_goerli': str_to_bool(cfg['USE_GOERLI']),
@@ -107,18 +120,19 @@ def main():
     # setup serial
     ser = serial_utils.setup_serial(PORT=PORT)
 
+    # setup signals
+    serial_utils.wait_for_arduino(ser)
+    serial_utils.send_to_arduino(ser, "awake")  
+
     # setup web3
     goerli, mainnet = web3_utils.setup_web3_provider(web3_config)
 
-    print('goerli', goerli)
-    print('mainnet', mainnet)
-
-    # # process previous tx
-    # if mainnet is not None: web3.process_previous_tx(mainnet)
-    # if goerli is not None: web3.process_previous_tx(goerli)
+    # process previous tx
+    if mainnet is not None: web3_utils.process_previous_tx(mainnet)
+    # if goerli is not None: web3_utils.process_previous_tx(goerli)
 
     # instantiate plantony with serial
-    plantony = Plantony(ser)
+    plantony = Plantony(ser, eleven_voice_id)
 
     # setup plantony
     plantony.setup()
@@ -126,11 +140,8 @@ def main():
     # add listener
     plantony.add_listener('Touched', invoke_plantony)
 
-    # process previous tx
-    web3_utils.process_previous_tx(goerli)
-
     # check for keyboard press
-    mock_arduino_event_listen(ser, plantony, goerli, max_rounds=max_rounds)
+    mock_arduino_event_listen(ser, plantony, goerli, trigger_line, max_rounds=max_rounds)
     # serial_listen.listen_for_keyboard_press(ser)
 
 if __name__ == "__main__":

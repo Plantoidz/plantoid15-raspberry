@@ -40,6 +40,10 @@ def send_to_arduino(ser, string_to_send):
     ser.write(string_with_markers.encode('utf-8')) # encode needed for Python3
 
 
+data_started = False
+data_buf = ""
+message_complete = False
+
 def check_received_arduino_signal(ser):
 
     if ser is None:
@@ -47,14 +51,18 @@ def check_received_arduino_signal(ser):
 
     start_marker = '<'
     end_marker = '>'
-    data_started = False
-    data_buf = ""
-    message_complete = False
+    global data_started
+    global data_buf
+    global message_complete
 
     if ser.inWaiting() > 0 and message_complete == False:
 
         # decode needed for Python3 
         x = ser.read().decode("utf-8") # ser.readline().decode('utf-8').strip()
+
+
+        print("["+x+"]")
+
 
         if data_started == True:
 
@@ -64,10 +72,15 @@ def check_received_arduino_signal(ser):
                 data_started = False
                 message_complete = True
 
+            print("databuf = " , data_buf); 
+
         elif x == start_marker:
 
             data_buf = ''
             data_started = True
+
+        print("["+x+"] == ["+ start_marker+"] == ",  x == start_marker)
+
 
     if message_complete == True:
 
@@ -76,12 +89,12 @@ def check_received_arduino_signal(ser):
 
     else:
 
-        return None
+        return "XXX" 
 
 
 #==================
 
-def wait_for_arduino():
+def wait_for_arduino(ser):
 
     # wait until the Arduino sends 'Arduino is ready' - allows time for Arduino reset
     # it also ensures that any bytes left over from a previous message are discarded
@@ -95,10 +108,12 @@ def wait_for_arduino():
 
     while msg.find("Arduino is ready") == -1:
 
-        msg = check_received_arduino_signal()
 
-        if msg is not None:
+        msg = check_received_arduino_signal(ser)
 
-            print(msg)
+        if not (msg == 'XXX'):
 
+            print("[",msg,"]")
+
+    print("ARDUINO IS READY")
 

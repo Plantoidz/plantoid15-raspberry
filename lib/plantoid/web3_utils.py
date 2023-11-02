@@ -48,6 +48,7 @@ def setup_web3_provider(config):
             'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
             config['use_goerli_address'],
             config['use_metadata_address'],
+            name="goerli",
             path=os.getcwd(),
             feeding_amount=1000000000000000,  # one line every 0.001 ETH
             reclaim_url="http://15goerli.plantoid.org",
@@ -61,6 +62,7 @@ def setup_web3_provider(config):
             'wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
             config['use_mainnet_address'],
             config['use_metadata_address'],
+            name="mainnet",
             path=os.getcwd(),
             feeding_amount=10000000000000000,  # one line every 0.01 ETH)
             reclaim_url="http://15.plantoid.org",
@@ -73,6 +75,7 @@ def setup(
     infura_websock,
     addr,
     metadata_address,
+    name="",
     path=None,
     feeding_amount=0,
     reclaim_url=None,
@@ -103,6 +106,9 @@ def setup(
     abi = o.replace('\n', '')
     # print(abi)
     abifile.close()
+
+    # network name
+    network.name = name
 
     # instantiate the plantoid address
     network.plantoid_address = addr
@@ -137,10 +143,11 @@ def process_previous_tx(network):
 
     path = network.path
     event_filter = network.event_filter
+    minted_db_token_ids = []
 
     # if db doesn't exist, nothing has been minted yet
 
-    if (not os.path.exists(path + '/minted.db')):
+    if (not os.path.exists(path + '/minted_'+str(network.name)+'.db')):
         print('processing is null')
         processing = 1
 
@@ -148,15 +155,7 @@ def process_previous_tx(network):
 
     else:
 
-        # with open(path + '/minted.db') as file:
-        #     for line in file:
-        #         pass
-        #     last = line
-        #     print("last line = " + last)
-
-        minted_db_token_ids = []
-
-        with open('minted.db', 'r') as file:
+        with open('minted_'+str(network.name)+'.db', 'r') as file:
             # Iterate through each line in the file
             for line in file:
                 # Strip the newline character and convert the string to an integer, then append to the list
@@ -241,7 +240,7 @@ def create_seed_metadata(network, token_Id):
     else:
 
         # the movie doesn't exist, create it
-        audio = path + "/sermons/" + token_Id + "_sermon.mp3"
+        audio = path + "/sermons/" + network.name + "/" + token_Id + "_sermon.mp3"
         print("creating movie for sermon file.. " + audio) 
         
         if os.path.isfile(audio):
@@ -279,15 +278,19 @@ def create_seed_metadata(network, token_Id):
         db['animation_url'] = "ipfs://" + ipfsQmp3 # ipfsQwav
 
     path_meta = path + "/metadata/"
+    path_meta_network = path + "/metadata/"+str(network.name)+"/"
 
     if not os.path.exists(path_meta):
         os.makedirs(path_meta)
 
-    with open(path_meta + token_Id + '.json', 'w') as outfile:
+    if not os.path.exists(path_meta_network):
+        os.makedirs(path_meta_network)
+
+    with open(path_meta_network + token_Id + '.json', 'w') as outfile:
         json.dump(db, outfile)
 
     ### record in the database that this seed has been processed
-    with open(path + "/minted.db", 'a') as outfile:
+    with open(path + '/minted_'+str(network.name)+'.db', 'a') as outfile:
         outfile.write(token_Id + "\n")
 
 

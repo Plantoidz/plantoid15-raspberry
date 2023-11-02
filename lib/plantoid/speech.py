@@ -115,7 +115,7 @@ def GPTmagic(prompt, call_type='chat_completion'):
         return response
 
 
-def get_text_to_speech_response(text, callback=None):
+def get_text_to_speech_response(text, eleven_voice_id, callback=None):
 
     headers = {
         "Accept": "audio/mpeg",
@@ -123,7 +123,7 @@ def get_text_to_speech_response(text, callback=None):
         "xi-api-key": eleven_labs_api_key,
     }
 
-    eleven_voice_id = '21m00Tcm4TlvDq8ikWAM' # Rachel
+    #eleven_voice_id = '21m00Tcm4TlvDq8ikWAM' # Rachel
     url = "https://api.elevenlabs.io/v1/text-to-speech/"+eleven_voice_id
 
     # Request TTS from remote API

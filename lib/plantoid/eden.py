@@ -95,10 +95,10 @@ def create_prompts(path, seed, n_prompt):
 
     return prompts
 
-def build_API_request(path, seed):
+def build_API_request(path, seed, network_name):
 
 
-    audiof = MP3(path + "/sermons/" + seed + "_sermon.mp3")
+    audiof = MP3(path + "/sermons/" + network_name + "/" + seed + "_sermon.mp3")
     audiolen = audiof.info.length  # seconds of the poem length
     print("audiolen === " + str(audiolen))
 
@@ -258,14 +258,14 @@ def fmpeg_interleave_av(video_file, audio_file, output_file):
     subprocess.run(cmd_combine)
 
 
-def make_video(path, video_file_path, seed): 
+def make_video(path, video_file_path, seed, network_name): 
 
     if not os.path.exists(path + "/videos"):
         # If it doesn't exist, create it
         os.makedirs(path + "/videos/")
 
-    audio_file_path = path +"/sermons/" + seed + "_sermon.mp3"
-    output_file_path = path +"/videos/" + seed + "_movie.mp4"
+    audio_file_path = path +"/sermons/" + network_name + "/" + seed + "_sermon.mp3"
+    output_file_path = path +"/videos/" + network_name + "/" + seed + "_movie.mp4"
 
     print(audio_file_path, video_file_path)
 
@@ -275,15 +275,6 @@ def make_video(path, video_file_path, seed):
     fmpeg_interleave_av(video_file_path, audio_file_path, output_file_path)
 
     return output_file_path
-
-    # ffmpeg_command = "ffmpeg -i " + video_file_path +" -i " + path +"/sermons/" + seed + "_sermon.mp3 " + path +"/videos/" + seed + "_movie.mp4"
-
-    # print("***** running ffmpeg with:", ffmpeg_command)
-    # os.system(ffmpeg_command)
-
-    # # os.remove(moviefile)
-
-    # video_path = path+ "/videos/" + seed + "_movie.mp4"
 
 def create_video_from_audio(path, tID, failsafe):
 
@@ -325,9 +316,9 @@ def create_video_from_audio(path, tID, failsafe):
     return video_path
 
 
-def fallback_video(path, tID):
+def fallback_video(path, tID, network_name):
 
-    audiof = MP3(path + "/sermons/" + tID + "_sermon.mp3")
+    audiof = MP3(path + "/sermons/" + network_name + "/" + tID + "_sermon.mp3")
     
     audiolen = int(audiof.info.length) + 1  # seconds of the poem length
 
