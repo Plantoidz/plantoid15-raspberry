@@ -303,11 +303,18 @@ class Plantony:
             generated_transcript = get_default_sermon_transcript()
 
         # save the generated transcript to a file with the seed name
-        if not os.path.exists(path + "/transcripts"):
-            os.makedirs(path + "/transcripts");
+        path_transcripts = path + "/transcripts"
+        path_transcripts_network = path + "/transcripts/" + str(network.name)
+
+        if not os.path.exists(path_transcripts):
+            os.makedirs(path_transcripts)
+
+        if not os.path.exists(path_transcripts_network):
+            os.makedirs(path_transcripts_network)
 
         # save the generated response to a file with the seed name
-        filename = path + f"/transcripts/{tID}_transcript.txt"
+        filename = path + f"/transcripts/{network.name}/{tID}_transcript.txt"
+
         with open(filename, "w") as f:
             f.write(generated_transcript)
 

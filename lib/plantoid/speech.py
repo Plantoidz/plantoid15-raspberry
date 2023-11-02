@@ -284,96 +284,108 @@ def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
 
     # audio = pyaudio.PyAudio()
 
-    with ignoreStderr():
-        audio = pyaudio.PyAudio()
+    recorded = False
 
-    stream = audio.open(format=FORMAT, channels=CHANNELS,
-                rate=RATE, input=True,
-                # input_device_index = device_index,
-                frames_per_buffer=CHUNK)
-    
-    print('quiet! checking noise threshold...')
+    while recorded == False:
 
-    noise_value = adjust_sound_env(stream, device_bias=cfg['device_bias'])
-    THRESHOLD = return_noise_threshold(noise_value, threshold_bias=cfg['threshold_bias'])
+        try:
 
-    print("THRESHOLD:", THRESHOLD)
+            with ignoreStderr():
+                audio = pyaudio.PyAudio()
 
-    samples = []
+            stream = audio.open(format=FORMAT, channels=CHANNELS,
+                        rate=RATE, input=True,
+                        # input_device_index = device_index,
+                        frames_per_buffer=CHUNK)
+            
+            print('quiet! checking noise threshold...')
 
-    if record_mode == 'fixed':
+            noise_value = adjust_sound_env(stream, device_bias=cfg['device_bias'])
+            THRESHOLD = return_noise_threshold(noise_value, threshold_bias=cfg['threshold_bias'])
 
-       # this is for a fixed amount of recording seconds
-       for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-           data = stream.read(CHUNK)
-           samples.append(data)
+            print("THRESHOLD:", THRESHOLD)
 
-    if record_mode == 'continuous':
+            samples = []
 
-        print('listening for speech...')
+            if record_mode == 'fixed':
 
-        chunks_per_second = RATE / CHUNK
+                # this is for a fixed amount of recording seconds
+                for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+                    data = stream.read(CHUNK)
+                    samples.append(data)
 
-        silence_buffer = deque(maxlen=int(SILENCE_LIMIT * chunks_per_second))
-        samples_buffer = deque(maxlen=int(SILENCE_LIMIT * RATE))
+            if record_mode == 'continuous':
 
-        started = False
+                print('listening for speech...')
 
-        ### this is for continuous recording, until silence is reached
+                chunks_per_second = RATE / CHUNK
 
-        run = 1
+                silence_buffer = deque(maxlen=int(SILENCE_LIMIT * chunks_per_second))
+                samples_buffer = deque(maxlen=int(SILENCE_LIMIT * RATE))
 
-        timing = None
-
-        print('preparing to record...')
-
-        while(run):
-
-            data = stream.read(CHUNK)
-            silence_buffer.append(abs(audioop.avg(data, 2)))
-
-            samples_buffer.extend(data)
-
-            if (True in [x > THRESHOLD for x in silence_buffer]):
-
-                if not started:
-                    print ("recording started")
-                    started = True
-                    samples_buffer.clear()
-                    timing = time.time()
-
-                samples.append(data)
-
-                # check for timeout
-                if(time.time() - timing > TIMEOUT):
-                    print(">>> stopping recording because of timeout")
-                    stream.stop_stream()
-
-                    record_wav_file(samples, audio, audio_file_path)
-
-                    #reset all vars
-                    started = False
-                    silence_buffer.clear()
-                    samples = []
-
-                    run = 0
-
-
-            elif(started == True):   ### there was a long enough silence
-                print ("recording stopped")
-                stream.stop_stream()
-                
-                record_wav_file(samples, audio, audio_file_path)
-
-                #reset all vars
                 started = False
-                silence_buffer.clear()
-                samples = []
 
-                run = 0
+                ### this is for continuous recording, until silence is reached
 
-    stream.close()
-    audio.terminate()
+                run = 1
+
+                timing = None
+
+                print('preparing to record...')
+
+                while(run):
+
+                    data = stream.read(CHUNK)
+                    silence_buffer.append(abs(audioop.avg(data, 2)))
+
+                    samples_buffer.extend(data)
+
+                    if (True in [x > THRESHOLD for x in silence_buffer]):
+
+                        if not started:
+                            print ("recording started")
+                            started = True
+                            samples_buffer.clear()
+                            timing = time.time()
+
+                        samples.append(data)
+
+                        # check for timeout
+                        if(time.time() - timing > TIMEOUT):
+                            print(">>> stopping recording because of timeout")
+                            stream.stop_stream()
+
+                            record_wav_file(samples, audio, audio_file_path)
+
+                            #reset all vars
+                            started = False
+                            silence_buffer.clear()
+                            samples = []
+
+                            run = 0
+
+
+                    elif(started == True):   ### there was a long enough silence
+                        print ("recording stopped")
+                        stream.stop_stream()
+                        
+                        record_wav_file(samples, audio, audio_file_path)
+
+                        #reset all vars
+                        started = False
+                        silence_buffer.clear()
+                        samples = []
+
+                        run = 0
+
+            stream.close()
+            audio.terminate()
+
+            recorded = True
+        
+        except OSError:
+        
+            print('OS Error encountered, retrying...')
 
     return audio_file_path
 

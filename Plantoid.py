@@ -91,6 +91,24 @@ def mock_arduino_event_listen(ser, plantony, network, trigger_line, max_rounds=4
     finally:
         ser.close()
 
+
+def web3_setup_loop(web3_config, use_goerli, use_mainnet):
+
+    connected = False
+
+    while connected == False:
+
+        # setup web3
+        goerli, mainnet = web3_utils.setup_web3_provider(web3_config)
+        print(mainnet)
+        print(goerli)
+
+        if (goerli is not None and use_goerli) or (mainnet is not None and use_mainnet):
+
+            connected = True
+
+    return goerli, mainnet
+
 def main():
 
     # load config
@@ -105,9 +123,12 @@ def main():
     trigger_line = cfg['TRIGGER_LINE']
     eleven_voice_id = cfg['ELEVEN_VOICE_ID']
 
+    use_goerli = str_to_bool(cfg['USE_GOERLI'])
+    use_mainnet = str_to_bool(cfg['USE_MAINNET'])
+
     web3_config = {
-        'use_goerli': str_to_bool(cfg['USE_GOERLI']),
-        'use_mainnet': str_to_bool(cfg['USE_MAINNET']),
+        'use_goerli': use_goerli,
+        'use_mainnet': use_mainnet,
         'use_goerli_address': cfg[use_plantoid]['USE_GOERLI_ADDRESS'],
         'use_mainnet_address': cfg[use_plantoid]['USE_MAINNET_ADDRESS'],
         'use_metadata_address': cfg[use_plantoid]['USE_METADATA_ADDRESS'],
@@ -126,8 +147,7 @@ def main():
         serial_utils.wait_for_arduino(ser)
         serial_utils.send_to_arduino(ser, "awake")  
 
-    # setup web3
-    goerli, mainnet = web3_utils.setup_web3_provider(web3_config)
+    goerli, mainnet = web3_setup_loop(web3_config, use_goerli, use_mainnet)
 
     # process previous tx
     # if mainnet is not None: web3_utils.process_previous_tx(mainnet)

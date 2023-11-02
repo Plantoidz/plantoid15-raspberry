@@ -141,7 +141,8 @@ def setup(
     
     except TimeoutError:
 
-        raise Exception('Connection unsuccessful or timed out!')
+        print('Connection unsuccessful or timed out!')
+        return None
 
 def process_previous_tx(network):
 
@@ -166,6 +167,8 @@ def process_previous_tx(network):
             for line in file:
                 # Strip the newline character and convert the string to an integer, then append to the list
                 minted_db_token_ids.append(str(line.strip()))
+
+            minted_db_token_ids = list(set(minted_db_token_ids))
 
     # loop over all entries to process unprocessed Deposits
     for event in event_filter.get_all_entries():
@@ -397,7 +400,7 @@ def send_relayer_transaction(metadata_address, data):
     }
 
     response = relayer.send_transaction(tx)
-    # print(response)
+    print('sent metatransaction. relayer response:', response)
 
 def enable_seed_reveal(network, token_Id):
 
@@ -410,7 +413,7 @@ def enable_seed_reveal(network, token_Id):
     signer_private_key = get_signer_private_key()
 
     # get the metadata path based on the token ID
-    metadata_path = os.getcwd()+'/metadata/'+str(token_Id)+'.json'
+    metadata_path = os.getcwd()+'/metadata/'+network.name+"/"+str(token_Id)+'.json'
 
     # skip if not a file
     if not os.path.isfile(metadata_path):
