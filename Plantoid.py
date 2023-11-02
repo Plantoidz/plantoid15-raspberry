@@ -121,8 +121,9 @@ def main():
     ser = serial_utils.setup_serial(PORT=PORT)
 
     # setup signals
-    serial_utils.wait_for_arduino(ser)
-    serial_utils.send_to_arduino(ser, "awake")  
+    if use_arduino:
+        serial_utils.wait_for_arduino(ser)
+        serial_utils.send_to_arduino(ser, "awake")  
 
     # setup web3
     goerli, mainnet = web3_utils.setup_web3_provider(web3_config)
