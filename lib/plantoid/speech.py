@@ -3,6 +3,7 @@
 # NOTE: this example requires PyAudio because it uses the Microphone class
 
 import speech_recognition as sr
+import pygame
 
 import pyaudio
 import wave
@@ -66,12 +67,17 @@ CHUNK = 512
 SILENCE_LIMIT = 3   # seconds of silence will stop the recording
 TIMEOUT = 15
 RECORD_SECONDS = 2 #seconds to listen for environmental noise
-THRESHOLD = 150
+THRESHOLD = 50
 
 # Load environment variables from .env file
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI")
 eleven_labs_api_key = os.environ.get("ELEVEN")
+
+def play_background_music_INTERNAL(filename, loops=-1):
+    pygame.mixer.init()
+    pygame.mixer.music.load(filename)
+    pygame.mixer.music.play(loops)
 
 
 def GPTmagic(prompt, call_type='chat_completion'): 
@@ -298,10 +304,10 @@ def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
                         # input_device_index = device_index,
                         frames_per_buffer=CHUNK)
             
-            print('quiet! checking noise threshold...')
+            # print('quiet! checking noise threshold...')
 
-            noise_value = adjust_sound_env(stream, device_bias=cfg['device_bias'])
-            THRESHOLD = return_noise_threshold(noise_value, threshold_bias=cfg['threshold_bias'])
+            # noise_value = adjust_sound_env(stream, device_bias=cfg['device_bias'])
+            # THRESHOLD = return_noise_threshold(noise_value, threshold_bias=cfg['threshold_bias'])
 
             print("THRESHOLD:", THRESHOLD)
 
@@ -385,7 +391,10 @@ def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
         
         except OSError:
         
+            error_sound_path = os.getcwd()+"/media/say_again.mp3"
             print('OS Error encountered, retrying...')
+            #playsound(error_sound_path)
+            play_background_music_INTERNAL(error_sound_path, loops=0)
 
     return audio_file_path
 

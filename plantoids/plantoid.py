@@ -50,7 +50,10 @@ class Plantony:
         self.acknowledgements = [
             os.getcwd()+"/media/hmm1.mp3",
             os.getcwd()+"/media/hmm2.mp3",
-        ];
+        ]
+
+        self.beep_start = os.getcwd()+"/media/beep_start.wav"
+        self.beep_stop = os.getcwd()+"/media/beep_stop.wav"
 
         # Load the sounds
         self.introduction = os.getcwd()+"/samples/intro1.mp3"
@@ -147,11 +150,14 @@ class Plantony:
         playsound(PlantoidSpeech.get_text_to_speech_response(self.closing, self.eleven_voice_id)) 
         playsound(self.outroduction)
 
-        self.send_serial_message("asleep")
+        # self.send_serial_message("asleep")
 
     def listen(self):
 
         self.send_serial_message("listening")
+
+        #playsound(self.beep_start)
+        self.play_background_music(self.cleanse, loops=0)
 
         audiofile = PlantoidSpeech.listen_for_speech()
 
@@ -403,7 +409,7 @@ class Plantony:
         self.play_background_music(filename, loops=0)
         time.sleep(1)
 
-        self.send_serial_message("asleep")
+        # self.send_serial_message("asleep")
         
         # # playsound(self.cleanse)
         # self.play_background_music(self.cleanse, loops=0)
@@ -445,7 +451,7 @@ class Plantony:
             # pin the metadata to IPFS and enable reveal link via metatransaction
             web3_utils.enable_seed_reveal(network, token_Id)
 
-            self.send_serial_message("asleep")
+            # self.send_serial_message("asleep")
 
 
         else:

@@ -59,6 +59,7 @@ def mock_arduino_event_listen(ser, plantony, network, trigger_line, max_rounds=4
             plantony.check_if_fed(network)
 
             print('checking if button pressed...')
+            print('serial wait count:', ser.in_waiting)
             if ser.in_waiting > 0:
 
                 try:
@@ -83,7 +84,7 @@ def mock_arduino_event_listen(ser, plantony, network, trigger_line, max_rounds=4
                     print("Received a line that couldn't be decoded!")
 
             # only check every 5 seconds
-            time.sleep(5)
+            time.sleep(2)
 
     except KeyboardInterrupt:
         print("Program stopped by the user.")
