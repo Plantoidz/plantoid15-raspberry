@@ -46,20 +46,23 @@ class Plantony:
         # load the text content
         self.opening_lines, self.closing_lines, self.word_categories = get_text_content()
 
+        path = os.getcwd()
+        path = "/home/pi/PLLantoid/plantoid15-raspberry/"
+
         # Load the sounds
         self.acknowledgements = [
-            os.getcwd()+"/media/hmm1.mp3",
-            os.getcwd()+"/media/hmm2.mp3",
+            path+"/media/hmm1.mp3",
+            path+"/media/hmm2.mp3",
         ]
 
-        self.beep_start = os.getcwd()+"/media/beep_start.wav"
-        self.beep_stop = os.getcwd()+"/media/beep_stop.wav"
+        self.beep_start = path+"/media/beep_start.wav"
+        self.beep_stop = path+"/media/beep_stop.wav"
 
         # Load the sounds
-        self.introduction = os.getcwd()+"/samples/intro1.mp3"
-        self.outroduction = os.getcwd()+"/samples/outro1.mp3"
-        self.reflection = os.getcwd()+"/media/initiation.mp3"
-        self.cleanse = os.getcwd()+"/media/cleanse.mp3"
+        self.introduction = path+"/samples/intro1.mp3"
+        self.outroduction = path+"/samples/outro1.mp3"
+        self.reflection = path+"/media/initiation.mp3"
+        self.cleanse = path+"/media/cleanse.mp3"
 
     # def ambient_background(self, music, stop_event):
 
@@ -91,7 +94,9 @@ class Plantony:
     def setup(self):
 
         # load the personality of Plantony
-        self.prompt_text = open(os.getcwd()+"/prompt_context/plantony_context.txt").read().strip()
+        path = os.getcwd()
+        path = "/home/pi/PLLantoid/plantoid15-raspberry"
+        self.prompt_text = open(path+"/prompt_context/plantony_context-feytopia.txt").read().strip()
 
         # select a random opening and closing line
         self.opening = random.choice(self.opening_lines)
@@ -134,6 +139,7 @@ class Plantony:
 
         self.send_serial_message("speaking")
 
+        path = '/home/pi/PLLantoid/plantoid15-raspberry/'
         playsound(self.introduction)
         
         audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.eleven_voice_id)
@@ -169,8 +175,24 @@ class Plantony:
 
     def respond(self, audio):
 
-        def prompt_agent_and_respond(audio, callback):
+     #   def prompt_agent_and_respond(audio, callback):
+
+
+              
+            self.send_serial_message("thinking")
+
+            print("Plantony respond is receiving the audiofile as : " + audio)
+
+            # get the path to the background music
+            background_music_path = os.getcwd()+"/media/ambient3.mp3"
+
+            # play the background music
+            self.play_background_music(background_music_path)
+
             
+
+
+
             # user text received from speech recognition
             user_message = PlantoidSpeech.recognize_speech(audio)
 
@@ -178,7 +200,7 @@ class Plantony:
 
             if len(user_message) == 0:
                 print('no text heard, using default text')
-                user_message = "Hmmmmm..."
+                user_message = "Tell me more..."
 
             # append the user's turn to the latest round
             self.append_turn_to_round(self.USER, user_message)
@@ -193,25 +215,30 @@ class Plantony:
             # append the agent's turn to the latest round
             self.append_turn_to_round(self.AGENT, agent_message)
 
-            audio_file = PlantoidSpeech.get_text_to_speech_response(agent_message, self.eleven_voice_id, callback=callback)
-            # shared_response_container["audio_file"] = audio_file
-            playsound(audio_file)
+            # audio_file = PlantoidSpeech.get_text_to_speech_response(agent_message, self.eleven_voice_id, callback=callback)
+            # # shared_response_container["audio_file"] = audio_file
+            # playsound(audio_file)
+
+            self.stop_background_music()
+
+            PlantoidSpeech.stream_response(agent_message, self.eleven_voice_id)
+
 
             # TODO: figure out if this goes here or above
             self.send_serial_message("speaking")
 
-        self.send_serial_message("thinking")
+        # self.send_serial_message("thinking")
 
-        print("Plantony respond is receiving the audiofile as : " + audio)
+        # print("Plantony respond is receiving the audiofile as : " + audio)
 
-        # get the path to the background music
-        background_music_path = os.getcwd()+"/media/ambient3.mp3"
+        # # get the path to the background music
+        # background_music_path = os.getcwd()+"/media/ambient3.mp3"
 
-        # play the background music
-        self.play_background_music(background_music_path)
+        # # play the background music
+        # self.play_background_music(background_music_path)
 
         # prompt agent and respond
-        prompt_agent_and_respond(audio, self.stop_background_music)
+        # prompt_agent_and_respond(audio, self.stop_background_music)
 
         # create a thread to call the API
         # thread = threading.Thread(target=prompt_agent_and_respond, args=(
@@ -275,8 +302,10 @@ class Plantony:
 
     def reset_prompt(self):
 
+
+        path =  "/home/pi/PLLantoid/plantoid15-raspberry/"
         # load the personality of Plantony
-        self.prompt_text = open(os.getcwd()+"/prompt_context/plantony_context.txt").read().strip()
+        self.prompt_text = open(path+"/prompt_context/plantony_context-fr.txt").read().strip()
 
         
     def weaving(self):

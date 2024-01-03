@@ -21,6 +21,8 @@ from dotenv import load_dotenv
 import openai
 import requests
 
+from elevenlabs import Voice, VoiceSettings, generate, stream, set_api_key
+
 import random
 import os
 import sys
@@ -73,6 +75,8 @@ THRESHOLD = 50
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI")
 eleven_labs_api_key = os.environ.get("ELEVEN")
+set_api_key(eleven_labs_api_key)
+
 
 def play_background_music_INTERNAL(filename, loops=-1):
     pygame.mixer.init()
@@ -137,6 +141,7 @@ def get_text_to_speech_response(text, eleven_voice_id, callback=None):
         url,
         json={
             "text": text,
+            "model_id": "eleven_multilingual_v2",
             "voice_settings": {
                 "stability": 0,
                 "similarity_boost": 0
@@ -163,6 +168,18 @@ def get_text_to_speech_response(text, eleven_voice_id, callback=None):
     else:
 
         raise Exception("Error: " + str(response.status_code))
+    
+
+
+def stream_response(agent_message, voiceid):
+            audio_stream = generate(
+                text=f"{agent_message}",
+                model="eleven_turbo_v2",
+                voice=Voice(voice_id=voiceid),
+                stream=True
+            )
+            stream(audio_stream)
+
 
 def compute_average(fragment, sample_width=2):
     """Compute the raw average of audio samples."""
@@ -277,7 +294,8 @@ def return_noise_threshold(noisy, threshold_bias=0):
 
 def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
 
-    config = load_config(os.getcwd()+'/configuration.toml')
+    path = "/home/pi/PLLantoid/plantoid15-raspberry"
+    config = load_config(path+'/configuration.toml')
 
     cfg = config['audio']
 
@@ -341,7 +359,7 @@ def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
 
                 while(run):
 
-                    data = stream.read(CHUNK)
+                    data = stream.read(CHUNK, exception_on_overflow = False)
                     silence_buffer.append(abs(audioop.avg(data, 2)))
 
                     samples_buffer.extend(data)
@@ -389,10 +407,11 @@ def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
 
             recorded = True
         
-        except OSError:
-        
-            error_sound_path = os.getcwd()+"/media/say_again.mp3"
-            print('OS Error encountered, retrying...')
+        except OSError as error:
+       
+            path = "/home/pi/PLLantoid/plantoid15-raspberry/"
+            error_sound_path = path+"/media/say_again.mp3"
+            print('OS Error encountered:', error)
             #playsound(error_sound_path)
             play_background_music_INTERNAL(error_sound_path, loops=0)
 
@@ -424,8 +443,8 @@ def recognize_speech(filename):
             print("trying to recognize from ... " + filename)
             usertext = r.recognize_google(audio)
 
-        except sr.UnknownValueError:
-            print("Google Speech Recognition could not understand audio")
+        except sr.UnknownValueError as e:
+            print("Google Speech Recognition could not understand audio: ", e)
 
         except sr.RequestError as e:
             print("Could not request results from Google Speech Recognition service; {0}".format(e))

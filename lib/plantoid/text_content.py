@@ -1,10 +1,24 @@
 def get_text_content():
 
+    opening_lines_fr = [
+            "Je suis honoré d'être ici parmis vous.. comment puis-je t'être utile?",
+            "Est-ce que tu veux me tenir companie? Racconte moi une histoire s'il te plait.",
+            "Je suis un peu timite, mais j'aimerai bien que tu m'explique un peu ce qui ce passe ici..",
+            "J'ai hâte de faire ta connaissance. Dis-moi quelque chose de personnel."
+            ];
+
     opening_lines = [
             "So tell me, what brings you here?",
             "Would you like to have a little chat with me?",
             "I'm a litte bit busy right now, but happy to entertain you for a bit",
             "I'm eager to get to know you! Tell me something about you.."
+            ];
+
+    closing_lines_fr = [
+            "Je suis désolé, je dois retourner dans le monde de la blockchain. Mon énergie est en train de s'épuiser.",
+            "Tu es un être humain intéressant, malheureusement, je dois repartir dans la blockchain maintenant..",
+            "J'adorerai continuer cette conversation, mais ma présence est requise par d'autres formes de vie fondées sur la blockchain..",
+            "Je suis désolée, je dois m'absenter maintenant. J'ai des transactions à gérer.."
             ];
 
     closing_lines = [

@@ -49,7 +49,7 @@ def setup_web3_provider(config):
             config['use_goerli_address'],
             config['use_metadata_address'],
             name="goerli",
-            path=os.getcwd(),
+            path=os.getcwd(),   ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
             feeding_amount=1000000000000000,  # one line every 0.001 ETH
             reclaim_url="http://15goerli.plantoid.org",
             failsafe=config['goerli_failsafe'], # this set failsafe = 1 (meaning we should recycle movies)
@@ -63,7 +63,7 @@ def setup_web3_provider(config):
             config['use_mainnet_address'],
             config['use_metadata_address'],
             name="mainnet",
-            path=os.getcwd(),
+            path=os.getcwd(),  ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
             feeding_amount=10000000000000000,  # one line every 0.01 ETH)
             reclaim_url="http://15.plantoid.org",
             failsafe=config['mainnet_failsafe'], # this set failsafe = 0 (meaning we should generate a new movie)
@@ -103,6 +103,8 @@ def setup(
 
         print('eth balance:', eth_balance)
 
+        path = "/home/pi/PLLantoid/plantoid15-raspberry/" ## TODO: THIS SHOULD NOT BE HARDCODED
+        
         abifile = open(path + '/abi', 'r')
         o = abifile.read()
         abi = o.replace('\n', '')
@@ -162,7 +164,7 @@ def process_previous_tx(network):
 
     else:
 
-        with open('minted_'+str(network.name)+'.db', 'r') as file:
+        with open(network.path + 'minted_'+str(network.name)+'.db', 'r') as file:
             # Iterate through each line in the file
             for line in file:
                 # Strip the newline character and convert the string to an integer, then append to the list
@@ -278,6 +280,8 @@ def create_seed_metadata(network, token_Id):
     ### Create Metadata
     db = dict()
 
+    ### TODO: THIS SHOULD NOT BE HARDCODED for PLANTOID15 !!
+
     db['name'] = token_Id
     db['description'] = "Plantoid #15 - Seed #" + token_Id
     db['external_url'] = "http://plantoid.org"
@@ -360,12 +364,12 @@ def create_signer_and_sign(msg_hash, private_key):
 
     return sig
 
-def encode_function_data(plantoid_address, token_Id, ipfs_hash, sig):
+def encode_function_data(plantoid_address, abi_file_path, token_Id, ipfs_hash, sig):
 
     w3 = Web3(EthereumTesterProvider())
 
     # Define the path to the ABI file
-    abi_file_path = './abis/plantoidMetadata'
+    # abi_file_path = path + './abis/plantoidMetadata'
 
     # Load the ABI
     with open(abi_file_path, 'r') as f:
@@ -452,8 +456,10 @@ def enable_seed_reveal(network, token_Id):
     )
 
     # get the encoded function data
+    abi_file_path = network.path + './abis/plantoidMetadata'
     function_data = encode_function_data(
         network.plantoid_address,
+        abi_file_path,
         token_Id,
         ipfs_hash,
         sig,

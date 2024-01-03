@@ -3,6 +3,7 @@ import requests
 
 def load_config(config_path):
 
+    path = "/home/pi/PLLantoid/plantoid15-raspberry/"
     return toml.load(config_path)
 
 def str_to_bool(s):

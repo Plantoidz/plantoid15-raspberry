@@ -113,7 +113,9 @@ def web3_setup_loop(web3_config, use_goerli, use_mainnet):
 def main():
 
     # load config
-    config = load_config(os.getcwd()+'/configuration.toml')
+    path = os.getcwd()
+    path = "/home/pi/PLLantoid/plantoid15-raspberry/"
+    config = load_config(path+'/configuration.toml')
 
     cfg = config['general']
 
