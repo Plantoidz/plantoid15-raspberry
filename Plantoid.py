@@ -8,6 +8,8 @@ from utils.util import load_config, str_to_bool
 from dotenv import load_dotenv
 import regex_spm
 
+
+
 def invoke_plantony(plantony: Plantony, network, max_rounds=4):
 
     print('plantony initiating...')
@@ -45,7 +47,7 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=4):
     plantony.reset_rounds()
     plantony.reset_prompt()
 
-def mock_arduino_event_listen(ser, plantony, network, trigger_line, max_rounds=4):
+def plantoid_event_listen(ser, plantony, web3config, max_rounds):
 
 
     # temp
@@ -55,8 +57,23 @@ def mock_arduino_event_listen(ser, plantony, network, trigger_line, max_rounds=4
 
         while True:
 
-            print('checking if fed...')
-            plantony.check_if_fed(network)
+            if(web3config["use_goerli"]):
+                print('checking if fed on GOERLI...')
+
+                is_connected = web3config["goerli"].w3.is_connected()
+                print(is_connected)
+                if(not is_connected ):
+                    time.sleep(2)
+                    web3config["goerli"] = web3_setup_loop_goerli(web3config)
+                    
+                plantony.check_if_fed(web3config["goerli"])
+            
+            if(web3config["use_mainnet"]):
+                print('checking if fed on MAINNET...')
+                if(not web3config["goerli"].w3.is_connected()):
+                    web3config["mainnet"] = web3_setup_loop_mainnet(web3config)
+                    
+                plantony.check_if_fed(web3config["mainnet"])
 
             print('checking if button pressed...')
             print('serial wait count:', ser.in_waiting)
@@ -74,7 +91,7 @@ def mock_arduino_event_listen(ser, plantony, network, trigger_line, max_rounds=4
 
                         # Trigger plantony interaction
                         print("Button was pressed, Invoking Plantony!")
-                        plantony.trigger('Touched', plantony, network, max_rounds=max_rounds)
+                        plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
 
                         # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
                         ser.reset_input_buffer()
@@ -93,50 +110,80 @@ def mock_arduino_event_listen(ser, plantony, network, trigger_line, max_rounds=4
         ser.close()
 
 
-def web3_setup_loop(web3_config, use_goerli, use_mainnet):
+def web3_setup_loop_goerli(web3_config):
 
     connected = False
 
     while connected == False:
 
         # setup web3
-        goerli, mainnet = web3_utils.setup_web3_provider(web3_config)
-        print(mainnet)
+        goerli = web3_utils.setup_web3_provider_goerli(web3_config)
         print(goerli)
 
-        if (goerli is not None and use_goerli) or (mainnet is not None and use_mainnet):
+        if (goerli is not None):
+            connected = True  
 
-            connected = True
+    return goerli
 
-    return goerli, mainnet
+
+def web3_setup_loop_mainnet(web3_config):
+
+    connected = False
+
+    while connected == False:
+
+        # setup web3
+        mainnet = web3_utils.setup_web3_provider_mainnet(web3_config)
+        print(mainnet)
+
+        if (mainnet is not None):
+            connected = True  
+
+    return mainnet
+
 
 def main():
 
     # load config
-    path = os.getcwd()
-    path = "/home/pi/PLLantoid/plantoid15-raspberry/"
+    # path = os.getcwd()
+    path = "/home/pi/PLLantoid/plantoid15-raspberry/"   ## TODO: find a way to give path in the config file
     config = load_config(path+'/configuration.toml')
 
     cfg = config['general']
+    plantoid_n = str(cfg['PLANTOID']) # find out which plantoid we are working on
 
-    use_plantoid = 'plantoid_'+str(cfg['PLANTOID'])
-    use_blockchain = str_to_bool(cfg['ENABLE_BLOCKCHAIN'])
-    use_arduino = str_to_bool(cfg['ENABLE_ARDUINO'])
-    max_rounds = cfg['max_rounds']
-    trigger_line = cfg['TRIGGER_LINE']
-    eleven_voice_id = cfg['ELEVEN_VOICE_ID']
+    plantoid_cfg = config[plantoid_n]
 
-    use_goerli = str_to_bool(cfg['USE_GOERLI'])
-    use_mainnet = str_to_bool(cfg['USE_MAINNET'])
+    eleven_voice_id = plantoid_cfg['ELEVEN_VOICE_ID'] # set up the voice of the plantoid
+    max_rounds = plantoid_cfg['max_rounds'] # set up the number of rounds for the plantoid
+    use_arduino = str_to_bool(plantoid_cfg['ENABLE_ARDUINO'])
+
+
+    plantoid_goerli_cfg = plantoid_cfg["goerli"]
+    plantoid_mainnet_cfg = plantoid_cfg["mainnet"]
+    use_goerli = str_to_bool(plantoid_goerli_cfg["ACTIVE"])
+    use_mainnet = str_to_bool(plantoid_mainnet_cfg["ACTIVE"])
+    print("mainnet == ", use_mainnet, " and goerli == ", use_goerli)
+
+   # path = cfg['PATH']
+
+   # use_plantoid = 'plantoid_'+str(cfg['PLANTOID'])
+   # use_blockchain = str_to_bool(cfg['ENABLE_BLOCKCHAIN'])
+   # trigger_line = cfg['TRIGGER_LINE']
+   # eleven_voice_id = cfg['ELEVEN_VOICE_ID']
+
+   # use_goerli = str_to_bool(cfg['USE_GOERLI'])
+   # use_mainnet = str_to_bool(cfg['USE_MAINNET'])
 
     web3_config = {
         'use_goerli': use_goerli,
         'use_mainnet': use_mainnet,
-        'use_goerli_address': cfg[use_plantoid]['USE_GOERLI_ADDRESS'],
-        'use_mainnet_address': cfg[use_plantoid]['USE_MAINNET_ADDRESS'],
-        'use_metadata_address': cfg[use_plantoid]['USE_METADATA_ADDRESS'],
-        'goerli_failsafe': cfg['GOERLI_FAILSAFE'],
-        'mainnet_failsafe': cfg['MAINNET_FAILSAFE'],
+        'use_goerli_address': plantoid_goerli_cfg['BLOCKCHAIN_ADDRESS'],
+        'use_mainnet_address': plantoid_mainnet_cfg['BLOCKCHAIN_ADDRESS'],
+        'use_metadata_address': plantoid_mainnet_cfg['METADATA_ADDRESS'],
+        'goerli_failsafe': plantoid_goerli_cfg['FAILSAFE'],
+        'mainnet_failsafe': plantoid_mainnet_cfg['FAILSAFE'],
+        'path': path,
     }
 
     # get output port from ENV
@@ -150,10 +197,20 @@ def main():
         serial_utils.wait_for_arduino(ser)
         serial_utils.send_to_arduino(ser, "awake")  
 
-    goerli, mainnet = web3_setup_loop(web3_config, use_goerli, use_mainnet)
+    mainnet = None;
+    goerli = None;
+
+    if(use_goerli):
+        goerli = web3_setup_loop_goerli(web3_config)
+        web3_config["goerli"] = goerli
+        print(goerli)
+    if(use_mainnet):
+        mainnet = web3_setup_loop_mainnet(web3_config)
+        web3_config["mainnet"] = mainnet
+        print(mainnet)
 
     # process previous tx
-    # if mainnet is not None: web3_utils.process_previous_tx(mainnet)
+    if mainnet is not None: web3_utils.process_previous_tx(mainnet)
     if goerli is not None: web3_utils.process_previous_tx(goerli)
 
     # instantiate plantony with serial
@@ -165,9 +222,13 @@ def main():
     # add listener
     plantony.add_listener('Touched', invoke_plantony)
 
-    # check for keyboard press
-    mock_arduino_event_listen(ser, plantony, goerli, trigger_line, max_rounds=max_rounds)
+    # check for crypto-transactions and serial communications
+    plantoid_event_listen(ser, plantony, web3_config, max_rounds=max_rounds)
+   
+    # plantoid_event_listen(ser, plantony, goerli, trigger_line, max_rounds=max_rounds)
     # serial_listen.listen_for_keyboard_press(ser)
+
+
 
 if __name__ == "__main__":
 

@@ -8,6 +8,8 @@ import subprocess
 import re
 import openai
 
+import hashlib
+
 from mutagen.mp3 import MP3
 
 import lib.eden.Eden as Eden
@@ -148,7 +150,8 @@ def build_API_request(path, seed, network_name):
     while i < len(prompts):
         # images.append("https://minio.aws.abraham.fun/creations-stg/c25c6b80c347d214eef34d67ee9b586f8e7de90662076667563f781c504f2877.webp");
         images.append(
-            "https://minio.aws.abraham.fun/creations-stg/2af20071b6342bc55ce70410cff3c4846dba9e497979ad8739668365e816e8de.jpg")
+          #  "https://minio.aws.abraham.fun/creations-stg/2af20071b6342bc55ce70410cff3c4846dba9e497979ad8739668365e816e8de.jpg")
+             "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg")
         i = i+1
     
 
@@ -206,11 +209,11 @@ def make_eden_API_call(config):
         raise Exception("Eden.run_task() did not return a valid result")
 
 
-def get_remote_video(remote_output_file, seed):
+def get_remote_video(remote_output_file, path):
 
     print('get video(), remote_output_file is', remote_output_file)
 
-    movie_file = os.getcwd()+"/tmp/out.mp4"
+    movie_file = path + "/tmp/out.mp4"
 
     # command = "wget " + outputf + " -O " + movie_file
 
@@ -221,9 +224,18 @@ def get_remote_video(remote_output_file, seed):
 
     # os.system("mv " + moviefile + " "+taskId+".mp4")
 
-    print('movie file is', movie_file)
+    md5sum = hashlib.md5(remote_output_file.encode('utf-8')).hexdigest()
+    finalpath = path + "/fallback_videos/"
+    seconds = int(get_media_duration(movie_file))
+    newfilename = finalpath + str(seconds) + "_" + md5sum + ".mp4"
 
-    return movie_file
+    os.system("mv " + movie_file + " " + newfilename)
+
+    print('movie file is', newfilename)
+
+    return newfilename
+
+
 
 def get_media_duration(file_path):
 
@@ -241,6 +253,8 @@ def get_media_duration(file_path):
             return total_seconds
         
     raise ValueError(f"Could not determine duration of {file_path}.")
+
+
 
 def fmpeg_interleave_av(video_file, audio_file, output_file):
 
@@ -295,7 +309,7 @@ def create_video_from_audio(path, tID, failsafe, network_name):
     # only if failsafe is not set (if set, it will recycle an existing movie).
     if failsafe == 0:
 
-        print('skipping failsafe, generating video file with eden')
+        print('generating video file with eden')
 
         # construct the API call to Eden (this includes the making of the prompts)
         eden_config = build_API_request(path, tID, network_name)  
@@ -306,21 +320,27 @@ def create_video_from_audio(path, tID, failsafe, network_name):
         if remote_output_file is not None:
 
             print('Remote output file location:', remote_output_file)
-            video_file = get_remote_video(remote_output_file, tID)
+            video_file = get_remote_video(remote_output_file, path)
 
-        else:
+            video_path = make_video(path, video_file, tID, network_name)
+            return video_path
 
-            raise Exception('Provided eden output file does not exist:', remote_output_file)
+        # else:
+        #     raise Exception('Provided eden output file does not exist:', remote_output_file)
 
-    if failsafe == 1:
 
-        print('using failsafe, using fallback')
-        #print("PlantoidEden.make_eden_API_call return Null -- going to use a fallback video !")
-        video_file = fallback_video(path, tID, network_name)
+    # FAILSAFE
+    # run this if failsafe == 1, or if the remote_output_file is None (see above)
+    # if failsafe == 1:
+
+    print('using failsafe, using fallback')
+     #print("PlantoidEden.make_eden_API_call return Null -- going to use a fallback video !")
+    video_file = fallback_video(path, tID, network_name)
 
     video_path = make_video(path, video_file, tID, network_name)
-
     return video_path
+
+
 
 
 def fallback_video(path, tID, network_name):
@@ -331,7 +351,7 @@ def fallback_video(path, tID, network_name):
 
     print("audiolen === " + str(audiolen))
 
-    fallback_video_dir = os.getcwd()+"/fallback_videos/"
+    fallback_video_dir = path + "/fallback_videos/"
     fallback_videos = sorted(os.listdir(fallback_video_dir))
     print(fallback_videos)
     

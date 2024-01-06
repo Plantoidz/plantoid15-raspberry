@@ -97,6 +97,8 @@ class Plantony:
         path = os.getcwd()
         path = "/home/pi/PLLantoid/plantoid15-raspberry"
         self.prompt_text = open(path+"/prompt_context/plantony_context-feytopia.txt").read().strip()
+        # self.prompt_text = open(path+"/prompt_context/plantony_eris.txt").read().strip()
+
 
         # select a random opening and closing line
         self.opening = random.choice(self.opening_lines)
@@ -139,7 +141,11 @@ class Plantony:
 
         self.send_serial_message("speaking")
 
-        path = '/home/pi/PLLantoid/plantoid15-raspberry/'
+        self.send_serial_message("asleep") ## REMOVE
+        self.send_serial_message("fire")    ## REMOVE
+
+
+
         playsound(self.introduction)
         
         audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.eleven_voice_id)
@@ -148,19 +154,28 @@ class Plantony:
     
         playsound(audiofile)
 
+        self.send_serial_message("awake") ## REMOVE
+        self.send_serial_message("fire")    ## REMOVE
+
     def terminate(self):
 
         self.send_serial_message("speaking")
+
+        self.send_serial_message("asleep") ## REMOVE
+        self.send_serial_message("fire")    ## REMOVE
 
         print('plantony closing', self.closing)
         playsound(PlantoidSpeech.get_text_to_speech_response(self.closing, self.eleven_voice_id)) 
         playsound(self.outroduction)
 
-        # self.send_serial_message("asleep")
+        self.send_serial_message("awake") ## REMOVE
+        self.send_serial_message("fire")    ## REMOVE
 
     def listen(self):
 
         self.send_serial_message("listening")
+        self.send_serial_message("asleep") ## REMOVE
+
 
         #playsound(self.beep_start)
         self.play_background_music(self.cleanse, loops=0)
@@ -180,6 +195,10 @@ class Plantony:
 
               
             self.send_serial_message("thinking")
+
+            self.send_serial_message("asleep") ## REMOVE
+
+
 
             print("Plantony respond is receiving the audiofile as : " + audio)
 
@@ -221,11 +240,21 @@ class Plantony:
 
             self.stop_background_music()
 
+            # TODO: figure out if this goes here or above
+            self.send_serial_message("speaking")
+            
+            self.send_serial_message("asleep") ## REMOVE
+            self.send_serial_message("fire") ## REMOVE
+
+
             PlantoidSpeech.stream_response(agent_message, self.eleven_voice_id)
 
 
-            # TODO: figure out if this goes here or above
-            self.send_serial_message("speaking")
+            self.send_serial_message("fire") ## REMOVE
+            self.send_serial_message("awake") ## REMOVE
+
+
+
 
         # self.send_serial_message("thinking")
 

@@ -36,40 +36,37 @@ def get_signer_private_key():
 
     return SIGNER_PRIVATE_KEY
 
-def setup_web3_provider(config):
+def setup_web3_provider_goerli(config):
 
-    goerli = None
-    mainnet = None
-
-    if config['use_goerli'] == True:
-
-        # make sure that the script can listen to both events happening in mainnet and goerli, and process them accordingly !
         goerli = setup(
-            'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
+         #   'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
+            'wss://eth-goerli.g.alchemy.com/v2/WSPX7dcNyq88jU95JsJtl4LtNlM6XwE8',
             config['use_goerli_address'],
             config['use_metadata_address'],
             name="goerli",
-            path=os.getcwd(),   ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
+            path=config['path'],   ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
             feeding_amount=1000000000000000,  # one line every 0.001 ETH
             reclaim_url="http://15goerli.plantoid.org",
             failsafe=config['goerli_failsafe'], # this set failsafe = 1 (meaning we should recycle movies)
         ) 
+        return goerli
 
-    if config['use_mainnet'] == True:
+def setup_web3_provider_mainnet(config):
 
-        # lorem ipsum
         mainnet = setup(
             'wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
             config['use_mainnet_address'],
             config['use_metadata_address'],
             name="mainnet",
-            path=os.getcwd(),  ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
+            path=config['path'],  ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
             feeding_amount=10000000000000000,  # one line every 0.01 ETH)
             reclaim_url="http://15.plantoid.org",
             failsafe=config['mainnet_failsafe'], # this set failsafe = 0 (meaning we should generate a new movie)
         ) 
-    
-    return goerli, mainnet
+        return mainnet
+
+
+
 
 def setup(
     infura_websock,
@@ -88,7 +85,15 @@ def setup(
         network = Web3Object();
 
         # connect to the infura node
-        network.w3 = Web3(Web3.WebsocketProvider(infura_websock))
+        network.w3 = Web3(Web3.WebsocketProvider(
+            infura_websock,
+            websocket_timeout=6000,
+        ))
+
+        # print("DEBUG", network.w3.manager._provider.counter)
+
+        # for k, v in network.w3.manager.items():
+        #     print("DEBUG", k, v.__dict__)
 
         print('w3 is', network.w3)
         print('is connected', network.w3.is_connected())
@@ -145,6 +150,8 @@ def setup(
 
         print('Connection unsuccessful or timed out!')
         return None
+
+
 
 def process_previous_tx(network):
 
