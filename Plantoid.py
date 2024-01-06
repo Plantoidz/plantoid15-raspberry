@@ -59,21 +59,25 @@ def plantoid_event_listen(ser, plantony, web3config, max_rounds):
 
             if(web3config["use_goerli"]):
                 print('checking if fed on GOERLI...')
+ 
+                try:
+                    plantony.check_if_fed(web3config["goerli"])
 
-                is_connected = web3config["goerli"].w3.is_connected()
-                print(is_connected)
-                if(not is_connected ):
-                    time.sleep(2)
+                except Exception as e:
+                    print("********* ERROR on websocket: ", e)
                     web3config["goerli"] = web3_setup_loop_goerli(web3config)
-                    
-                plantony.check_if_fed(web3config["goerli"])
+            
             
             if(web3config["use_mainnet"]):
                 print('checking if fed on MAINNET...')
-                if(not web3config["goerli"].w3.is_connected()):
+
+                try:
+                    plantony.check_if_fed(web3config["mainnet"])
+
+                except Exception as e:
+                    print("********* ERROR on websocket: ", e)
                     web3config["mainnet"] = web3_setup_loop_mainnet(web3config)
-                    
-                plantony.check_if_fed(web3config["mainnet"])
+            
 
             print('checking if button pressed...')
             print('serial wait count:', ser.in_waiting)

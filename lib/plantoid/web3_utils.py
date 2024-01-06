@@ -39,8 +39,8 @@ def get_signer_private_key():
 def setup_web3_provider_goerli(config):
 
         goerli = setup(
-         #   'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
-            'wss://eth-goerli.g.alchemy.com/v2/WSPX7dcNyq88jU95JsJtl4LtNlM6XwE8',
+            'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
+         #   'wss://eth-goerli.g.alchemy.com/v2/WSPX7dcNyq88jU95JsJtl4LtNlM6XwE8',
             config['use_goerli_address'],
             config['use_metadata_address'],
             name="goerli",
@@ -84,12 +84,15 @@ def setup(
         # create a web3 object
         network = Web3Object();
 
+
         # connect to the infura node
         network.w3 = Web3(Web3.WebsocketProvider(
-            infura_websock,
+            infura_websock, 
             websocket_timeout=6000,
+            websocket_kwargs={'timeout': 6000}
         ))
 
+     
         # print("DEBUG", network.w3.manager._provider.counter)
 
         # for k, v in network.w3.manager.items():
