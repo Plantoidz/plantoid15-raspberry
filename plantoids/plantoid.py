@@ -330,134 +330,147 @@ class Plantony:
     # TODO: replace with behavior selector
     def generate_oracle(self, network, audio, tID, amount):
 
-        self.send_serial_message("thinking")
-
-        # get the path of the network
-        path = network.path
-
-        # get the path to the background music
-        background_music_path = self.path+"/media/ambient3.mp3"
-
-        # play the background music
-        self.play_background_music(background_music_path)
-
-        # get generated transcript
-        generated_transcript = PlantoidSpeech.recognize_speech(audio)
-
-        # print the generated transcript
-        print("I heard... (oracle): " + generated_transcript)
-
-        # if no generated transcript, use a default
-        if not generated_transcript: 
-            generated_transcript = get_default_sermon_transcript()
-
-        # save the generated transcript to a file with the seed name
-        path_transcripts = path + "/transcripts"
-        path_transcripts_network = path + "/transcripts/" + str(network.name)
-
-        if not os.path.exists(path_transcripts):
-            os.makedirs(path_transcripts)
-
-        if not os.path.exists(path_transcripts_network):
-            os.makedirs(path_transcripts_network)
-
-        # save the generated response to a file with the seed name
-        filename = path + f"/transcripts/{network.name}/{tID}_transcript.txt"
-
-        with open(filename, "w") as f:
-            f.write(generated_transcript)
-
-        print("transcript saved as ..... " + filename)
-
-        # TODO: re-enable
-        # calculate the length of the poem
-        # one line every 0.01 ETH for mainnet, one line every 0.001 ETH for goerli
-        n_lines = int(amount / network.min_amount)  
-        
-        if n_lines > 6: 
-            n_lines = 6
-
-        # n_lines = 4
-
-        print("generating transcript with number of lines = " + str(n_lines))
-        
-        # generate the sermon prompt
-        prompt = get_sermon_prompt(
-            generated_transcript,
-            self.selected_words_string,
-            n_lines
+        generate_oracle_ = behavior_selector.get_plantoid_function(
+            self.plantoid_number,
+            'generate_oracle',
         )
+
+        generate_oracle_(
+            self,
+            network,
+            audio,
+            tID,
+            amount,
+        )
+
+    #     self.send_serial_message("thinking")
+
+    #     # get the path of the network
+    #     path = network.path
+
+    #     # get the path to the background music
+    #     background_music_path = self.path+"/media/ambient3.mp3"
+
+    #     # play the background music
+    #     self.play_background_music(background_music_path)
+
+    #     # get generated transcript
+    #     generated_transcript = PlantoidSpeech.recognize_speech(audio)
+
+    #     # print the generated transcript
+    #     print("I heard... (oracle): " + generated_transcript)
+
+    #     # if no generated transcript, use a default
+    #     if not generated_transcript: 
+    #         generated_transcript = get_default_sermon_transcript()
+
+    #     # save the generated transcript to a file with the seed name
+    #     path_transcripts = path + "/transcripts"
+    #     path_transcripts_network = path + "/transcripts/" + str(network.name)
+
+    #     if not os.path.exists(path_transcripts):
+    #         os.makedirs(path_transcripts)
+
+    #     if not os.path.exists(path_transcripts_network):
+    #         os.makedirs(path_transcripts_network)
+
+    #     # save the generated response to a file with the seed name
+    #     filename = path + f"/transcripts/{network.name}/{tID}_transcript.txt"
+
+    #     with open(filename, "w") as f:
+    #         f.write(generated_transcript)
+
+    #     print("transcript saved as ..... " + filename)
+
+    #     # TODO: re-enable
+    #     # calculate the length of the poem
+    #     # one line every 0.01 ETH for mainnet, one line every 0.001 ETH for goerli
+    #     n_lines = int(amount / network.min_amount)  
         
-        # get GPT response
-        response = PlantoidSpeech.GPTmagic(prompt, call_type='completion')
-        sermon_text = response.choices[0].text
+    #     if n_lines > 6: 
+    #         n_lines = 6
 
-        print('sermon text:')
-        print(sermon_text)
+    #     # n_lines = 4
 
-        responses_path = path + "/responses"
-        responses_path_network = path + "/responses/" + str(network.name)
-
-        # save the generated response to a file with the seed name
-        if not os.path.exists(responses_path):
-            os.makedirs(responses_path);
-
-        # save the generated response to a file with the seed name
-        if not os.path.exists(responses_path_network):
-            os.makedirs(responses_path_network);
+    #     print("generating transcript with number of lines = " + str(n_lines))
         
-        # save the generated response to a file with the seed name
-        filename = path + f"/responses/{network.name}/{tID}_response.txt"
-        with open(filename, "w") as f:
-            f.write(sermon_text)
-
-        # now let's print to the LP0, with Plantoid signature
-        # TODO: figure out what this is meant to do
-        plantoid_sig = get_plantoid_sig(network, tID)
-
-        # TODO: figure out what this is meant to do
-        # os.system("cat " + filename + " > /dev/usb/lp0") #stdout on PC, only makes sense in the gallery
-        # os.system("echo '" + plantoid_sig + "' > /dev/usb/lp0")
-
-        # now let's read it aloud
-        audiofile = PlantoidSpeech.get_text_to_speech_response(sermon_text, self.eleven_voice_id)
-        # stop_event.set() # stop the background noise
-
-        sermons_path = path + "/sermons"
-        sermons_path_network = path + "/sermons/"+str(network.name)
-
-        # save the generated sermons to a file with the seed name
-        if not os.path.exists(sermons_path):
-            os.makedirs(sermons_path)
-
-        if not os.path.exists(sermons_path_network):
-            os.makedirs(sermons_path_network)
+    #     # generate the sermon prompt
+    #     prompt = get_sermon_prompt(
+    #         generated_transcript,
+    #         self.selected_words_string,
+    #         n_lines
+    #     )
         
-        # save mp3 file
-        # subprocess.run(["cp", audiofile, f"{path}/sermons/{tID}_sermon.mp3"])
-        subprocess.run(["cp", audiofile, f"{sermons_path_network}/{tID}_sermon.mp3"])
+    #     # get GPT response
+    #     response = PlantoidSpeech.GPTmagic(prompt, call_type='completion')
+    #     sermon_text = response.choices[0].text
 
-        # stop the background music
-        self.stop_background_music()
+    #     print('sermon text:')
+    #     print(sermon_text)
 
-        # play the oracle
-        self.read_oracle(audiofile)
+    #     responses_path = path + "/responses"
+    #     responses_path_network = path + "/responses/" + str(network.name)
 
-    # TODO: try to queue these
-    def read_oracle(self, filename):
+    #     # save the generated response to a file with the seed name
+    #     if not os.path.exists(responses_path):
+    #         os.makedirs(responses_path);
 
-        self.send_serial_message("speaking")
+    #     # save the generated response to a file with the seed name
+    #     if not os.path.exists(responses_path_network):
+    #         os.makedirs(responses_path_network);
         
-        # playsound(filename)
-        self.play_background_music(filename, loops=0)
-        time.sleep(1)
+    #     # save the generated response to a file with the seed name
+    #     filename = path + f"/responses/{network.name}/{tID}_response.txt"
+    #     with open(filename, "w") as f:
+    #         f.write(sermon_text)
 
-        # self.send_serial_message("asleep")
+    #     # now let's print to the LP0, with Plantoid signature
+    #     # TODO: figure out what this is meant to do
+    #     plantoid_sig = get_plantoid_sig(network, tID)
+
+    #     # TODO: figure out what this is meant to do
+    #     # os.system("cat " + filename + " > /dev/usb/lp0") #stdout on PC, only makes sense in the gallery
+    #     # os.system("echo '" + plantoid_sig + "' > /dev/usb/lp0")
+
+    #     # now let's read it aloud
+    #     audiofile = PlantoidSpeech.get_text_to_speech_response(sermon_text, self.eleven_voice_id)
+    #     # stop_event.set() # stop the background noise
+
+    #     sermons_path = path + "/sermons"
+    #     sermons_path_network = path + "/sermons/"+str(network.name)
+
+    #     # save the generated sermons to a file with the seed name
+    #     if not os.path.exists(sermons_path):
+    #         os.makedirs(sermons_path)
+
+    #     if not os.path.exists(sermons_path_network):
+    #         os.makedirs(sermons_path_network)
         
-        # # playsound(self.cleanse)
-        # self.play_background_music(self.cleanse, loops=0)
+    #     # save mp3 file
+    #     # subprocess.run(["cp", audiofile, f"{path}/sermons/{tID}_sermon.mp3"])
+    #     subprocess.run(["cp", audiofile, f"{sermons_path_network}/{tID}_sermon.mp3"])
 
-        print('oracle read completed!')
+    #     # stop the background music
+    #     self.stop_background_music()
+
+    #     # play the oracle
+    #     self.read_oracle(audiofile)
+
+    # # TODO: try to queue these
+    # def read_oracle(self, filename):
+
+    #     self.send_serial_message("speaking")
+        
+    #     # playsound(filename)
+    #     self.play_background_music(filename, loops=0)
+    #     time.sleep(1)
+
+    #     # self.send_serial_message("asleep")
+        
+    #     # # playsound(self.cleanse)
+    #     # self.play_background_music(self.cleanse, loops=0)
+
+    #     print('oracle read completed!')
 
 
     def check_if_fed(self, network):
@@ -488,7 +501,11 @@ class Plantony:
         
             # create the metadata
             # web3_utils.create_seed_metadata(network, token_Id)
-            create_seed_metadata = behavior_selector.get_create_metadata_function(self.plantoid_number)
+            create_seed_metadata = behavior_selector.get_plantoid_function(
+                self.plantoid_number,
+                'create_seed_metadata',
+            )
+            
             create_seed_metadata(network, token_Id)
 
             # pin the metadata to IPFS and enable reveal link via metatransaction

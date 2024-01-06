@@ -191,7 +191,11 @@ def process_previous_tx(network, plantoid_number):
 
             print('processing metadata for token id:', token_Id)
 
-            create_seed_metadata = behavior_selector.get_create_metadata_function(plantoid_number)
+            create_seed_metadata = behavior_selector.get_plantoid_function(
+                plantoid_number,
+                'create_seed_metadata',
+            )
+            
             create_seed_metadata(network, token_Id)
             enable_seed_reveal(network, token_Id)
 
