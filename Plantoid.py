@@ -4,10 +4,9 @@ import re
 import lib.plantoid.serial_utils as serial_utils
 import lib.plantoid.web3_utils as web3_utils
 from plantoids.plantoid import Plantony
-from utils.util import load_config, str_to_bool
+from utils.util import load_config, get_working_path, str_to_bool
 from dotenv import load_dotenv
 import regex_spm
-
 
 
 def invoke_plantony(plantony: Plantony, network, max_rounds=4):
@@ -47,11 +46,16 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=4):
     plantony.reset_rounds()
     plantony.reset_prompt()
 
-def plantoid_event_listen(ser, plantony, web3config, max_rounds):
+def plantoid_event_listen(
+        ser,
+        plantony,
+        web3config,
+        max_rounds=4,
+        use_raspberry=False,
+    ):
 
 
-    # temp
-    pattern = r"<(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3})>"
+    pattern = serial_utils.use_serial_pattern(use_raspberry)
 
     try:
 
@@ -148,15 +152,19 @@ def web3_setup_loop_mainnet(web3_config):
 
 def main():
 
+    load_dotenv()
+
+    use_raspeberry = str_to_bool(os.environ.get("USE_RASPBERRY"))
+    raspberry_path = os.environ.get("RASPBERRY_PATH")
+
     # load config
-    # path = os.getcwd()
-    path = "/home/pi/PLLantoid/plantoid15-raspberry/"   ## TODO: find a way to give path in the config file
+    path = get_working_path(use_raspeberry, raspberry_path)
     config = load_config(path+'/configuration.toml')
 
     cfg = config['general']
-    plantoid_n = str(cfg['PLANTOID']) # find out which plantoid we are working on
+    plantoid_number = str(cfg['PLANTOID']) # find out which plantoid we are working on
 
-    plantoid_cfg = config[plantoid_n]
+    plantoid_cfg = config[plantoid_number]
 
     eleven_voice_id = plantoid_cfg['ELEVEN_VOICE_ID'] # set up the voice of the plantoid
     max_rounds = plantoid_cfg['max_rounds'] # set up the number of rounds for the plantoid
@@ -204,21 +212,22 @@ def main():
     mainnet = None;
     goerli = None;
 
-    if(use_goerli):
+    if use_goerli:
         goerli = web3_setup_loop_goerli(web3_config)
         web3_config["goerli"] = goerli
         print(goerli)
-    if(use_mainnet):
+
+    if use_mainnet:
         mainnet = web3_setup_loop_mainnet(web3_config)
         web3_config["mainnet"] = mainnet
         print(mainnet)
 
     # process previous tx
-    if mainnet is not None: web3_utils.process_previous_tx(mainnet)
-    if goerli is not None: web3_utils.process_previous_tx(goerli)
+    if mainnet is not None: web3_utils.process_previous_tx(mainnet, plantoid_number)
+    if goerli is not None: web3_utils.process_previous_tx(goerli, plantoid_number)
 
     # instantiate plantony with serial
-    plantony = Plantony(ser, eleven_voice_id)
+    plantony = Plantony(ser, eleven_voice_id, plantoid_number)
 
     # setup plantony
     plantony.setup()
@@ -227,7 +236,13 @@ def main():
     plantony.add_listener('Touched', invoke_plantony)
 
     # check for crypto-transactions and serial communications
-    plantoid_event_listen(ser, plantony, web3_config, max_rounds=max_rounds)
+    plantoid_event_listen(
+        ser,
+        plantony,
+        web3_config,
+        max_rounds=max_rounds,
+        use_raspberry=use_raspeberry,
+    )
    
     # plantoid_event_listen(ser, plantony, goerli, trigger_line, max_rounds=max_rounds)
     # serial_listen.listen_for_keyboard_press(ser)

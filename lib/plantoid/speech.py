@@ -292,19 +292,18 @@ def return_noise_threshold(noisy, threshold_bias=0):
         
     return max(0,thresholds[-1] + threshold_bias)
 
-def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
+def listen_for_speech(path=None): # @@@ remember to add acknowledgements afterwards
 
-    path = "/home/pi/PLLantoid/plantoid15-raspberry"
-    config = load_config(path+'/configuration.toml')
+    # config = load_config(path+'/configuration.toml')
 
-    cfg = config['audio']
+    # cfg = config['audio']
 
     # TEMP
     record_mode = 'continuous'
 
     # define the audio file path
     # TODO: pass as param
-    audio_file_path = os.getcwd() + "/tmp/temp_reco.wav"
+    audio_file_path = path + "/tmp/temp_reco.wav"
 
     # audio = pyaudio.PyAudio()
 
@@ -409,7 +408,6 @@ def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
         
         except OSError as error:
        
-            path = "/home/pi/PLLantoid/plantoid15-raspberry/"
             error_sound_path = path+"/media/say_again.mp3"
             print('OS Error encountered:', error)
             #playsound(error_sound_path)

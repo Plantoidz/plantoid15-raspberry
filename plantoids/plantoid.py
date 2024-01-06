@@ -8,16 +8,20 @@ import subprocess
 import json
 
 from lib.plantoid.text_content import *
+from lib.plantoid.behaviors import behavior_selector
 import lib.plantoid.speech as PlantoidSpeech
 import lib.plantoid.serial_utils as PlantoidSerial
 import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
-    def __init__(self, serial_connector, eleven_voice_id):
+    def __init__(self, serial_connector, eleven_voice_id, plantoid_number):
 
         # instantaite serial connector
         self.serial_connector = serial_connector
+
+        # instantiate plantoid number
+        self.plantoid_number = plantoid_number
 
         # user and agent names
         self.USER = "Human"
@@ -46,23 +50,22 @@ class Plantony:
         # load the text content
         self.opening_lines, self.closing_lines, self.word_categories = get_text_content()
 
-        path = os.getcwd()
-        path = "/home/pi/PLLantoid/plantoid15-raspberry/"
+        self.path = os.getcwd()
 
         # Load the sounds
         self.acknowledgements = [
-            path+"/media/hmm1.mp3",
-            path+"/media/hmm2.mp3",
+            self.path+"/media/hmm1.mp3",
+            self.path+"/media/hmm2.mp3",
         ]
 
-        self.beep_start = path+"/media/beep_start.wav"
-        self.beep_stop = path+"/media/beep_stop.wav"
+        self.beep_start = self.path+"/media/beep_start.wav"
+        self.beep_stop = self.path+"/media/beep_stop.wav"
 
         # Load the sounds
-        self.introduction = path+"/samples/intro1.mp3"
-        self.outroduction = path+"/samples/outro1.mp3"
-        self.reflection = path+"/media/initiation.mp3"
-        self.cleanse = path+"/media/cleanse.mp3"
+        self.introduction = self.path+"/samples/intro1.mp3"
+        self.outroduction = self.path+"/samples/outro1.mp3"
+        self.reflection = self.path+"/media/initiation.mp3"
+        self.cleanse = self.path+"/media/cleanse.mp3"
 
     # def ambient_background(self, music, stop_event):
 
@@ -94,11 +97,7 @@ class Plantony:
     def setup(self):
 
         # load the personality of Plantony
-        path = os.getcwd()
-        path = "/home/pi/PLLantoid/plantoid15-raspberry"
-        self.prompt_text = open(path+"/prompt_context/plantony_context-feytopia.txt").read().strip()
-        # self.prompt_text = open(path+"/prompt_context/plantony_eris.txt").read().strip()
-
+        self.prompt_text = open(self.path+"/prompt_context/plantony_context-feytopia.txt").read().strip()
 
         # select a random opening and closing line
         self.opening = random.choice(self.opening_lines)
@@ -144,8 +143,6 @@ class Plantony:
         self.send_serial_message("asleep") ## REMOVE
         self.send_serial_message("fire")    ## REMOVE
 
-
-
         playsound(self.introduction)
         
         audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.eleven_voice_id)
@@ -176,11 +173,10 @@ class Plantony:
         self.send_serial_message("listening")
         self.send_serial_message("asleep") ## REMOVE
 
-
         #playsound(self.beep_start)
         self.play_background_music(self.cleanse, loops=0)
 
-        audiofile = PlantoidSpeech.listen_for_speech()
+        audiofile = PlantoidSpeech.listen_for_speech(path=self.path)
 
         playsound(self.acknowledge())
 
@@ -192,25 +188,17 @@ class Plantony:
 
      #   def prompt_agent_and_respond(audio, callback):
 
-
-              
             self.send_serial_message("thinking")
 
             self.send_serial_message("asleep") ## REMOVE
 
-
-
             print("Plantony respond is receiving the audiofile as : " + audio)
 
             # get the path to the background music
-            background_music_path = os.getcwd()+"/media/ambient3.mp3"
+            background_music_path = self.path+"/media/ambient3.mp3"
 
             # play the background music
             self.play_background_music(background_music_path)
-
-            
-
-
 
             # user text received from speech recognition
             user_message = PlantoidSpeech.recognize_speech(audio)
@@ -246,9 +234,7 @@ class Plantony:
             self.send_serial_message("asleep") ## REMOVE
             self.send_serial_message("fire") ## REMOVE
 
-
             PlantoidSpeech.stream_response(agent_message, self.eleven_voice_id)
-
 
             self.send_serial_message("fire") ## REMOVE
             self.send_serial_message("awake") ## REMOVE
@@ -261,7 +247,7 @@ class Plantony:
         # print("Plantony respond is receiving the audiofile as : " + audio)
 
         # # get the path to the background music
-        # background_music_path = os.getcwd()+"/media/ambient3.mp3"
+        # background_music_path = self.path+"/media/ambient3.mp3"
 
         # # play the background music
         # self.play_background_music(background_music_path)
@@ -331,10 +317,8 @@ class Plantony:
 
     def reset_prompt(self):
 
-
-        path =  "/home/pi/PLLantoid/plantoid15-raspberry/"
         # load the personality of Plantony
-        self.prompt_text = open(path+"/prompt_context/plantony_context-fr.txt").read().strip()
+        self.prompt_text = open(self.path+"/prompt_context/plantony_context-feytopia.txt").read().strip()
 
         
     def weaving(self):
@@ -343,6 +327,7 @@ class Plantony:
 
         playsound(self.reflection)
 
+    # TODO: replace with behavior selector
     def generate_oracle(self, network, audio, tID, amount):
 
         self.send_serial_message("thinking")
@@ -351,7 +336,7 @@ class Plantony:
         path = network.path
 
         # get the path to the background music
-        background_music_path = os.getcwd()+"/media/ambient3.mp3"
+        background_music_path = self.path+"/media/ambient3.mp3"
 
         # play the background music
         self.play_background_music(background_music_path)
@@ -495,8 +480,6 @@ class Plantony:
         
             # listen for audio
             audiofile = self.listen()
-
-            print('Early termination of check if fed.')
         
             # generate the oracle
             self.generate_oracle(network, audiofile, token_Id, amount)
@@ -504,7 +487,9 @@ class Plantony:
             self.send_serial_message("thinking")
         
             # create the metadata
-            web3_utils.create_seed_metadata(network, token_Id)
+            # web3_utils.create_seed_metadata(network, token_Id)
+            create_seed_metadata = behavior_selector.get_create_metadata_function(self.plantoid_number)
+            create_seed_metadata(network, token_Id)
 
             # pin the metadata to IPFS and enable reveal link via metatransaction
             web3_utils.enable_seed_reveal(network, token_Id)

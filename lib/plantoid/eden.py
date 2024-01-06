@@ -391,7 +391,7 @@ def fallback_video(path, tID, network_name):
 # if __name__ == "__main__":
 
 #     seed = sys.argv[1]
-#     path = "/home/pi/PLLantoid/v6/GOERLI/"
+#     path = ""
 
 # #    outf = createVideoFromAudio(path, seed)
 

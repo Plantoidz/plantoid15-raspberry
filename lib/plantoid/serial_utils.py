@@ -92,6 +92,19 @@ def check_received_arduino_signal(ser):
         return "XXX" 
 
 
+def use_serial_pattern(use_raspberry):
+
+    if use_raspberry == True:
+
+        pattern = r"<(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3})>"
+
+    else:
+
+        pattern = "button_pressed"
+
+    return pattern
+
+
 #==================
 
 def wait_for_arduino(ser):

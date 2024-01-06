@@ -1,9 +1,22 @@
 import toml
+import os
 import requests
+
+def get_working_path(use_raspberry, raspberry_path):
+
+    if use_raspberry:
+
+        working_path = raspberry_path
+
+    else:
+
+        working_path = os.getcwd()
+
+    print("Working Path is:", working_path)
+    return working_path
 
 def load_config(config_path):
 
-    path = "/home/pi/PLLantoid/plantoid15-raspberry/"
     return toml.load(config_path)
 
 def str_to_bool(s):

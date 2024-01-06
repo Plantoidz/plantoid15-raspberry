@@ -9,7 +9,7 @@ import json
 from dotenv import load_dotenv
 from pinata import Pinata
 
-import lib.plantoid.eden as eden
+from lib.plantoid.behaviors import behavior_selector
 
 class Web3Object:
     infura_websock = None
@@ -110,8 +110,6 @@ def setup(
         eth_balance = network.w3.from_wei(eth_balance_wei, 'ether')
 
         print('eth balance:', eth_balance)
-
-        path = "/home/pi/PLLantoid/plantoid15-raspberry/" ## TODO: THIS SHOULD NOT BE HARDCODED
         
         abifile = open(path + '/abi', 'r')
         o = abifile.read()
@@ -156,7 +154,7 @@ def setup(
 
 
 
-def process_previous_tx(network):
+def process_previous_tx(network, plantoid_number):
 
     processing = 0
 
@@ -174,7 +172,7 @@ def process_previous_tx(network):
 
     else:
 
-        with open(network.path + 'minted_'+str(network.name)+'.db', 'r') as file:
+        with open(network.path + '/minted_'+str(network.name)+'.db', 'r') as file:
             # Iterate through each line in the file
             for line in file:
                 # Strip the newline character and convert the string to an integer, then append to the list
@@ -192,6 +190,8 @@ def process_previous_tx(network):
         if token_Id not in minted_db_token_ids:
 
             print('processing metadata for token id:', token_Id)
+
+            create_seed_metadata = behavior_selector.get_create_metadata_function(plantoid_number)
             create_seed_metadata(network, token_Id)
             enable_seed_reveal(network, token_Id)
 
@@ -236,86 +236,6 @@ def check_for_deposits(web3obj):
     #     return None
 
     #        #  return  str(event.args.tokenId) 
-
-def create_seed_metadata(network, token_Id):
-
-    print('call create metadata.')
-
-    # create a pinata object
-    pinata = Pinata(PINATA_API_KEY, PINATA_API_SECRET, PINATA_JWT)
-
-    # get the path
-    path = network.path
-
-    # set variables to None
-    ipfsQmp3 = None
-    movie_path = None
-
-    # check if the movie already exists
-    if os.path.exists(path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"):
-
-        # the movie already exists, move directly to the metadata creation
-        print("skipping the production of the movie, as it already exists...");
-        movie_path = path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"
-
-    else:
-
-        # the movie doesn't exist, create it
-        audio = path + "/sermons/" + network.name + "/" + token_Id + "_sermon.mp3"
-        print("creating movie for sermon file.. " + audio) 
-        
-        if os.path.isfile(audio):
-            movie_path = eden.create_video_from_audio(path, token_Id, network.failsafe, network.name)
-
-        else:
-            print("no Sermon audio file associated with seed: " + token_Id, 'skipping...')
-            return
-
-    ### Pin the Video-Sermon on IPFS
-    if movie_path is not None:
-
-        print("movie found, pinning to IPFS")
-
-        response = pinata.pin_file(movie_path)
-        print('pinata response:', response)
-
-        # TODO: this should probably check for a response code
-        if(response and response.get('data')):
-            ipfsQmp3 = response['data']['IpfsHash']
-            print("recording the animation_url = " + ipfsQmp3)
-
-    else:
-        print("movie is null, skipping pinning to IPFS")
-
-    ### Create Metadata
-    db = dict()
-
-    ### TODO: THIS SHOULD NOT BE HARDCODED for PLANTOID15 !!
-
-    db['name'] = token_Id
-    db['description'] = "Plantoid #15 - Seed #" + token_Id
-    db['external_url'] = "http://plantoid.org"
-    db['image'] = "https://ipfs.io/ipfs/QmRcrcn4X6QfSwFnJQ1dNHn8YgW7pbmm6BjZn7t8FW7WFV" # ipfsQpng
-
-    if ipfsQmp3 is not None:
-        db['animation_url'] = "ipfs://" + ipfsQmp3 # ipfsQwav
-
-    path_meta = path + "/metadata/"
-    path_meta_network = path + "/metadata/"+str(network.name)+"/"
-
-    if not os.path.exists(path_meta):
-        os.makedirs(path_meta)
-
-    if not os.path.exists(path_meta_network):
-        os.makedirs(path_meta_network)
-
-    with open(path_meta_network + token_Id + '.json', 'w') as outfile:
-        json.dump(db, outfile)
-
-    ### record in the database that this seed has been processed
-    with open(path + '/minted_'+str(network.name)+'.db', 'a') as outfile:
-        outfile.write(token_Id + "\n")
-
 
 def pin_metadata_to_ipfs(metadata_path):
 
@@ -427,7 +347,7 @@ def enable_seed_reveal(network, token_Id):
     signer_private_key = get_signer_private_key()
 
     # get the metadata path based on the token ID
-    metadata_path = os.getcwd()+'/metadata/'+network.name+"/"+str(token_Id)+'.json'
+    metadata_path = network.path+'/metadata/'+network.name+"/"+str(token_Id)+'.json'
 
     # skip if not a file
     if not os.path.isfile(metadata_path):

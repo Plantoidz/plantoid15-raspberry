@@ -1,9 +1,9 @@
 [general]
 PLANTOID=15
-PATH="/home/pi/PLLantoid/plantoid15-raspberry/"
 
-#ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK" 
-#21m00Tcm4TlvDq8ikWAM
+
+# Rachel 21m00Tcm4TlvDq8ikWAM 
+# Tony o7lPjDgzlF8ZloHzVPeK
 
 ENABLE_BLOCKCHAIN = "False"   ## @@@@ WHAT IS THAT FOR ?
 
@@ -14,9 +14,9 @@ device_bias=-100
 threshold_bias=0
 
 [15]
-ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK" 
-max_rounds=6
-ENABLE_ARDUINO = "True"
+ELEVEN_VOICE_ID="21m00Tcm4TlvDq8ikWAM" 
+max_rounds=0
+ENABLE_ARDUINO = "False"
 
 [15.mainnet]
 ACTIVE = "False"
@@ -33,7 +33,7 @@ METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 
 [14]
-ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK" 
+ELEVEN_VOICE_ID="21m00Tcm4TlvDq8ikWAM" 
 max_rounds=6
 ENABLE_ARDUINO = "True"
 
