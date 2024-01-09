@@ -22,7 +22,7 @@ load_dotenv()
 # Access environment variables
 openai.api_key = os.environ.get("OPENAI")
 
-model_id = "text-davinci-003"
+model_id = "gpt-3.5-turbo-instruct"
 max_tokens = 1024
 
 

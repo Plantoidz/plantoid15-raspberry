@@ -91,6 +91,7 @@ def plantoid_event_listen(
 
                     line = ser.readline().decode('utf-8').strip()
                     print("line ====", line)
+                    print("pattern ============= ", pattern)
 
                     condition = bool(re.fullmatch(pattern, line))
                     print("condition", condition)
@@ -223,11 +224,11 @@ def main():
         print(mainnet)
 
     # process previous tx
-    if mainnet is not None: web3_utils.process_previous_tx(mainnet, plantoid_number)
-    if goerli is not None: web3_utils.process_previous_tx(goerli, plantoid_number)
+    if mainnet is not None: web3_utils.process_previous_tx(mainnet, int(plantoid_number))
+    if goerli is not None: web3_utils.process_previous_tx(goerli, int(plantoid_number))
 
     # instantiate plantony with serial
-    plantony = Plantony(ser, eleven_voice_id, plantoid_number)
+    plantony = Plantony(ser, eleven_voice_id, int(plantoid_number))
 
     # setup plantony
     plantony.setup()

@@ -14,9 +14,9 @@ device_bias=-100
 threshold_bias=0
 
 [15]
-ELEVEN_VOICE_ID="21m00Tcm4TlvDq8ikWAM" 
-max_rounds=0
-ENABLE_ARDUINO = "False"
+ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
+max_rounds=1
+ENABLE_ARDUINO = "True"
 
 [15.mainnet]
 ACTIVE = "False"

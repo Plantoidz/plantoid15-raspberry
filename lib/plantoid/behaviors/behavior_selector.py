@@ -3,6 +3,8 @@ import lib.plantoid.behaviors.behavior_15 as behavior_15
 def get_plantoid_function(plantoid_number, fn_name):
 
     # TODO: add cases here
+
+    print("PLANTOID NUMBER == ", plantoid_number)
     
     if plantoid_number == 15:
 

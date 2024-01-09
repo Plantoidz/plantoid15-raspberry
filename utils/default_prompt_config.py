@@ -39,7 +39,7 @@ def default_chat_completion_config(model="gpt-3.5-turbo"):
             }
         }
     
-def default_completion_config(model="text-davinci-003"):
+def default_completion_config(model="gpt-3.5-turbo-instruct"):
     """
     Return a GPT model configuration dict for the completion method from passed parameters.
 
@@ -48,6 +48,6 @@ def default_completion_config(model="text-davinci-003"):
 
     # TODO: add others
     return {
-        "engine": "text-davinci-003",
+        "engine": "gpt-3.5-turbo-instruct",
         "max_tokens": 1024,
     }

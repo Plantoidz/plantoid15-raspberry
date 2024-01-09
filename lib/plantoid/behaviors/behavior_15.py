@@ -21,6 +21,8 @@ PINATA_JWT = os.environ.get('PINATA_JWT')
 def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
 
     plantoid.send_serial_message("thinking")
+    plantoid.send_serial_message("asleep") ## REMOVE
+
 
     # get the path of the network
     path = network.path
@@ -132,17 +134,25 @@ def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
 
     # play the oracle
     plantoid.send_serial_message("speaking")
+    plantoid.send_serial_message("fire") ## REMOVE
+
     
     # playsound(filename)
-    plantoid.play_background_music(filename, loops=0)
+    plantoid.play_background_music(audiofile, loops=0)
     time.sleep(1)
 
     print('oracle read completed!')
+    plantoid.send_serial_message("fire") ## REMOVE
+
 
 
 def create_seed_metadata(network, token_Id):
 
     print('call create metadata.')
+
+
+     plantoid.send_serial_message("asleep") ## REMOVE
+     plantoid.send_serial_message("fire") ## REMOVE
 
     # create a pinata object
     pinata = Pinata(PINATA_API_KEY, PINATA_API_SECRET, PINATA_JWT)
@@ -173,6 +183,7 @@ def create_seed_metadata(network, token_Id):
         else:
             print("no Sermon audio file associated with seed: " + token_Id, 'skipping...')
             return
+
 
     ### Pin the Video-Sermon on IPFS
     if movie_path is not None:
@@ -218,3 +229,6 @@ def create_seed_metadata(network, token_Id):
     ### record in the database that this seed has been processed
     with open(path + '/minted_'+str(network.name)+'.db', 'a') as outfile:
         outfile.write(token_Id + "\n")
+
+    plantoid.send_serial_message("fire") ## REMOVE
+    plantoid.send_serial_message("awake") ## REMOVE
