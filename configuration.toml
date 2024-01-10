@@ -7,16 +7,13 @@ PLANTOID=15
 
 ENABLE_BLOCKCHAIN = "False"   ## @@@@ WHAT IS THAT FOR ?
 
-
-
 [audio]
 device_bias=-100
 threshold_bias=0
 
 [15]
-ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
+ELEVEN_VOICE_ID="21m00Tcm4TlvDq8ikWAM"
 max_rounds=1
-ENABLE_ARDUINO = "True"
 
 [15.mainnet]
 ACTIVE = "False"
@@ -35,8 +32,6 @@ METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 [14]
 ELEVEN_VOICE_ID="21m00Tcm4TlvDq8ikWAM" 
 max_rounds=6
-ENABLE_ARDUINO = "True"
-
 
 [14.mainnet]
 ACTIVE = "False"

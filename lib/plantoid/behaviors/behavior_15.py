@@ -151,8 +151,8 @@ def create_seed_metadata(network, token_Id):
     print('call create metadata.')
 
 
-     plantoid.send_serial_message("asleep") ## REMOVE
-     plantoid.send_serial_message("fire") ## REMOVE
+    # plantoid.send_serial_message("asleep") ## REMOVE
+    # plantoid.send_serial_message("fire") ## REMOVE
 
     # create a pinata object
     pinata = Pinata(PINATA_API_KEY, PINATA_API_SECRET, PINATA_JWT)
@@ -230,5 +230,5 @@ def create_seed_metadata(network, token_Id):
     with open(path + '/minted_'+str(network.name)+'.db', 'a') as outfile:
         outfile.write(token_Id + "\n")
 
-    plantoid.send_serial_message("fire") ## REMOVE
-    plantoid.send_serial_message("awake") ## REMOVE
+    # plantoid.send_serial_message("fire") ## REMOVE
+    # plantoid.send_serial_message("awake") ## REMOVE
