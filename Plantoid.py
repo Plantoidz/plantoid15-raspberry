@@ -156,6 +156,7 @@ def main():
     load_dotenv()
 
     use_raspeberry = str_to_bool(os.environ.get("USE_RASPBERRY"))
+    use_arduino = str_to_bool(os.environ.get("USE_ARDUINO"))
     raspberry_path = os.environ.get("RASPBERRY_PATH")
 
     # load config
@@ -169,7 +170,6 @@ def main():
 
     eleven_voice_id = plantoid_cfg['ELEVEN_VOICE_ID'] # set up the voice of the plantoid
     max_rounds = plantoid_cfg['max_rounds'] # set up the number of rounds for the plantoid
-    use_arduino = str_to_bool(plantoid_cfg['ENABLE_ARDUINO'])
 
 
     plantoid_goerli_cfg = plantoid_cfg["goerli"]

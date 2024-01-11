@@ -25,6 +25,7 @@ def create_seed_metadata(network, token_Id):
     print('call create metadata.')
 
 
+
     #plantoid.send_serial_message("asleep") ## REMOVE
     #plantoid.send_serial_message("fire") ## REMOVE
 
