@@ -352,8 +352,10 @@ class Plantony:
                 self.plantoid_number,
                 'create_seed_metadata',
             )
+
+            print("i'm heree.. . . . . . . . . .  . . . ")
             
-            create_seed_metadata_(network, token_Id)
+            create_seed_metadata_(self, network, token_Id)
 
     #     self.send_serial_message("thinking")
 
@@ -510,7 +512,7 @@ class Plantony:
             self.generate_oracle(network, audiofile, token_Id, amount)
         
             # create the metadata
-            self.create_seed_metadat(network, token_Id)
+            self.create_seed_metadata(network, token_Id)
 
 
             # web3_utils.create_seed_metadata(network, token_Id)

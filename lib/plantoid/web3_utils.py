@@ -207,7 +207,7 @@ def process_previous_tx(plantoid, network):
             # )
             
             # create_seed_metadata(network, token_Id)
-
+            print("calling create seed metadata with network = ", network, " and tokenId = ", token_Id)
             plantoid.create_seed_metadata(network, token_Id)
 
 
