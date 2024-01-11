@@ -197,6 +197,7 @@ def main():
         'goerli_failsafe': plantoid_goerli_cfg['FAILSAFE'],
         'mainnet_failsafe': plantoid_mainnet_cfg['FAILSAFE'],
         'path': path,
+        'plantoid_path': path + "/" + plantoid_number + "/",
     }
 
     # get output port from ENV
@@ -223,15 +224,18 @@ def main():
         web3_config["mainnet"] = mainnet
         print(mainnet)
 
-    # process previous tx
-    if mainnet is not None: web3_utils.process_previous_tx(mainnet, int(plantoid_number))
-    if goerli is not None: web3_utils.process_previous_tx(goerli, int(plantoid_number))
 
     # instantiate plantony with serial
     plantony = Plantony(ser, eleven_voice_id, int(plantoid_number))
 
     # setup plantony
     plantony.setup()
+
+    # process previous tx
+    if mainnet is not None: web3_utils.process_previous_tx(plantony, mainnet)
+    if goerli is not None: web3_utils.process_previous_tx(plantony, goerli)
+
+
 
     # add listener
     plantony.add_listener('Touched', invoke_plantony)

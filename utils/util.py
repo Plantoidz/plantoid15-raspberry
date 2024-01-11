@@ -10,7 +10,7 @@ def get_working_path(use_raspberry, raspberry_path):
 
     else:
 
-        working_path = os.getcwd()
+        working_path = os.getcwd()  ## in general this is not a good idea, otherwise it only works when you launch it from the proper root directory
 
     print("Working Path is:", working_path)
     return working_path

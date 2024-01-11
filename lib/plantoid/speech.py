@@ -67,7 +67,7 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 512
 SILENCE_LIMIT = 3   # seconds of silence will stop the recording
-TIMEOUT = 12
+TIMEOUT = 20
 RECORD_SECONDS = 2 #seconds to listen for environmental noise
 THRESHOLD = 50
 
@@ -96,14 +96,19 @@ def GPTmagic(prompt, call_type='chat_completion'):
         # Prepare the GPT magic
         config = default_chat_completion_config(model="gpt-4")
 
-        # Generate the response from the GPT model
-        response = openai.ChatCompletion.create(messages=[{
-            "role": "user",
-            "content": prompt,
-        }], **config)
 
-        messages = response.choices[0].message.content
-        print('gpt response:', messages)
+        try:
+            # Generate the response from the GPT model
+            response = openai.ChatCompletion.create(messages=[{
+                "role": "user",
+                "content": prompt,
+            }], **config)
+
+            messages = response.choices[0].message.content
+            print('gpt response:', messages)
+       
+        except Exception as e:
+            print("Exception occured", e)
 
         return messages
     
@@ -116,11 +121,15 @@ def GPTmagic(prompt, call_type='chat_completion'):
 
         config = default_completion_config()
 
-        # Generate the response from the GPT-3.5 model
-        response = openai.Completion.create(
-            prompt=prompt,
-            **config,
-        )
+
+        try:
+            # Generate the response from the GPT-3.5 model
+            response = openai.Completion.create(
+                prompt=prompt,
+                **config,
+            )
+        except Exception as e:
+            print("Exception occured", e)
 
         return response
 

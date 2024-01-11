@@ -15,7 +15,7 @@ threshold_bias=0
 
 [15]
 ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
-max_rounds=1
+max_rounds=10
 ENABLE_ARDUINO = "True"
 
 [15.mainnet]
@@ -26,7 +26,7 @@ METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 [15.goerli]
 ACTIVE = "True"
-FAILSAFE = 0
+FAILSAFE = 1
 BLOCKCHAIN_ADDRESS = "0x0B60EE161d7b67fa231e9565dAFF65b34553bC6F"
 METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 

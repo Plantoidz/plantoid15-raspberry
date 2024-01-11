@@ -97,7 +97,7 @@ class Plantony:
     def setup(self):
 
         # load the personality of Plantony
-        self.prompt_text = open(self.path+"/prompt_context/plantony_context-feytopia.txt").read().strip()
+        self.prompt_text = open(self.path+"/prompt_context/plantony_context-sex.txt").read().strip()
 
         # select a random opening and closing line
         self.opening = random.choice(self.opening_lines)
@@ -143,8 +143,10 @@ class Plantony:
         self.send_serial_message("asleep") ## REMOVE
         self.send_serial_message("fire")    ## REMOVE
 
-        playsound(self.introduction)
-        
+        # playsound(self.introduction)
+        audiofile = PlantoidSpeech.get_text_to_speech_response("Hello, my name is SexTony, I'm the founder of the PsychoSexual movement using psychology to provide orgasmic experiences to human beings", self.eleven_voice_id)
+        playsound(audiofile)
+
         audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.eleven_voice_id)
         print('plantony opening', self.opening)
         print("welcome plantony... opening = " + audiofile)
@@ -318,7 +320,7 @@ class Plantony:
     def reset_prompt(self):
 
         # load the personality of Plantony
-        self.prompt_text = open(self.path+"/prompt_context/plantony_context-feytopia.txt").read().strip()
+        self.prompt_text = open(self.path+"/prompt_context/plantony_context-sex.txt").read().strip()
 
         
     def weaving(self):
@@ -326,6 +328,7 @@ class Plantony:
         self.send_serial_message("speaking")
 
         playsound(self.reflection)
+
 
     # TODO: replace with behavior selector
     def generate_oracle(self, network, audio, tID, amount):
@@ -342,6 +345,15 @@ class Plantony:
             tID,
             amount,
         )
+
+    def create_seed_metadata(self, network, token_Id):
+        
+            create_seed_metadata_ = behavior_selector.get_plantoid_function(
+                self.plantoid_number,
+                'create_seed_metadata',
+            )
+            
+            create_seed_metadata_(network, token_Id)
 
     #     self.send_serial_message("thinking")
 
@@ -496,17 +508,18 @@ class Plantony:
         
             # generate the oracle
             self.generate_oracle(network, audiofile, token_Id, amount)
-
-            self.send_serial_message("thinking")
         
             # create the metadata
+            self.create_seed_metadat(network, token_Id)
+
+
             # web3_utils.create_seed_metadata(network, token_Id)
-            create_seed_metadata = behavior_selector.get_plantoid_function(
-                self.plantoid_number,
-                'create_seed_metadata',
-            )
+            # create_seed_metadata = behavior_selector.get_plantoid_function(
+            #     self.plantoid_number,
+            #     'create_seed_metadata',
+            # )
             
-            create_seed_metadata(network, token_Id)
+            # create_seed_metadata(network, token_Id)
 
             # pin the metadata to IPFS and enable reveal link via metatransaction
             web3_utils.enable_seed_reveal(network, token_Id)

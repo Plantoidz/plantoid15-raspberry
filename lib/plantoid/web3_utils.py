@@ -45,6 +45,7 @@ def setup_web3_provider_goerli(config):
             config['use_metadata_address'],
             name="goerli",
             path=config['path'],   ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
+            plantoid_path=config['plantoid_path'],
             feeding_amount=1000000000000000,  # one line every 0.001 ETH
             reclaim_url="http://15goerli.plantoid.org",
             failsafe=config['goerli_failsafe'], # this set failsafe = 1 (meaning we should recycle movies)
@@ -59,6 +60,7 @@ def setup_web3_provider_mainnet(config):
             config['use_metadata_address'],
             name="mainnet",
             path=config['path'],  ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
+            plantoid_path=config['plantoid_path'],
             feeding_amount=10000000000000000,  # one line every 0.01 ETH)
             reclaim_url="http://15.plantoid.org",
             failsafe=config['mainnet_failsafe'], # this set failsafe = 0 (meaning we should generate a new movie)
@@ -74,6 +76,7 @@ def setup(
     metadata_address,
     name="",
     path=None,
+    plantoid_path = None,
     feeding_amount=0,
     reclaim_url=None,
     failsafe=0,
@@ -135,6 +138,7 @@ def setup(
         
         # set the path
         network.path = path
+        network.plantoid_path = plantoid_path
 
         # set the minimum amount of wei that needs to be fed to the plantoid
         network.min_amount = feeding_amount
@@ -152,15 +156,21 @@ def setup(
         print('Connection unsuccessful or timed out!')
         return None
 
+    except Exception as e:
+        print('Generic exception caught: ', e)
+        return None
 
 
-def process_previous_tx(network, plantoid_number):
+
+def process_previous_tx(plantoid, network):
 
     processing = 0
 
-    path = network.path
+    path = network.plantoid_path
     event_filter = network.event_filter
     minted_db_token_ids = []
+
+    print("NETWORK PATH = ", path)
 
     # if db doesn't exist, nothing has been minted yet
 
@@ -172,7 +182,7 @@ def process_previous_tx(network, plantoid_number):
 
     else:
 
-        with open(network.path + '/minted_'+str(network.name)+'.db', 'r') as file:
+        with open(path + '/minted_'+str(network.name)+'.db', 'r') as file:
             # Iterate through each line in the file
             for line in file:
                 # Strip the newline character and convert the string to an integer, then append to the list
@@ -191,12 +201,16 @@ def process_previous_tx(network, plantoid_number):
 
             print('processing metadata for token id:', token_Id)
 
-            create_seed_metadata = behavior_selector.get_plantoid_function(
-                plantoid_number,
-                'create_seed_metadata',
-            )
+            # create_seed_metadata = behavior_selector.get_plantoid_function(
+            #     plantoid_number,
+            #     'create_seed_metadata',
+            # )
             
-            create_seed_metadata(network, token_Id)
+            # create_seed_metadata(network, token_Id)
+
+            plantoid.create_seed_metadata(network, token_Id)
+
+
             enable_seed_reveal(network, token_Id)
 
 
@@ -351,7 +365,7 @@ def enable_seed_reveal(network, token_Id):
     signer_private_key = get_signer_private_key()
 
     # get the metadata path based on the token ID
-    metadata_path = network.path+'/metadata/'+network.name+"/"+str(token_Id)+'.json'
+    metadata_path = network.plantoid_path+'/metadata/'+network.name+"/"+str(token_Id)+'.json'
 
     # skip if not a file
     if not os.path.isfile(metadata_path):
