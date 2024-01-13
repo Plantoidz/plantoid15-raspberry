@@ -330,18 +330,17 @@ class Plantony:
         playsound(self.reflection)
 
 
-    # TODO: replace with behavior selector
-    def generate_oracle(self, network, audio, tID, amount):
+   
+    def ingurgitate_crypto(self, network,  tID, amount):
 
-        generate_oracle_ = behavior_selector.get_plantoid_function(
+        eat_crypto = behavior_selector.get_plantoid_function(
             self.plantoid_number,
-            'generate_oracle',
+            'ingurgitate_crypto',
         )
 
-        generate_oracle_(
+        eat_crypto(
             self,
             network,
-            audio,
             tID,
             amount,
         )
@@ -502,16 +501,13 @@ class Plantony:
 
             print("got amount " + str(amount) + " for id = " + token_Id)
 
-            # do weaving
-            self.weaving()
-        
-            # listen for audio
-            audiofile = self.listen()
-        
-            # generate the oracle
-            self.generate_oracle(network, audiofile, token_Id, amount)
-        
-            # create the metadata
+
+            # react to being fed
+            print("about to ingurgitate....")
+            self.ingurgitate_crypto(network, token_Id, amount)
+            print("ingugitated.")
+
+            # create the seed metadata
             self.create_seed_metadata(network, token_Id)
 
 

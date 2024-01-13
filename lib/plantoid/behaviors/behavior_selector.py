@@ -11,13 +11,13 @@ def get_plantoid_function(plantoid_number, fn_name):
 
         fn_dict = {
             'create_seed_metadata': behavior_15.create_seed_metadata,
-            'generate_oracle': behavior_15.generate_oracle
+            'ingurgitate_crypto': behavior_15.ingurgitate_crypto
         }
 
     if plantoid_number == 14:
         fn_dict = {
             'create_seed_metadata': behavior_14.create_seed_metadata,
-            'generate_oracle': behavior_14.generate_oracle
+            'ingurgitate_crypto': behavior_14.ingurgitate_crypto
         }
 
     selected_function = fn_dict[fn_name]
