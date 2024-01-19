@@ -384,7 +384,7 @@ def enable_seed_reveal(network, token_Id):
 
     if is_duplicate == True:
         print('Duplicate IPFS hash encountered:', ipfs_hash, 'skipping...')
-        # return @@@ AHAHAH
+        return 
 
     token_Id = int(metadata['name'])
     # print('ipfs hash is', ipfs_hash)
