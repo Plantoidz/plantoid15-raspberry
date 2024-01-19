@@ -15,7 +15,7 @@ import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
-    def __init__(self, serial_connector, eleven_voice_id, plantoid_number):
+    def __init__(self, serial_connector, eleven_voice_id, plantoid_number, path):
 
         # instantaite serial connector
         self.serial_connector = serial_connector
@@ -50,7 +50,7 @@ class Plantony:
         # load the text content
         self.opening_lines, self.closing_lines, self.word_categories = get_text_content()
 
-        self.path = os.getcwd()
+        self.path = path #os.getcwd()
 
         # Load the sounds
         self.acknowledgements = [
@@ -97,7 +97,7 @@ class Plantony:
     def setup(self):
 
         # load the personality of Plantony
-        self.prompt_text = open(self.path+"/prompt_context/plantony_context-sex.txt").read().strip()
+        self.prompt_text = open(self.path+"/prompt_context/plantony_context.txt").read().strip()
 
         # select a random opening and closing line
         self.opening = random.choice(self.opening_lines)
@@ -143,9 +143,9 @@ class Plantony:
         self.send_serial_message("asleep") ## REMOVE
         self.send_serial_message("fire")    ## REMOVE
 
-        # playsound(self.introduction)
-        audiofile = PlantoidSpeech.get_text_to_speech_response("Hello, my name is SexTony, I'm the founder of the PsychoSexual movement using psychology to provide orgasmic experiences to human beings", self.eleven_voice_id)
-        playsound(audiofile)
+        playsound(self.introduction)
+        # audiofile = PlantoidSpeech.get_text_to_speech_response("Hello, my name is SexTony, I'm the founder of the PsychoSexual movement using psychology to provide orgasmic experiences to human beings", self.eleven_voice_id)
+        # playsound(audiofile)
 
         audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.eleven_voice_id)
         print('plantony opening', self.opening)
@@ -320,7 +320,7 @@ class Plantony:
     def reset_prompt(self):
 
         # load the personality of Plantony
-        self.prompt_text = open(self.path+"/prompt_context/plantony_context-sex.txt").read().strip()
+        self.prompt_text = open(self.path+"/prompt_context/plantony_context.txt").read().strip()
 
         
     def weaving(self):

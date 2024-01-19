@@ -47,7 +47,7 @@ def setup_web3_provider_goerli(config):
             path=config['path'],   ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
             plantoid_path=config['plantoid_path'],
             feeding_amount=1000000000000000,  # one line every 0.001 ETH
-            reclaim_url="http://15goerli.plantoid.org",
+            reclaim_url="http://" + config['plantoid_number'] + ".plantoid.org",
             failsafe=config['goerli_failsafe'], # this set failsafe = 1 (meaning we should recycle movies)
         ) 
         return goerli
@@ -62,7 +62,7 @@ def setup_web3_provider_mainnet(config):
             path=config['path'],  ## TODO: THIS IS GONNA FAIL WHEN RUNNING OF SYSTEMD
             plantoid_path=config['plantoid_path'],
             feeding_amount=10000000000000000,  # one line every 0.01 ETH)
-            reclaim_url="http://15.plantoid.org",
+            reclaim_url="http://" + config['plantoid_number'] + ".plantoid.org",
             failsafe=config['mainnet_failsafe'], # this set failsafe = 0 (meaning we should generate a new movie)
         ) 
         return mainnet
@@ -384,7 +384,7 @@ def enable_seed_reveal(network, token_Id):
 
     if is_duplicate == True:
         print('Duplicate IPFS hash encountered:', ipfs_hash, 'skipping...')
-        return
+        # return @@@ AHAHAH
 
     token_Id = int(metadata['name'])
     # print('ipfs hash is', ipfs_hash)

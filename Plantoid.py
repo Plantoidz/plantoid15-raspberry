@@ -159,6 +159,8 @@ def main():
     use_arduino = str_to_bool(os.environ.get("USE_ARDUINO"))
     raspberry_path = os.environ.get("RASPBERRY_PATH")
 
+    print("raspberry_path === ", raspberry_path)
+
     # load config
     path = get_working_path(use_raspeberry, raspberry_path)
     config = load_config(path+'/configuration.toml')
@@ -198,6 +200,7 @@ def main():
         'mainnet_failsafe': plantoid_mainnet_cfg['FAILSAFE'],
         'path': path,
         'plantoid_path': path + "/" + plantoid_number + "/",
+        'plantoid_number': plantoid_number,
     }
 
     # get output port from ENV
@@ -226,7 +229,7 @@ def main():
 
 
     # instantiate plantony with serial
-    plantony = Plantony(ser, eleven_voice_id, int(plantoid_number))
+    plantony = Plantony(ser, eleven_voice_id, int(plantoid_number), path)
 
     # setup plantony
     plantony.setup()

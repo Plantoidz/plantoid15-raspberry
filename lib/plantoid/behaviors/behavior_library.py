@@ -76,6 +76,8 @@ def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
     # calculate the length of the poem
     # one line every 0.01 ETH for mainnet, one line every 0.001 ETH for goerli
     n_lines = int(amount / network.min_amount)  
+
+    n_lines = n_lines + 2
     
     if n_lines > 6: 
         n_lines = 6
@@ -83,20 +85,28 @@ def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
     # n_lines = 4
 
     print("generating transcript with number of lines = " + str(n_lines))
-    
+
     # generate the sermon prompt
     prompt = get_sermon_prompt(
         generated_transcript,
         plantoid.selected_words_string,
         n_lines
     )
-    
-    # get GPT response
-    response = PlantoidSpeech.GPTmagic(prompt, call_type='completion')
-    sermon_text = response.choices[0].text
+    print("PROMPTING with ..............................................", prompt)
 
-    print('sermon text:')
-    print(sermon_text)
+    # get GPT response
+    # response = PlantoidSpeech.GPTmagic(prompt, call_type='completion')
+    # sermon_text = response.choices[0].text
+
+    # print('sermon text 1:')
+    # print(sermon_text)
+
+    # get GPT response
+    sermon_text = PlantoidSpeech.GPTmagic(prompt)
+
+    print('sermon text: ', sermon_text)
+  
+    #--------
 
     responses_path = path + "/responses/"
     responses_path_network = responses_path + str(network.name)
@@ -124,9 +134,11 @@ def print_oracle(plantoid: Plantony, network, tID, sermon_text):
     # now let's print to the LP0, with Plantoid signature
     plantoid_sig = get_plantoid_sig(network, tID)
 
+    print("LP0 printing sermon text = ", sermon_text)
+
    # os.system("cat " + filename + " > /dev/usb/lp0") #stdout on PC, only makes sense in the gallery
-    os.system("echo '" + sermon_text + "' > /dev/usb/lp0")
-    os.system("echo '" + plantoid_sig + "' > /dev/usb/lp0")
+    os.system('echo "' + sermon_text + '" > /dev/usb/lp0')
+    os.system('echo "' + plantoid_sig + '" > /dev/usb/lp0')
 
 
 
@@ -265,7 +277,7 @@ def record_metadata(plantoid: Plantony, network, token_Id, db, ipfsQmp3):
 
 
 
-def create_video_from_audio(path, tID, network_name, init_img):
+def create_video_from_audio(path, tID, network_name, init_img, init_strength):
 
     # create empty output file
     remote_output_file = None
@@ -275,7 +287,7 @@ def create_video_from_audio(path, tID, network_name, init_img):
 
     # construct the API call to Eden (this includes the making of the prompts)
     #eden_config = eden.build_API_request(path, tID, network_name)  
-    eden_config = eden.build_API_request(path, tID, network_name, path + "/sermons/" + network_name + "/" + tID + "_sermon.mp3", init_img)
+    eden_config = eden.build_API_request(path, tID, network_name, path + "/sermons/" + network_name + "/" + tID + "_sermon.mp3", init_img, init_strength)
 
     # get the output file from the eden call
     remote_output_file = eden.make_eden_API_call(eden_config)           
@@ -330,6 +342,8 @@ def fmpeg_interleave_av(video_file, audio_file, output_file):
 
 def make_video(path, video_file_path, seed, network_name): 
 
+    if not video_file_path: return None
+
     video_path = path + "/videos"
     video_network_path = path + "/videos/" + network_name
 
@@ -364,8 +378,15 @@ def fallback_video(path, tID, network_name):
     print("audiolen === " + str(audiolen))
 
     fallback_video_dir = path + "/fallback_videos/"
+
+    if not os.path.exists(fallback_video_dir):
+        # If it doesn't exist, create it and return null
+        os.makedirs(fallback_video_dir)
+        return None
+    
     fallback_videos = sorted(os.listdir(fallback_video_dir))
     print(fallback_videos)
+    if len(fallback_videos) == 0: return None
     
     Zmin = int(re.search('(\d+)', fallback_videos[0]).group(0))
     Zmax = int(re.search('(\d+)', fallback_videos[-1]).group(0))
@@ -419,6 +440,12 @@ def get_remote_video(remote_output_file, path):
 
     md5sum = hashlib.md5(remote_output_file.encode('utf-8')).hexdigest()
     finalpath = path + "/fallback_videos/"
+
+    if not os.path.exists(finalpath):
+        # If it doesn't exist, create it
+        os.makedirs(finalpath)
+
+
     seconds = int(get_media_duration(movie_file))
     newfilename = finalpath + str(seconds) + "_" + md5sum + ".mp4"
 

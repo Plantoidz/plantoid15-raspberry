@@ -39,8 +39,8 @@ def create_prompts(path, seed, n_prompt, network_name):
     prompt1 = "Can you generate a short sentence that illustrates the physical environment where the poem takes place in a very graphical manner. Starting with: A scene... "
     prompt1 = prompt1 + "Here's the poem which I'd like you to litterally illustrate: " + stri
 
-    prompt = "I need to illustrate this poem."
-    prompt = prompt + "Can you generate" + str_n_prompts_n + "sentences that reflect a different scene of the poem, presented chronologically based on the phrasing of the poem. "
+    prompt = "I need to illustrate this poem. "
+    prompt = prompt + "Can you generate " + str_n_prompts_n + " sentences (not more than " + str_n_prompts_n + " sentences) that illustrate the poem, presented chronologically based on the phrasing of the poem. "
     prompt = prompt + "I don't wont a summary of the plot, I want a graphical description that illustrates the statements of the poem. "
     prompt = prompt + "These descriptions will be used to generate a video illustrating the poem. "
     prompt = prompt + "Every sentence needs to be a self-contained descriptive illustration, that does not refer to the previous or following sentences. "
@@ -48,6 +48,8 @@ def create_prompts(path, seed, n_prompt, network_name):
     prompt = prompt + "You can mention colors but only in one of these descriptions, and no reference to colors must be present in the first sentence. "
     prompt = prompt + "Draft your answer with each line starting with the number of the line, followed by a dot, a space, and then the actual description. "
     prompt = prompt + "Here's the poem which I'd like you to litterally illustrate: " + stri
+
+    print("PROOOOOOOOOOOOOOOOMPT: ", prompt)
 
     response1 = openai.Completion.create(
             engine=model_id,
@@ -99,7 +101,7 @@ def create_prompts(path, seed, n_prompt, network_name):
 
 
 
-def build_API_request(path, seed, network_name, audio_file, init_image):
+def build_API_request(path, seed, network_name, audio_file, init_image, init_strength):
 
 
 
@@ -163,8 +165,8 @@ def build_API_request(path, seed, network_name, audio_file, init_image):
 
     config = {"interpolation_texts": prompts,
               "interpolation_init_images": images,
-              "interpolation_init_images_min_strength": 0,
-              "interpolation_init_images_max_strength": 0,
+              "interpolation_init_images_min_strength": init_strength,
+              "interpolation_init_images_max_strength": init_strength,
               "interpolation_init_images_power": 0.5,
               "n_film": n_film,
               "latent_blending_skip_f": [0.1,0.9],

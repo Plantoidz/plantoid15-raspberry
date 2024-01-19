@@ -73,7 +73,8 @@ def create_seed_metadata(plantoid: Plantony, network, token_Id):
             print('generating video file with eden')
 
             init_img = "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg"
-            movie_path = behavior_library.create_video_from_audio(path, token_Id, network.name, init_img)
+            init_strength = 0
+            movie_path = behavior_library.create_video_from_audio(path, token_Id, network.name, init_img, init_strength)
 
         
         elif(network.failsafe == 1 or movie_path == None):
