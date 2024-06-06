@@ -97,7 +97,7 @@ class Plantony:
     def setup(self):
 
         # load the personality of Plantony
-        self.prompt_text = open(self.path+"/prompt_context/plantony_context.txt").read().strip()
+        self.prompt_text = open(self.path+"/prompt_context/plantony_context-nftparis.txt").read().strip()
 
         # select a random opening and closing line
         self.opening = random.choice(self.opening_lines)

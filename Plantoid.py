@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import regex_spm
 
 
-def invoke_plantony(plantony: Plantony, network, max_rounds=4):
+def invoke_plantony(plantony: Plantony, network, max_rounds=12):
 
     print('plantony initiating...')
     plantony.welcome()
@@ -57,10 +57,56 @@ def plantoid_event_listen(
 
     pattern = serial_utils.use_serial_pattern(use_raspberry)
 
+
+    counter = 0  ### TODO: this is a dirty trick i'm using in order to ensure that the loop constantly checks for arduino signals, but doesn't overload infura with web3 requests every milliseconds  
+
+
     try:
 
         while True:
+        
 
+
+            
+
+            print('checking if button pressed...')
+            print('serial wait count:', ser.in_waiting)
+            if ser.in_waiting > 0:
+
+                try:
+
+                    line = ser.readline().decode('utf-8').strip()
+                    print("line ====", line)
+                    print("pattern ============= ", pattern)
+
+                    condition = bool(re.fullmatch(pattern, line))
+                    print("condition", condition)
+
+                    if condition == True:
+
+                        # Trigger plantony interaction
+                        print("Button was pressed, Invoking Plantony!")
+                        # plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
+
+                        # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
+                        ser.reset_input_buffer()
+
+                except UnicodeDecodeError:
+                    
+                    print("Received a line that couldn't be decoded!")
+
+            # only check every 5 seconds
+            time.sleep(1)
+
+            
+            # increase counter and only check for deposits events every 10 seconds
+
+            counter = counter + 1
+            if(counter % 10):   continue   
+
+
+
+            
             if(web3config["use_goerli"]):
                 print('checking if fed on GOERLI...')
  
@@ -81,36 +127,8 @@ def plantoid_event_listen(
                 except Exception as e:
                     print("********* ERROR on websocket: ", e)
                     web3config["mainnet"] = web3_setup_loop_mainnet(web3config)
-            
 
-            print('checking if button pressed...')
-            print('serial wait count:', ser.in_waiting)
-            if ser.in_waiting > 0:
 
-                try:
-
-                    line = ser.readline().decode('utf-8').strip()
-                    print("line ====", line)
-                    print("pattern ============= ", pattern)
-
-                    condition = bool(re.fullmatch(pattern, line))
-                    print("condition", condition)
-
-                    if condition == True:
-
-                        # Trigger plantony interaction
-                        print("Button was pressed, Invoking Plantony!")
-                        plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
-
-                        # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
-                        ser.reset_input_buffer()
-
-                except UnicodeDecodeError:
-                    
-                    print("Received a line that couldn't be decoded!")
-
-            # only check every 5 seconds
-            time.sleep(2)
 
     except KeyboardInterrupt:
         print("Program stopped by the user.")
@@ -238,10 +256,10 @@ def main():
     if mainnet is not None: web3_utils.process_previous_tx(plantony, mainnet)
     if goerli is not None: web3_utils.process_previous_tx(plantony, goerli)
 
-
+    # invoke_plantony(plantony, goerli)
 
     # add listener
-    plantony.add_listener('Touched', invoke_plantony)
+#    plantony.add_listener('Touched', invoke_plantony)
 
     # check for crypto-transactions and serial communications
     plantoid_event_listen(

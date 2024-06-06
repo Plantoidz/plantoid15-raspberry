@@ -32,6 +32,8 @@ SIGNER_PRIVATE_KEY = os.environ.get("SIGNER_PRIVATE_KEY")
 INFURA_API_KEY_MAINNET = os.environ.get("INFURA_MAINNET")
 INFURA_API_KEY_GOERLI = os.environ.get("INFURA_GOERLI")
 
+print(INFURA_API_KEY_MAINNET)
+
 def get_signer_private_key():
 
     return SIGNER_PRIVATE_KEY
@@ -39,8 +41,9 @@ def get_signer_private_key():
 def setup_web3_provider_goerli(config):
 
         goerli = setup(
-            'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
-         #   'wss://eth-goerli.g.alchemy.com/v2/WSPX7dcNyq88jU95JsJtl4LtNlM6XwE8',
+            'wss://eth-sepolia.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
+            # 'wss://eth-goerli.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
+            # 'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
             config['use_goerli_address'],
             config['use_metadata_address'],
             name="goerli",
@@ -55,6 +58,7 @@ def setup_web3_provider_goerli(config):
 def setup_web3_provider_mainnet(config):
 
         mainnet = setup(
+            #'wss://eth-mainnet.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
             'wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
             config['use_mainnet_address'],
             config['use_metadata_address'],
@@ -81,7 +85,9 @@ def setup(
     reclaim_url=None,
     failsafe=0,
 ):
-    
+   
+    print('trying to connect to name ==== ', name)
+
     try:
 
         # create a web3 object
@@ -91,8 +97,8 @@ def setup(
         # connect to the infura node
         network.w3 = Web3(Web3.WebsocketProvider(
             infura_websock, 
-            websocket_timeout=6000,
-            websocket_kwargs={'timeout': 6000}
+            websocket_timeout=10000,
+            websocket_kwargs={'timeout': 10000}
         ))
 
      
@@ -131,10 +137,11 @@ def setup(
 
         # instantiate the contract
         network.plantoid_contract = network.w3.eth.contract(address=address, abi=abi)
+        print('plantoid contract === ', network.plantoid_contract)
 
         # instantiate the event filter
         network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=1)
-        # print('event filter:', network.event_filter)
+        print('event filter:', network.event_filter)
         
         # set the path
         network.path = path
@@ -158,6 +165,7 @@ def setup(
 
     except Exception as e:
         print('Generic exception caught: ', e)
+    #    import pdb; pdb.set_trace()
         return None
 
 

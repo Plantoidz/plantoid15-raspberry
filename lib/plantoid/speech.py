@@ -67,7 +67,7 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 512
 SILENCE_LIMIT = 3   # seconds of silence will stop the recording
-TIMEOUT = 20
+TIMEOUT = 13
 RECORD_SECONDS = 2 #seconds to listen for environmental noise
 THRESHOLD = 50
 

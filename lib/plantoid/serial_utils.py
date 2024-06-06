@@ -6,7 +6,7 @@ import random
 import regex_spm
 
 
-def setup_serial(PORT="/dev/ttyUSB0", baud_rate=9600):
+def setup_serial(PORT="/dev/ttyUSB0", baud_rate=115200):
 
     try:
 
