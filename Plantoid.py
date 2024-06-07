@@ -86,7 +86,7 @@ def plantoid_event_listen(
 
                         # Trigger plantony interaction
                         print("Button was pressed, Invoking Plantony!")
-                        # plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
+                        plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
 
                         # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
                         ser.reset_input_buffer()
@@ -190,6 +190,8 @@ def main():
 
     eleven_voice_id = plantoid_cfg['ELEVEN_VOICE_ID'] # set up the voice of the plantoid
     max_rounds = plantoid_cfg['max_rounds'] # set up the number of rounds for the plantoid
+    lang = plantoid_cfg['LANG'] # check if a particular language is set
+    personality = plantoid_cfg['PERSONALITY'] # load the personality prompt context
 
 
     plantoid_goerli_cfg = plantoid_cfg["goerli"]
@@ -247,7 +249,7 @@ def main():
 
 
     # instantiate plantony with serial
-    plantony = Plantony(ser, eleven_voice_id, int(plantoid_number), path)
+    plantony = Plantony(ser, eleven_voice_id, int(plantoid_number), path, lang, personality)
 
     # setup plantony
     plantony.setup()
@@ -259,7 +261,7 @@ def main():
     # invoke_plantony(plantony, goerli)
 
     # add listener
-#    plantony.add_listener('Touched', invoke_plantony)
+    plantony.add_listener('Touched', invoke_plantony)
 
     # check for crypto-transactions and serial communications
     plantoid_event_listen(

@@ -11,10 +11,14 @@ ENABLE_BLOCKCHAIN = "False"   ## @@@@ WHAT IS THAT FOR ?
 device_bias=-100
 threshold_bias=0
 
+
 [15]
 ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
 max_rounds=4
 ENABLE_ARDUINO = "True"
+LANG="fr-FR"
+PERSONALITY="./prompt_context/plantony_context-fr.txt"
+
 
 [15.mainnet]
 ACTIVE = "True"
@@ -35,6 +39,7 @@ METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
 max_rounds=12
 ENABLE_ARDUINO="False"
+LANG="fr-FR"
 
 [14.mainnet]
 ACTIVE = "True"

@@ -184,6 +184,7 @@ def stream_response(agent_message, voiceid):
             audio_stream = generate(
                 text=f"{agent_message}",
                 model="eleven_turbo_v2",
+             #   model="eleven_multilingual_v2",
                 voice=Voice(voice_id=voiceid),
                 stream=True
             )
@@ -434,7 +435,7 @@ def record_wav_file(data, audio, audio_file_path):
         #wf.close()
 
 
-def recognize_speech(filename):
+def recognize_speech(filename, lang=None):
     
 
     with sr.AudioFile(filename) as source:
@@ -448,7 +449,10 @@ def recognize_speech(filename):
         
         try:
             print("trying to recognize from ... " + filename)
-            usertext = r.recognize_google(audio)
+            if lang:
+                usertext = r.recognize_google(audio, language=lang)
+            else: 
+                usertext = r.recognize_google(audio)
 
         except sr.UnknownValueError as e:
             print("Google Speech Recognition could not understand audio: ", e)

@@ -15,7 +15,7 @@ import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
-    def __init__(self, serial_connector, eleven_voice_id, plantoid_number, path):
+    def __init__(self, serial_connector, eleven_voice_id, plantoid_number, path, lang, personality):
 
         # instantaite serial connector
         self.serial_connector = serial_connector
@@ -40,6 +40,12 @@ class Plantony:
 
         # eleven voice id
         self.eleven_voice_id = eleven_voice_id
+
+        # language selected
+        self.lang = lang
+
+        # personality prompt context
+        self.personality = personality
 
         # a round will contain a series of turns
         self.rounds = [[]]
@@ -97,7 +103,7 @@ class Plantony:
     def setup(self):
 
         # load the personality of Plantony
-        self.prompt_text = open(self.path+"/prompt_context/plantony_context-nftparis.txt").read().strip()
+        self.prompt_text = open(self.path+self.personality).read().strip()
 
         # select a random opening and closing line
         self.opening = random.choice(self.opening_lines)
@@ -203,7 +209,7 @@ class Plantony:
             self.play_background_music(background_music_path)
 
             # user text received from speech recognition
-            user_message = PlantoidSpeech.recognize_speech(audio)
+            user_message = PlantoidSpeech.recognize_speech(audio, self.lang)
 
             print("I heard... " + user_message)
 
@@ -320,7 +326,7 @@ class Plantony:
     def reset_prompt(self):
 
         # load the personality of Plantony
-        self.prompt_text = open(self.path+"/prompt_context/plantony_context.txt").read().strip()
+        self.prompt_text = open(self.path+self.personality).read().strip()
 
         
     def weaving(self):

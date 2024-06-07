@@ -43,7 +43,7 @@ def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
     plantoid.play_background_music(background_music_path)
 
     # get generated transcript
-    generated_transcript = PlantoidSpeech.recognize_speech(audio)
+    generated_transcript = PlantoidSpeech.recognize_speech(audio, plantoid.lang)
 
     # print the generated transcript
     print("I heard... (oracle): " + generated_transcript)
