@@ -199,7 +199,16 @@ def process_previous_tx(plantoid, network):
             minted_db_token_ids = list(set(minted_db_token_ids))
 
     # loop over all entries to process unprocessed Deposits
-    for event in event_filter.get_all_entries():
+
+    try:
+        event_list = event_filter.get_all_entries()
+    
+    except Exception as err:
+        print(f"process previous tx - Unexpected {err=}, {type(err)=}")
+        return
+
+    
+    for event in event_list:
 
         token_Id = str(event.args.tokenId)
 
@@ -222,25 +231,20 @@ def process_previous_tx(plantoid, network):
             enable_seed_reveal(network, token_Id)
 
 
-        # if processing == 0:
+   
 
-        #     if(token_Id == last.strip()):
 
-        #         processing = 1
-        #         print('processing is true\n')
-
-        #     continue
-
-        # print('handling event...\n')
-        # create_seed_metadata(network, token_Id)
-        # enable_seed_reveal(network, token_Id)
-    
 def check_for_deposits(web3obj):
 
     # get the event filter
     event_filter = web3obj.event_filter
 
-    events = event_filter.get_new_entries()
+    try:
+        events = event_filter.get_new_entries()
+    
+    except Exception as err:
+        print(f"check for depositis - Unexpected {err=}, {type(err)=}")
+        return None
 
     print('transaction events', events)
 
@@ -256,12 +260,9 @@ def check_for_deposits(web3obj):
     else:
 
         return None
-    # except:
-    #     print("failed to read new entries()\n")
-    #     # TODO: check if this is correct exception handling
-    #     return None
 
-    #        #  return  str(event.args.tokenId) 
+
+
 
 def pin_metadata_to_ipfs(metadata_path):
 

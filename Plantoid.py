@@ -148,7 +148,10 @@ def web3_setup_loop_goerli(web3_config):
         print(goerli)
 
         if (goerli is not None):
-            connected = True  
+            connected = True
+            return goerli
+
+        time.sleep(15)
 
     return goerli
 
@@ -164,7 +167,10 @@ def web3_setup_loop_mainnet(web3_config):
         print(mainnet)
 
         if (mainnet is not None):
-            connected = True  
+            connected = True
+            return mainnet
+
+        time.sleep(15)
 
     return mainnet
 

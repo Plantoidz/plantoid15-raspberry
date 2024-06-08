@@ -95,7 +95,7 @@ def GPTmagic(prompt, call_type='chat_completion'):
 
         # Prepare the GPT magic
         config = default_chat_completion_config(model="gpt-4")
-
+#        config = default_chat_completion_config()
 
         try:
             # Generate the response from the GPT model
@@ -183,8 +183,8 @@ def get_text_to_speech_response(text, eleven_voice_id, callback=None):
 def stream_response(agent_message, voiceid):
             audio_stream = generate(
                 text=f"{agent_message}",
-                model="eleven_turbo_v2",
-             #   model="eleven_multilingual_v2",
+             #   model="eleven_turbo_v2",
+                model="eleven_multilingual_v2",
                 voice=Voice(voice_id=voiceid),
                 stream=True
             )

@@ -54,7 +54,7 @@ class Plantony:
         # self.turns = []
 
         # load the text content
-        self.opening_lines, self.closing_lines, self.word_categories = get_text_content()
+        self.opening_lines, self.closing_lines, self.word_categories = get_text_content(self.lang)
 
         self.path = path #os.getcwd()
 
@@ -68,9 +68,9 @@ class Plantony:
         self.beep_stop = self.path+"/media/beep_stop.wav"
 
         # Load the sounds
-        self.introduction = self.path+"/samples/intro1.mp3"
-        self.outroduction = self.path+"/samples/outro1.mp3"
-        self.reflection = self.path+"/media/initiation.mp3"
+        self.introduction = self.path+"/samples/" + self.lang + "/intro.mp3"
+        self.outroduction = self.path+"/samples/" + self.lang + "/outro.mp3"
+        self.reflection = self.path+"/samples/" +   self.lang + "/initiation.mp3"
         self.cleanse = self.path+"/media/cleanse.mp3"
 
     # def ambient_background(self, music, stop_event):
@@ -146,8 +146,6 @@ class Plantony:
 
         self.send_serial_message("speaking")
 
-        self.send_serial_message("asleep") ## REMOVE
-        self.send_serial_message("fire")    ## REMOVE
 
         playsound(self.introduction)
         # audiofile = PlantoidSpeech.get_text_to_speech_response("Hello, my name is SexTony, I'm the founder of the PsychoSexual movement using psychology to provide orgasmic experiences to human beings", self.eleven_voice_id)
@@ -159,27 +157,21 @@ class Plantony:
     
         playsound(audiofile)
 
-        self.send_serial_message("awake") ## REMOVE
-        self.send_serial_message("fire")    ## REMOVE
 
     def terminate(self):
 
         self.send_serial_message("speaking")
 
-        self.send_serial_message("asleep") ## REMOVE
-        self.send_serial_message("fire")    ## REMOVE
-
         print('plantony closing', self.closing)
         playsound(PlantoidSpeech.get_text_to_speech_response(self.closing, self.eleven_voice_id)) 
         playsound(self.outroduction)
 
-        self.send_serial_message("awake") ## REMOVE
-        self.send_serial_message("fire")    ## REMOVE
+        self.send_serial_message("asleep") ## REMOVE
+
 
     def listen(self):
 
         self.send_serial_message("listening")
-        self.send_serial_message("asleep") ## REMOVE
 
         #playsound(self.beep_start)
         self.play_background_music(self.cleanse, loops=0)
@@ -198,7 +190,6 @@ class Plantony:
 
             self.send_serial_message("thinking")
 
-            self.send_serial_message("asleep") ## REMOVE
 
             print("Plantony respond is receiving the audiofile as : " + audio)
 
@@ -239,13 +230,11 @@ class Plantony:
             # TODO: figure out if this goes here or above
             self.send_serial_message("speaking")
             
-            self.send_serial_message("asleep") ## REMOVE
-            self.send_serial_message("fire") ## REMOVE
 
             PlantoidSpeech.stream_response(agent_message, self.eleven_voice_id)
 
-            self.send_serial_message("fire") ## REMOVE
-            self.send_serial_message("awake") ## REMOVE
+  #          self.send_serial_message("fire") ## REMOVE
+  #          self.send_serial_message("awake") ## REMOVE
 
 
 

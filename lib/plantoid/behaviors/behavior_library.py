@@ -16,7 +16,7 @@ import re
 import hashlib
 import random
 
-
+from unidecode import unidecode
 
 load_dotenv()
 
@@ -50,7 +50,7 @@ def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
 
     # if no generated transcript, use a default
     if not generated_transcript: 
-        generated_transcript = get_default_sermon_transcript()
+        generated_transcript = get_default_sermon_transcript(plantoid.lang)
 
     # save the generated transcript to a file with the seed name
     path_transcripts = path + "/transcripts/"
@@ -90,7 +90,8 @@ def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
     prompt = get_sermon_prompt(
         generated_transcript,
         plantoid.selected_words_string,
-        n_lines
+        n_lines,
+        plantoid.lang
     )
     print("PROMPTING with ..............................................", prompt)
 
@@ -132,9 +133,12 @@ def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
 def print_oracle(plantoid: Plantony, network, tID, sermon_text):
 
     # now let's print to the LP0, with Plantoid signature
-    plantoid_sig = get_plantoid_sig(network, tID)
+    plantoid_sig = get_plantoid_sig(network, tID, plantoid.lang)
 
     print("LP0 printing sermon text = ", sermon_text)
+
+
+    sermon_text = unidecode(sermon_text)
 
    # os.system("cat " + filename + " > /dev/usb/lp0") #stdout on PC, only makes sense in the gallery
     os.system('echo "' + sermon_text + '" > /dev/usb/lp0')
@@ -169,8 +173,6 @@ def read_oracle(plantoid: Plantony, network, tID, sermon_text):
 
     # play the oracle
     plantoid.send_serial_message("speaking")
-    plantoid.send_serial_message("asleep") ## REMOVE
-    plantoid.send_serial_message("fire") ## REMOVE
 
     
     # playsound(filename)
@@ -178,7 +180,6 @@ def read_oracle(plantoid: Plantony, network, tID, sermon_text):
     time.sleep(1)
 
     print('oracle read completed!')
-    plantoid.send_serial_message("fire") ## REMOVE
     plantoid.send_serial_message("awake")
 
 
