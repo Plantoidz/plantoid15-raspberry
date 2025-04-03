@@ -9,7 +9,12 @@ import json
 from dotenv import load_dotenv
 from pinata import Pinata
 
-from lib.plantoid.behaviors import behavior_selector
+from escpos.printer import Usb
+import qrcode
+from PIL import Image
+
+
+#from lib.plantoid.behaviors import behavior_selector
 
 class Web3Object:
     infura_websock = None
@@ -24,7 +29,7 @@ class Web3Object:
 load_dotenv()
 
 PINATA_API_KEY = os.environ.get("PINATA_API_KEY")
-PINATA_API_SECRET = os.environ.get("PINATA_API_SECRET")
+PINATA_API_SECRET = os.environ.get("PINATA_SECRET_KEY")
 PINATA_JWT = os.environ.get('PINATA_JWT')
 DEFENDER_API_KEY = os.environ.get("DEFENDER_API_KEY")
 DEFENDER_API_SECRET = os.environ.get("DEFENDER_API_SECRET")
@@ -268,6 +273,10 @@ def pin_metadata_to_ipfs(metadata_path):
 
     pinata = Pinata(PINATA_API_KEY, PINATA_API_SECRET, PINATA_JWT)
 
+    print("KEY = ", PINATA_API_KEY)
+    print("SECRET = ", PINATA_API_SECRET)
+    print("JWT = ", PINATA_JWT)
+
     print('metadata is', metadata_path)
 
     response = pinata.pin_file(metadata_path)
@@ -290,9 +299,11 @@ def get_msg_hash(plantoid_address, ipfs_hash, token_Id):
 
     token_uri = 'ipfs://' + ipfs_hash
 
+    checksum_address =  Web3.to_checksum_address(plantoid_address)
+
     msgHash = Web3.solidity_keccak(
         ['uint256', 'string', 'address'],
-        [token_Id, token_uri, plantoid_address],
+        [token_Id, token_uri, checksum_address],
     )
 
     def arrayify_bytes(hbytes):
@@ -340,8 +351,10 @@ def encode_function_data(plantoid_address, abi_file_path, token_Id, ipfs_hash, s
     # Get the contract utility using the ABI
     contract = w3.eth.contract(abi=abi)
 
+    checksum_address =  Web3.to_checksum_address(plantoid_address)
+
     # Encode the function call
-    data = contract.encodeABI(fn_name="revealMetadata", args=[plantoid_address, token_Id, token_Uri, sig])
+    data = contract.encodeABI(fn_name="revealMetadata", args=[checksum_address, token_Id, token_Uri, sig])
 
     # print('encoded function data: ', data)
 
@@ -427,3 +440,6 @@ def enable_seed_reveal(network, token_Id):
         network.metadata_address,
         function_data,
     )
+
+
+

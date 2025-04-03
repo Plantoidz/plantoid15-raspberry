@@ -3,13 +3,16 @@ import time
 from pathlib import Path
 import json
 from dotenv import load_dotenv
-from pinata import Pinata
 import subprocess
 
-from plantoids.plantoid import Plantony
+#from plantoids.plantoid import Plantony
 from lib.plantoid.text_content import *
 import lib.plantoid.speech as PlantoidSpeech
 import lib.plantoid.eden as eden
+
+from pinata import Pinata
+
+from lib.plantoid.pin_utils import * 
 
 from mutagen.mp3 import MP3
 import re
@@ -21,12 +24,12 @@ from unidecode import unidecode
 load_dotenv()
 
 PINATA_API_KEY = os.environ.get("PINATA_API_KEY")
-PINATA_API_SECRET = os.environ.get("PINATA_API_SECRET")
+PINATA_API_SECRET = os.environ.get("PINATA_SECRET_KEY")
 PINATA_JWT = os.environ.get('PINATA_JWT')
 
 
 
-def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
+def generate_oracle(plantoid, network, audio, tID, amount):
 
     plantoid.send_serial_message("thinking")
     plantoid.send_serial_message("asleep") ## REMOVE
@@ -130,7 +133,7 @@ def generate_oracle(plantoid: Plantony, network, audio, tID, amount):
     return sermon_text
 
 
-def print_oracle(plantoid: Plantony, network, tID, sermon_text):
+def print_oracle(plantoid, network, tID, sermon_text):
 
     # now let's print to the LP0, with Plantoid signature
     plantoid_sig = get_plantoid_sig(network, tID, plantoid.lang)
@@ -140,13 +143,18 @@ def print_oracle(plantoid: Plantony, network, tID, sermon_text):
 
     sermon_text = unidecode(sermon_text)
 
+    print("printing the sermon....")
+    print_thermal_txt(sermon_text)
+    print("printing the signature...")
+    #print_thermal_txt(plantoid_sig)
+
    # os.system("cat " + filename + " > /dev/usb/lp0") #stdout on PC, only makes sense in the gallery
-    os.system('echo "' + sermon_text + '" > /dev/usb/lp0')
-    os.system('echo "' + plantoid_sig + '" > /dev/usb/lp0')
+   #  os.system('echo "' + sermon_text + '" > /dev/usb/lp0')
+   #  os.system('echo "' + plantoid_sig + '" > /dev/usb/lp0')
 
 
 
-def read_oracle(plantoid: Plantony, network, tID, sermon_text):
+def read_oracle(plantoid, network, tID, sermon_text):
 
     path = network.plantoid_path
 
@@ -228,19 +236,27 @@ def pin_movie(movie_path):
 
         print("movie found, pinning to IPFS")
 
-        response = pinata.pin_file(movie_path)
-        print('pinata response:', response)
+        try:
+            response = pinata.pin_file(movie_path)
+            print('pinata response:', response)
 
-        # TODO: this should probably check for a response code
-        if(response and response.get('data')):
-            ipfsQmp3 = response['data']['IpfsHash']
-            print("recording the animation_url = " + ipfsQmp3)
-            return ipfsQmp3
-        
+            # TODO: this should probably check for a response code
+            if(response and response.get('data')):
+                ipfsQmp3 = response['data']['IpfsHash']
+                print("recording the animation_url = " + ipfsQmp3)
+
+                url = "https://ipfs.io/ipfs/" + ipfsQmp3
+                qrcode = create_ipfs_qr(url, output_file="/tmp/ipfs_qrcode.png", size=10)
+                print_thermal_img(qrcode)
+
+                return ipfsQmp3
+            
+        except Exception as e:
+            print(f"Something went wrong with Pinata: {e}")
 
     
 
-def record_metadata(plantoid: Plantony, network, token_Id, db, ipfsQmp3):
+def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
 
     # get the path

@@ -1,6 +1,6 @@
 #import lib.plantoid.behaviors.behavior_library as behavior_library
 from lib.plantoid.behaviors import behavior_library
-from plantoids.plantoid import Plantony
+#from plantoids.plantoid import Plantony
 import lib.plantoid.eden as eden
 
 
@@ -15,7 +15,7 @@ PINATA_JWT = os.environ.get('PINATA_JWT')
 
 
 
-def ingurgitate_crypto(plantoid: Plantony, network, tID, amount):
+def ingurgitate_crypto(plantoid, network, tID, amount):
     print("trying to get the oracle library........")
 
 
@@ -29,14 +29,14 @@ def ingurgitate_crypto(plantoid: Plantony, network, tID, amount):
     oracle = behavior_library.generate_oracle(plantoid, network, audiofile, tID, amount)
 
     # print oracle on the LP printer
-    # behavior_library.print_oracle(plantoid, network, tID, oracle)
+    behavior_library.print_oracle(plantoid, network, tID, oracle)
 
     # read oracle out loud
     behavior_library.read_oracle(plantoid, network, tID, oracle)
 
 
 
-def create_seed_metadata(plantoid: Plantony, network, token_Id):
+def create_seed_metadata(plantoid, network, token_Id):
 
     movie_path = None
     animurl = None
