@@ -163,7 +163,7 @@ def build_API_request(path, seed, network_name, audio_file, init_image, init_str
     print("n_film ====> " + str(n_film))
 
 
-    config = {"interpolation_texts": prompts,
+    config = {"interpolation_prompts": prompts,
               "interpolation_init_images": images,
               "interpolation_init_images_min_strength": init_strength,
               "interpolation_init_images_max_strength": init_strength,
@@ -178,36 +178,36 @@ def build_API_request(path, seed, network_name, audio_file, init_image, init_str
               "fps": fps,
               "n_frames": int(frames)}
 
-    # print(config)
+    print(config)
     return config
 
 
 def make_eden_API_call(config):
 
     s = time.time()
-    task_result = Eden.run_task("real2real", config)
+    output_file = Eden.run_task("real2real", config)
     e = time.time()
 
-    if task_result is not None:
+    if output_file is not None:
 
         print("Processing of Interpolation took: " +
         time.strftime("%Hh%Mm%Ss", time.gmtime(e-s)))
 
-        # print(result['output']['files'])
+        print("output file is ---> " + output_file)
 
-        json_result = json.dumps(task_result, indent=4)
+        # json_result = json.dumps(task_result, indent=4)
 
-        use_output_file = os.getcwd()+"/tmp/sample2.json"
+        # use_output_file = os.getcwd()+"/tmp/sample2.json"
 
-        print('using output file:', use_output_file)
+        # print('using output file:', use_output_file)
 
-        with open(use_output_file, "w") as outfile:
-            outfile.write(json_result)
+        # with open(use_output_file, "w") as outfile:
+        #     outfile.write(json_result)
 
-        # NOTE: this will be stored on replicate servers, and has to be saved locally
-        output_file = task_result['output']['files'][0]
+        # # NOTE: this will be stored on replicate servers, and has to be saved locally
+        # output_file = task_result['output']['files'][0]
 
-        print('output file location:', output_file)
+        # print('output file location:', output_file)
         return output_file
 
     else:

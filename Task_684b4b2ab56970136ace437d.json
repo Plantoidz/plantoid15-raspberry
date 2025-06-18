@@ -1,0 +1,75 @@
+{
+    "task": {
+        "_id": "684b4b2ab56970136ace437d",
+        "user": {
+            "_id": "652d4ba4fe557f5a6978ad5c",
+            "userId": "user_2Wqk3gfwnI5AdVd4INL1MEyUJre",
+            "username": "plantoid",
+            "userImage": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18yVXluSWYzVXVRNDdBNEdyZm1ITFdjME1rOWUiLCJyaWQiOiJ1c2VyXzJXcWszZ2Z3bkk1QWRWZDRJTkwxTUV5VUpyZSJ9"
+        },
+        "tool": "real2real",
+        "args": {
+            "mode": "real2real",
+            "negative_prompt": "nude, naked, text, watermark, low-quality, signature, padding, margins, white borders, padded border, moir\u00e9 pattern, downsampling, aliasing, distorted, blurry, blur, jpeg artifacts, compression artifacts, poorly drawn, low-resolution, bad, grainy, error, bad-contrast",
+            "width": 1024,
+            "height": 1024,
+            "checkpoint": "juggernaut_XL2",
+            "use_lora": false,
+            "lora_scale": 0.7,
+            "use_init_image": false,
+            "init_image_strength": 0.05,
+            "adopt_aspect_from_init_img": true,
+            "use_controlnet": false,
+            "controlnet_type": "off",
+            "control_image_strength": 0,
+            "use_ip_image": false,
+            "ip_image_strength": 0.65,
+            "use_audio_file": false,
+            "n_frames": 73,
+            "loop": true,
+            "fps": 7,
+            "n_film": 2,
+            "smooth": true,
+            "use_lcm": false,
+            "use_interpolation_init_images": true,
+            "interpolation_init_images": [
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg"
+            ],
+            "interpolation_init_images_power": 0.5,
+            "interpolation_init_images_min_strength": 0,
+            "interpolation_init_images_max_strength": 0,
+            "use_latent_blending": false,
+            "n_anchor_imgs": 3,
+            "latent_blending_skip_f": [
+                0.1,
+                0.9
+            ],
+            "seed": 1947077111,
+            "sampler": "euler",
+            "steps": 20,
+            "guidance_scale": 20,
+            "upscale_f": 1,
+            "n_samples": 1,
+            "user": "652d4ba4fe557f5a6978ad5c"
+        },
+        "status": "running",
+        "agent": null,
+        "cost": 73,
+        "output_type": "video",
+        "performance": {
+            "waitTime": 118.392777
+        },
+        "result": null,
+        "error": null,
+        "progress": 0,
+        "updatedAt": "2025-06-12T21:50:24.584Z",
+        "createdAt": "2025-06-12T21:48:26.192Z"
+    }
+}

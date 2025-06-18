@@ -1,5 +1,6 @@
 import time
 import os
+import sys
 import re
 import lib.plantoid.serial_utils as serial_utils
 import lib.plantoid.web3_utils as web3_utils
@@ -29,6 +30,7 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=12):
 
         print('plantony responding...')
         plantony.respond(audiofile)
+        
 
     # TODO: sub function without speech
     print('plantony listening...')
@@ -55,7 +57,8 @@ def plantoid_event_listen(
     ):
 
 
-    pattern = serial_utils.use_serial_pattern(use_raspberry)
+    # pattern = serial_utils.use_serial_pattern(use_raspberry)
+    # pattern = re.compile(plantony.pattern)
 
 
     counter = 0  ### TODO: this is a dirty trick i'm using in order to ensure that the loop constantly checks for arduino signals, but doesn't overload infura with web3 requests every milliseconds  
@@ -77,9 +80,9 @@ def plantoid_event_listen(
 
                     line = ser.readline().decode('utf-8').strip()
                     print("line ====", line)
-                    print("pattern ============= ", pattern)
+                    print("pattern ============= ", plantony.pattern)
 
-                    condition = bool(re.fullmatch(pattern, line))
+                    condition = bool(re.fullmatch(plantony.pattern, line))
                     print("condition", condition)
 
                     if condition == True:
@@ -104,8 +107,6 @@ def plantoid_event_listen(
             counter = counter + 1
             if(counter % 10):   continue   
 
-
-
             
             if(web3config["use_goerli"]):
                 print('checking if fed on GOERLI...')
@@ -116,6 +117,7 @@ def plantoid_event_listen(
                 except Exception as e:
                     print("********* ERROR on websocket: ", e)
                     web3config["goerli"] = web3_setup_loop_goerli(web3config)
+                    # sys.exit(0)
             
             
             if(web3config["use_mainnet"]):
@@ -127,7 +129,11 @@ def plantoid_event_listen(
                 except Exception as e:
                     print("********* ERROR on websocket: ", e)
                     web3config["mainnet"] = web3_setup_loop_mainnet(web3config)
+                    # sys.exit(0)
 
+    
+        
+            
 
 
     except KeyboardInterrupt:
@@ -198,7 +204,7 @@ def main():
     max_rounds = plantoid_cfg['max_rounds'] # set up the number of rounds for the plantoid
     lang = plantoid_cfg['LANG'] # check if a particular language is set
     personality = plantoid_cfg['PERSONALITY'] # load the personality prompt context
-
+    pattern = plantoid_cfg['PATTERN'] # load the pattern for the "Touched" regex
 
     plantoid_goerli_cfg = plantoid_cfg["goerli"]
     plantoid_mainnet_cfg = plantoid_cfg["mainnet"]
@@ -255,7 +261,7 @@ def main():
 
 
     # instantiate plantony with serial
-    plantony = Plantony(ser, eleven_voice_id, int(plantoid_number), path, lang, personality)
+    plantony = Plantony(ser, eleven_voice_id, int(plantoid_number), path, lang, personality, pattern)
 
     # setup plantony
     plantony.setup()

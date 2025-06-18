@@ -15,7 +15,7 @@ import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
-    def __init__(self, serial_connector, eleven_voice_id, plantoid_number, path, lang, personality):
+    def __init__(self, serial_connector, eleven_voice_id, plantoid_number, path, lang, personality, pattern):
 
         # instantaite serial connector
         self.serial_connector = serial_connector
@@ -46,6 +46,9 @@ class Plantony:
 
         # personality prompt context
         self.personality = personality
+        
+        # pattern recognition for Touching
+        self.pattern = pattern
 
         # a round will contain a series of turns
         self.rounds = [[]]
@@ -518,6 +521,8 @@ class Plantony:
             web3_utils.enable_seed_reveal(network, token_Id)
 
             # self.send_serial_message("asleep")
+            
+            return 1
 
 
         else:
@@ -534,5 +539,7 @@ class Plantony:
 
             # # create the metadata
             # web3_utils.create_seed_metadata(network, tID)
+            
+            return 0
 
 

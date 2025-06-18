@@ -138,7 +138,7 @@ def print_oracle(plantoid, network, tID, sermon_text):
     # now let's print to the LP0, with Plantoid signature
     plantoid_sig = get_plantoid_sig(network, tID, plantoid.lang)
 
-    print("LP0 printing sermon text = ", sermon_text)
+    # print("LP0 printing sermon text = ", sermon_text)
 
 
     sermon_text = unidecode(sermon_text)
@@ -146,7 +146,7 @@ def print_oracle(plantoid, network, tID, sermon_text):
     print("printing the sermon....")
     print_thermal_txt(sermon_text)
     print("printing the signature...")
-    #print_thermal_txt(plantoid_sig)
+    print_thermal_txt(plantoid_sig)
 
    # os.system("cat " + filename + " > /dev/usb/lp0") #stdout on PC, only makes sense in the gallery
    #  os.system('echo "' + sermon_text + '" > /dev/usb/lp0')

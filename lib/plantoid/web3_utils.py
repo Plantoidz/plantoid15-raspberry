@@ -4,6 +4,7 @@ from oz_defender.relay import RelayClient, RelayerClient
 import subprocess
 import os
 import time
+import sys
 from pathlib import Path
 import json
 from dotenv import load_dotenv
@@ -249,7 +250,8 @@ def check_for_deposits(web3obj):
     
     except Exception as err:
         print(f"check for depositis - Unexpected {err=}, {type(err)=}")
-        return None
+        # return None
+        sys.exit(0)
 
     print('transaction events', events)
 
