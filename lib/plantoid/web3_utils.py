@@ -47,9 +47,9 @@ def get_signer_private_key():
 def setup_web3_provider_goerli(config):
 
         goerli = setup(
-            'wss://eth-sepolia.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
+            # 'wss://eth-sepolia.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
             # 'wss://eth-goerli.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
-            # 'wss://goerli.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
+            'wss://sepolia.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
             config['use_goerli_address'],
             config['use_metadata_address'],
             name="goerli",
@@ -94,85 +94,85 @@ def setup(
    
     print('trying to connect to name ==== ', name)
 
-    try:
-
-        # create a web3 object
-        network = Web3Object();
-
-
-        # connect to the infura node
-        network.w3 = Web3(Web3.WebsocketProvider(
-            infura_websock, 
-            websocket_timeout=10000,
-            websocket_kwargs={'timeout': 10000}
-        ))
-
-     
-        # print("DEBUG", network.w3.manager._provider.counter)
-
-        # for k, v in network.w3.manager.items():
-        #     print("DEBUG", k, v.__dict__)
-
-        print('w3 is', network.w3)
-        print('is connected', network.w3.is_connected())
-
-        # checksum the address
-        address = Web3.to_checksum_address(addr)
-        print('address is', address)
-
-        # get the balance of the address
-        eth_balance_wei = network.w3.eth.get_balance(address)
-        eth_balance = network.w3.from_wei(eth_balance_wei, 'ether')
-
-        print('eth balance:', eth_balance)
-        
-        abifile = open(path + '/abi', 'r')
-        o = abifile.read()
-        abi = o.replace('\n', '')
-        # print(abi)
-        abifile.close()
-
-        # network name
-        network.name = name
-
-        # instantiate the plantoid address
-        network.plantoid_address = addr
-
-        # instantiate the metadata address
-        network.metadata_address = metadata_address
-
-        # instantiate the contract
-        network.plantoid_contract = network.w3.eth.contract(address=address, abi=abi)
-        print('plantoid contract === ', network.plantoid_contract)
-
-        # instantiate the event filter
-        network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=1)
-        print('event filter:', network.event_filter)
-        
-        # set the path
-        network.path = path
-        network.plantoid_path = plantoid_path
-
-        # set the minimum amount of wei that needs to be fed to the plantoid
-        network.min_amount = feeding_amount
-
-        # set the url to reclaim the plantoid
-        network.reclaim_url = reclaim_url
-
-        # set the failsafe
-        network.failsafe = failsafe
-
-        return network  
     
-    except TimeoutError:
 
-        print('Connection unsuccessful or timed out!')
-        return None
+    # create a web3 object
+    network = Web3Object();
 
-    except Exception as e:
-        print('Generic exception caught: ', e)
-    #    import pdb; pdb.set_trace()
-        return None
+
+    # connect to the infura node
+    network.w3 = Web3(Web3.WebsocketProvider(
+        infura_websock, 
+        websocket_timeout=10000,
+        websocket_kwargs={'timeout': 10000}
+    ))
+
+    
+    # print("DEBUG", network.w3.manager._provider.counter)
+
+    # for k, v in network.w3.manager.items():
+    #     print("DEBUG", k, v.__dict__)
+
+    print('w3 is', network.w3)
+    print('is connected', network.w3.is_connected())
+
+    # checksum the address
+    address = Web3.to_checksum_address(addr)
+    print('address is', address)
+
+    # get the balance of the address
+    eth_balance_wei = network.w3.eth.get_balance(address)
+    eth_balance = network.w3.from_wei(eth_balance_wei, 'ether')
+
+    print('eth balance:', eth_balance)
+    
+    abifile = open(path + '/abi', 'r')
+    o = abifile.read()
+    abi = o.replace('\n', '')
+    # print(abi)
+    abifile.close()
+
+    # network name
+    network.name = name
+
+    # instantiate the plantoid address
+    network.plantoid_address = addr
+
+    # instantiate the metadata address
+    network.metadata_address = metadata_address
+
+    # instantiate the contract
+    network.plantoid_contract = network.w3.eth.contract(address=address, abi=abi)
+    print('plantoid contract === ', network.plantoid_contract)
+
+    # instantiate the event filter
+    network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=1)
+    print('event filter:', network.event_filter)
+    
+    # set the path
+    network.path = path
+    network.plantoid_path = plantoid_path
+
+    # set the minimum amount of wei that needs to be fed to the plantoid
+    network.min_amount = feeding_amount
+
+    # set the url to reclaim the plantoid
+    network.reclaim_url = reclaim_url
+
+    # set the failsafe
+    network.failsafe = failsafe
+
+    return network  
+    
+    # except TimeoutError:
+
+    #     print('Connection unsuccessful or timed out!')
+    #     return None
+
+    # except Exception as e:
+    #     print('Generic exception caught: ', e)
+    # #    import pdb; pdb.set_trace()
+    #     return None
 
 
 

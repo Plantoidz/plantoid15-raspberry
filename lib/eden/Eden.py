@@ -40,7 +40,7 @@ def run_task(generator_name, config):
     )
     
     result = response.json()
-
+    # result['task'] = json.loads(result['task'])
     
     if response.status_code == 500:
         error = result.get("error", "Unknown error")
