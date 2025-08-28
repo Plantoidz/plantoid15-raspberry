@@ -214,14 +214,6 @@ def main():
 
    # path = cfg['PATH']
 
-   # use_plantoid = 'plantoid_'+str(cfg['PLANTOID'])
-   # use_blockchain = str_to_bool(cfg['ENABLE_BLOCKCHAIN'])
-   # trigger_line = cfg['TRIGGER_LINE']
-   # eleven_voice_id = cfg['ELEVEN_VOICE_ID']
-
-   # use_goerli = str_to_bool(cfg['USE_GOERLI'])
-   # use_mainnet = str_to_bool(cfg['USE_MAINNET'])
-
     web3_config = {
         'use_goerli': use_goerli,
         'use_mainnet': use_mainnet,
