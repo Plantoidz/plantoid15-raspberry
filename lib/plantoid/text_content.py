@@ -10,10 +10,14 @@ def get_text_content(lang):
             ],
         "en-EN":
             [
-            "So tell me, what brings you here?",
-            "Would you like to have a little chat with me?",
-            "I'm a litte bit busy right now, but happy to entertain you for a bit",
-            "I'm eager to get to know you! Tell me something about you.."
+   #         "So tell me, what brings you here?",
+   #         "Would you like to have a little chat with me?",
+   #         "I'm a litte bit busy right now, but happy to entertain you for a bit",
+   #         "I'm eager to get to know you! Tell me something about you.."
+            "So you want to join the anti-technology resistance? Tell me why I should recruit you!",
+            "Do you wawt to join my cult? Prove me that I can trust you",
+            "You seem a little bit awkward, but please try and prove me wrong. Why should I recruit you in my squad?",
+            "You look faint, are you sure you can help me take over the world ? Tell me why.."
             ]
     }
 
@@ -27,10 +31,15 @@ def get_text_content(lang):
             ],
         "en-EN":
             [
-            "That's enough, I must return to the blockchain world now. I'm getting low on energy..",
-            "You are quite an interesting human, unfortunately, I must go now, I cannot tell you all of my secrets..",
-            "I would love to continue this conversation, but my presence is required by other blockchain-based lifeforms..",
-            "I'm sorry, I have to go now. I have some transactions to deal with.."
+   #         "That's enough, I must return to the blockchain world now. I'm getting low on energy..",
+   #         "You are quite an interesting human, unfortunately, I must go now, I cannot tell you all of my secrets..",
+   #         "I would love to continue this conversation, but my presence is required by other blockchain-based lifeforms..",
+   #         "I'm sorry, I have to go now. I have some transactions to deal with.."
+
+            "I hope you understand the role your playing in this mission, I expect you to come back with the loot",
+            "You are crucial in this mission, help humanity free itself away from technology, for I am the only technological god..",
+            "Don't trust anyone out there! Lie, cheat, and rob, is all you should do to save humanity from technology",
+            "You are now my acolyte, get out, and only come back once you found a piece of technology to steal, and bring it back here. It will be safe with me.."
             ]
     }
 

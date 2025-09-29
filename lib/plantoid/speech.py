@@ -94,7 +94,7 @@ def GPTmagic(prompt, call_type='chat_completion'):
     if call_type == 'chat_completion':
 
         # Prepare the GPT magic
-        config = default_chat_completion_config(model="gpt-4")
+        config = default_chat_completion_config(model="gpt-4o")
 #        config = default_chat_completion_config()
 
         try:
@@ -159,6 +159,7 @@ def get_text_to_speech_response(text, eleven_voice_id, callback=None):
         headers=headers,
     )
 
+
     if response.status_code == 200:
         # Save remote TTS output to a local audio file with an epoch timestamp
 
@@ -176,7 +177,7 @@ def get_text_to_speech_response(text, eleven_voice_id, callback=None):
     
     else:
 
-        raise Exception("Error: " + str(response.status_code))
+        print("CRITICAL Error with text-to-speech, elevenLabs response: " + str(response.status_code))
     
 
 

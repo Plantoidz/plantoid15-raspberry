@@ -164,7 +164,7 @@ class Plantony:
 
         print('plantony closing', self.closing)
         playsound(PlantoidSpeech.get_text_to_speech_response(self.closing, self.eleven_voice_id)) 
-        playsound(self.outroduction)
+        #playsound(self.outroduction)
 
         self.send_serial_message("asleep") ## REMOVE
 

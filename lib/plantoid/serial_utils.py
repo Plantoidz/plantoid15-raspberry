@@ -6,12 +6,13 @@ import random
 import regex_spm
 
 
-def setup_serial(PORT="/dev/ttyUSB0", baud_rate=115200):
+def setup_serial(PORT="/dev/ttyUSB0", baud_rate=9600):
 
     try:
 
         if PORT is None: raise Exception('No Serial Port Provided!')
 
+        print("setting up serial with PORT = ", PORT);
         # configure the serial connections (the parameters differs on the device you are connecting to)
         ser = serial.Serial(port=PORT, baudrate=baud_rate)
 
@@ -55,10 +56,16 @@ def check_received_arduino_signal(ser):
     global data_buf
     global message_complete
 
+
     if ser.inWaiting() > 0 and message_complete == False:
 
-        # decode needed for Python3 
-        x = ser.read().decode("utf-8") # ser.readline().decode('utf-8').strip()
+        try:
+            # decode needed for Python3 
+            x = ser.read().decode("utf-8", errors='ignore') # ser.readline().decode('utf-8').strip()
+        except Exception as e:
+            print(f"Read error: {e}")
+            data = ""
+
 
 
         print("["+x+"]")
@@ -112,7 +119,15 @@ def wait_for_arduino(ser):
     # wait until the Arduino sends 'Arduino is ready' - allows time for Arduino reset
     # it also ensures that any bytes left over from a previous message are discarded
 
+
     print("Waiting for Arduino to reset")
+
+    #reset_arduino_software(ser)
+
+    send_to_arduino(ser, "RESET");
+    
+    print("Sent 1st reset signal")
+
 
     msg = ""
 
@@ -121,6 +136,12 @@ def wait_for_arduino(ser):
 
     while msg.find("Arduino is ready") == -1:
 
+        print("looping inside the reset loop")
+
+        send_to_arduino(ser, "RESET");
+    #    reset_arduino_software(ser)
+        
+        print("now reading msg")
 
         msg = check_received_arduino_signal(ser)
 
@@ -130,3 +151,9 @@ def wait_for_arduino(ser):
 
     print("ARDUINO IS READY")
 
+
+
+def reset_arduino_software(ser):
+    ser.write(b'<RESET>\n')
+    time.sleep(2)
+    ser.flushInput()

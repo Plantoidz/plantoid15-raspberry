@@ -63,8 +63,8 @@ def setup_web3_provider_goerli(config):
 def setup_web3_provider_mainnet(config):
 
         mainnet = setup(
-            #'wss://eth-mainnet.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
-            'wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
+            'wss://eth-mainnet.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
+            # 'wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
             config['use_mainnet_address'],
             config['use_metadata_address'],
             name="mainnet",
@@ -144,8 +144,12 @@ def setup(
         network.plantoid_contract = network.w3.eth.contract(address=address, abi=abi)
         print('plantoid contract === ', network.plantoid_contract)
 
+        print('contract events.............................................................')
+        print(dir(network.plantoid_contract.events))
+
         # instantiate the event filter
-        network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=1)
+        recent_block = network.w3.eth.block_number - 10000
+        network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=recent_block)
         print('event filter:', network.event_filter)
         
         # set the path

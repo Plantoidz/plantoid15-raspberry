@@ -1,7 +1,6 @@
 import time
 import os
 import re
-import sys  # Added for sys.exit()
 import lib.plantoid.serial_utils as serial_utils
 import lib.plantoid.web3_utils as web3_utils
 from plantoids.plantoid import Plantony
@@ -46,12 +45,6 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=12):
 
     plantony.reset_rounds()
     plantony.reset_prompt()
-    
-    # Exit the process after completing the specified number of rounds
-    # Using exit code 0 since this is a normal, expected completion
-    print("Completed the maximum number of rounds. Exiting with code 0. Service will restart per systemd configuration.")
-    sys.exit(0)
-
 
 def plantoid_event_listen(
         ser,
@@ -75,7 +68,6 @@ def plantoid_event_listen(
 
 
             
-            serial_utils.send_to_arduino(ser, "awake")  
 
             print('checking if button pressed...')
             print('serial wait count:', ser.in_waiting)
@@ -99,10 +91,9 @@ def plantoid_event_listen(
                         # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
                         ser.reset_input_buffer()
 
-                except Exception as e:
-                    print("********* ERROR during serial communication: ", e)
-                    print("Breaking error detected. Exiting the application.")
-                    sys.exit(1)  # Exit with error code 1 to indicate an error occurred
+                except UnicodeDecodeError:
+                    
+                    print("Received a line that couldn't be decoded!")
 
             # only check every 5 seconds
             time.sleep(1)
@@ -124,8 +115,7 @@ def plantoid_event_listen(
 
                 except Exception as e:
                     print("********* ERROR on websocket: ", e)
-                    print("Breaking error detected. Exiting the application.")
-                    sys.exit(1)  # Exit with error code 1 to indicate an error occurred
+                    web3config["goerli"] = web3_setup_loop_goerli(web3config)
             
             
             if(web3config["use_mainnet"]):
@@ -136,14 +126,12 @@ def plantoid_event_listen(
 
                 except Exception as e:
                     print("********* ERROR on websocket: ", e)
-                    print("Breaking error detected. Exiting the application.")
-                    sys.exit(1)  # Exit with error code 1 to indicate an error occurred
+                    web3config["mainnet"] = web3_setup_loop_mainnet(web3config)
 
 
 
     except KeyboardInterrupt:
         print("Program stopped by the user.")
-        sys.exit(0)  # Added proper exit code
 
     finally:
         ser.close()
@@ -152,63 +140,39 @@ def plantoid_event_listen(
 def web3_setup_loop_goerli(web3_config):
 
     connected = False
-    retry_count = 0
-    max_retries = 3  # Maximum number of retries before giving up
-    
-    while connected == False and retry_count < max_retries:
 
-        try:
-            # setup web3
-            goerli = web3_utils.setup_web3_provider_goerli(web3_config)
-            print(goerli)
+    while connected == False:
 
-            if (goerli is not None):
-                connected = True
-                return goerli
-                
-        except Exception as e:
-            print(f"Error setting up Goerli provider (attempt {retry_count+1}/{max_retries}): {e}")
-            retry_count += 1
-            
-            if retry_count >= max_retries:
-                print("Maximum retries reached for Goerli setup. Exiting application.")
-                sys.exit(1)
+        # setup web3
+        goerli = web3_utils.setup_web3_provider_goerli(web3_config)
+        print(goerli)
+
+        if (goerli is not None):
+            connected = True
+            return goerli
 
         time.sleep(15)
 
-    print("Failed to connect to Goerli after multiple attempts. Exiting application.")
-    sys.exit(1)
+    return goerli
 
 
 def web3_setup_loop_mainnet(web3_config):
 
     connected = False
-    retry_count = 0
-    max_retries = 3  # Maximum number of retries before giving up
-    
-    while connected == False and retry_count < max_retries:
 
-        try:
-            # setup web3
-            mainnet = web3_utils.setup_web3_provider_mainnet(web3_config)
-            print(mainnet)
+    while connected == False:
 
-            if (mainnet is not None):
-                connected = True
-                return mainnet
-                
-        except Exception as e:
-            print(f"Error setting up Mainnet provider (attempt {retry_count+1}/{max_retries}): {e}")
-            retry_count += 1
-            
-            if retry_count >= max_retries:
-                print("Maximum retries reached for Mainnet setup. Exiting application.")
-                sys.exit(1)
+        # setup web3
+        mainnet = web3_utils.setup_web3_provider_mainnet(web3_config)
+        print(mainnet)
+
+        if (mainnet is not None):
+            connected = True
+            return mainnet
 
         time.sleep(15)
 
-    print("Failed to connect to Mainnet after multiple attempts. Exiting application.")
-    sys.exit(1)
+    return mainnet
 
 
 def main():
@@ -268,9 +232,6 @@ def main():
     # get output port from ENV
     PORT = os.environ.get('SERIAL_PORT_OUTPUT')
 
-    print("PORT ENV ****** ===============>", PORT)
-    # PORT = "/dev/ttyUSB1"
-
     # setup serial
     ser = serial_utils.setup_serial(PORT=PORT)
 
@@ -300,15 +261,8 @@ def main():
     plantony.setup()
 
     # process previous tx
-    try:
-        if mainnet is not None: 
-            web3_utils.process_previous_tx(plantony, mainnet)
-        if goerli is not None: 
-            web3_utils.process_previous_tx(plantony, goerli)
-    except Exception as e:
-        print("********* ERROR when processing previous transactions: ", e)
-        print("Breaking error detected. Exiting the application.")
-        sys.exit(1)
+    if mainnet is not None: web3_utils.process_previous_tx(plantony, mainnet)
+    if goerli is not None: web3_utils.process_previous_tx(plantony, goerli)
 
     # invoke_plantony(plantony, goerli)
 

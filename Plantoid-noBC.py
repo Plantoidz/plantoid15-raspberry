@@ -75,7 +75,6 @@ def plantoid_event_listen(
 
 
             
-            serial_utils.send_to_arduino(ser, "awake")  
 
             print('checking if button pressed...')
             print('serial wait count:', ser.in_waiting)

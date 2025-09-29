@@ -20,7 +20,7 @@ ENABLE_ARDUINO = "True"
 LANG="en-EN"
 
 #PERSONALITY="./prompt_context/plantony_context-fr.txt"
-PERSONALITY="./prompt_context/plantony_context.txt"
+PERSONALITY="./prompt_context/plantony_context_ted.txt"
 
 [15.mainnet]
 ACTIVE = "True"
@@ -43,7 +43,7 @@ max_rounds=4
 ENABLE_ARDUINO="True"
 LANG="en-EN"
 
-PERSONALITY="./prompt_context/plantony_context.txt"
+PERSONALITY="./prompt_context/plantony_context-RoomService.txt"
 
 [14.mainnet]
 ACTIVE = "True"
