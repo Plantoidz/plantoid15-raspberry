@@ -103,7 +103,8 @@ def use_serial_pattern(use_raspberry):
 
     if use_raspberry == True:
 
-        pattern = r"<(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3})>"
+        # pattern = r"<(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3}),\s*(-?\d{1,3})>"
+        pattern = r"<Touched>"
 
     else:
 
