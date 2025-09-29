@@ -52,19 +52,30 @@ def create_ipfs_qr(ipfs_link, output_file="/tmp/ipfs_qrcode.png", size=10):
 
 def print_thermal_txt(textual):
 
-    p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
-    p.text(textual)
-    p.cut()
-    p.close()
+    try:
+        p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
+        p.text(textual)
+        p.cut()
+        p.close()
+    except Exception as e:
+        print(f"Error: Thermal printer not connected or accessible - {e}")
+        return False
+    return True
 
 
 
 def print_thermal_img(image_file):
     
-    p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
+    try:
+        p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
 
-    img = Image.open(image_file)
-    img = img.resize((400, 400))
+        img = Image.open(image_file)
+        img = img.resize((400, 400))
 
-    p.image(img)
-    p.cut()
+        p.image(img)
+        p.cut()
+        
+    except Exception as e:
+        print(f"Error: Thermal printer not connected or accessible - {e}")
+        return False
+    return True
