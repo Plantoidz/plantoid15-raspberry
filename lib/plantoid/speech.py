@@ -21,7 +21,9 @@ from dotenv import load_dotenv
 import openai
 import requests
 
-from elevenlabs import Voice, VoiceSettings, generate, stream, set_api_key
+#from elevenlabs import Voice, VoiceSettings, generate, stream, set_api_key
+from elevenlabs.client import ElevenLabs
+from elevenlabs import stream
 
 import random
 import os
@@ -60,22 +62,23 @@ def ignoreStderr():
 # # THRESHOLD = 250     # Raspberry uses 150
 # SILENCE_LIMIT = 4   # seconds of silence will stop the recording
 
-# TIMEOUT = 15
-
-FORMAT = pyaudio.paInt16
+# FORMAT = pyaudio.paInt16      # standard USB MIC
+FORMAT = pyaudio.paInt32        # mic I2S
 CHANNELS = 1
 RATE = 44100
 CHUNK = 512
-SILENCE_LIMIT = 3   # seconds of silence will stop the recording
-TIMEOUT = 13
-RECORD_SECONDS = 2 #seconds to listen for environmental noise
-THRESHOLD = 50
+
+TIMEOUT = 20
+SILENCE_LIMIT = 5.0   # seconds of silence will stop the recording
+THRESHOLD = 20
+THRESHOLD_DB = -70
+# RECORD_SECONDS = 2 #seconds to listen for environmental noise
 
 # Load environment variables from .env file
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI")
 eleven_labs_api_key = os.environ.get("ELEVEN")
-set_api_key(eleven_labs_api_key)
+elevenlabs = ElevenLabs(api_key=eleven_labs_api_key)
 
 
 def play_background_music_INTERNAL(filename, loops=-1):
@@ -97,6 +100,8 @@ def GPTmagic(prompt, call_type='chat_completion'):
         config = default_chat_completion_config(model="gpt-4")
 #        config = default_chat_completion_config()
 
+        print("generating GPT magic response.............")
+
         try:
             # Generate the response from the GPT model
             response = openai.ChatCompletion.create(messages=[{
@@ -105,7 +110,6 @@ def GPTmagic(prompt, call_type='chat_completion'):
             }], **config)
 
             messages = response.choices[0].message.content
-            print('gpt response:', messages)
        
         except Exception as e:
             print("Exception occured", e)
@@ -181,12 +185,11 @@ def get_text_to_speech_response(text, eleven_voice_id, callback=None):
 
 
 def stream_response(agent_message, voiceid):
-            audio_stream = generate(
-                text=f"{agent_message}",
-             #   model="eleven_turbo_v2",
-                model="eleven_multilingual_v2",
-                voice=Voice(voice_id=voiceid),
-                stream=True
+            audio_stream = elevenlabs.text_to_speech.stream(
+                text=agent_message,
+             #  model="eleven_turbo_v2",
+                model_id="eleven_multilingual_v2",
+                voice_id=voiceid,
             )
             stream(audio_stream)
 
@@ -331,8 +334,7 @@ def listen_for_speech(path=None): # @@@ remember to add acknowledgements afterwa
                         # input_device_index = device_index,
                         frames_per_buffer=CHUNK)
             
-            # print('quiet! checking noise threshold...')
-
+            #print('quiet! checking noise threshold...')
             # noise_value = adjust_sound_env(stream, device_bias=cfg['device_bias'])
             # THRESHOLD = return_noise_threshold(noise_value, threshold_bias=cfg['threshold_bias'])
 
@@ -353,63 +355,107 @@ def listen_for_speech(path=None): # @@@ remember to add acknowledgements afterwa
 
                 chunks_per_second = RATE / CHUNK
 
-                silence_buffer = deque(maxlen=int(SILENCE_LIMIT * chunks_per_second))
+                # silence_buffer = deque(maxlen=int(SILENCE_LIMIT * chunks_per_second))
                 samples_buffer = deque(maxlen=int(SILENCE_LIMIT * RATE))
+                silence_buffer_size = SILENCE_LIMIT * chunks_per_second
 
                 started = False
 
                 ### this is for continuous recording, until silence is reached
-
                 run = 1
-
                 timing = None
 
                 print('preparing to record...')
 
+                
                 while(run):
-
-                    data = stream.read(CHUNK, exception_on_overflow = False)
-                    silence_buffer.append(abs(audioop.avg(data, 2)))
-
-                    samples_buffer.extend(data)
-
-                    if (True in [x > THRESHOLD for x in silence_buffer]):
-
-                        if not started:
-                            print ("recording started")
-                            started = True
-                            samples_buffer.clear()
-                            timing = time.time()
-
-                        samples.append(data)
-
-                        # check for timeout
-                        if(time.time() - timing > TIMEOUT):
-                            print(">>> stopping recording because of timeout")
-                            stream.stop_stream()
-
-                            record_wav_file(samples, audio, audio_file_path)
-
-                            #reset all vars
-                            started = False
-                            silence_buffer.clear()
-                            samples = []
-
-                            run = 0
-
-
-                    elif(started == True):   ### there was a long enough silence
-                        print ("recording stopped")
-                        stream.stop_stream()
+                    
+                        data = stream.read(CHUNK, exception_on_overflow=False)
                         
-                        record_wav_file(samples, audio, audio_file_path)
+                        # Calculate and display level
+                        audio_data = np.frombuffer(data, dtype=np.int32)
+                        rms = np.sqrt(np.mean(audio_data.astype(np.float64)**2))
+                        db = 20 * np.log10(rms / 2147483647.0) if rms > 0 else -100
+                        
+                        # Visual level meter
+                        level_bar = "#" * int((db + 100) / 2)
+                        print(f"\r[{level_bar:<50}] {db:6.1f} dB ", end='', flush=True)
+                        
+                        samples_buffer.append(db)
+                    
+                        if(db > THRESHOLD_DB):
+                            
+                            if not started:
+                                print("recording started")
+                                timing = time.time()
+                                started = True
+                                samples_buffer.clear();
+                            
+                            samples.append(data)
 
-                        #reset all vars
-                        started = False
-                        silence_buffer.clear()
-                        samples = []
+                    
 
-                        run = 0
+                    # data = stream.read(CHUNK, exception_on_overflow = False)
+                    # silence_buffer.append(abs(audioop.avg(data, 2)))
+
+                    # samples_buffer.extend(data)
+                    
+                    
+                    # # if (True in [x > THRESHOLD for x in silence_buffer]):
+                    # #     print("X: ", x)
+                        
+                    # if max(silence_buffer) > THRESHOLD:
+                    #     print("Max value in buffer:", max(silence_buffer))    
+                        
+                    #     if not started:
+                    #         print ("recording started")
+                    #         started = True
+                    #         samples_buffer.clear()
+                    #         timing = time.time()
+
+                    #     samples.append(data)
+
+                            # check for timeout
+                            if(time.time() - timing > TIMEOUT):
+                                    print(">>> stopping recording because of timeout")
+                                    stream.stop_stream()
+
+                                    record_wav_file(samples, audio, audio_file_path)
+
+                                    #reset all vars
+                                    started = False
+                                    samples_buffer.clear()
+                                    samples = []
+
+                                    run = 0
+
+
+                        elif(started == True):   ### volume went below the threshold
+                            
+                            samples.append(data)
+                            
+                            # check if we have enough silence below threshold
+                            if len(samples_buffer) >= silence_buffer_size:
+                                avg_db = sum(samples_buffer) / len(samples_buffer)
+                                
+                                silence_count = sum(1 for db_val in samples_buffer if db_val < THRESHOLD_DB)
+                                silence_percentage = silence_count / len(samples_buffer)
+                                
+                                if avg_db < THRESHOLD_DB or silence_percentage > 0.9:
+                            
+                                                            
+                                    print ("recording stopped")
+                                    stream.stop_stream()
+                                    
+                                    record_wav_file(samples, audio, audio_file_path)
+
+                                    #reset all vars
+                                    started = False
+                                    #silence_buffer.clear()
+                                    samples_buffer.clear()
+                                    samples = []
+
+                                    run = 0
 
             stream.close()
             audio.terminate()

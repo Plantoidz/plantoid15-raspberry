@@ -29,7 +29,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     oracle = behavior_library.generate_oracle(plantoid, network, audiofile, tID, amount)
 
     # print oracle on the LP printer
-    behavior_library.print_oracle(plantoid, network, tID, oracle)
+    behavior_library.print_response(plantoid, network, tID, oracle)
 
     # read oracle out loud
     behavior_library.read_oracle(plantoid, network, tID, oracle)

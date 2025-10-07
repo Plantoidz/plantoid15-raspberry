@@ -2,9 +2,9 @@ import toml
 import os
 import requests
 
-def get_working_path(use_raspberry, raspberry_path):
+def get_working_path(raspberry_path):
 
-    if use_raspberry:
+    if raspberry_path:
 
         working_path = raspberry_path
 

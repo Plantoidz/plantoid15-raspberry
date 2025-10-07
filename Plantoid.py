@@ -67,36 +67,35 @@ def plantoid_event_listen(
     try:
 
         while True:
-        
-
-
             
+        
+            if(plantony.serial_connector):  # only check for button pressed if there is a serial communication with Arduino
+                
+                print('checking if button pressed...')
+                print('serial wait count:', ser.in_waiting)
+                if ser.in_waiting > 0:
 
-            print('checking if button pressed...')
-            print('serial wait count:', ser.in_waiting)
-            if ser.in_waiting > 0:
+                    try:
 
-                try:
+                        line = ser.readline().decode('utf-8').strip()
+                        print("line ====", line)
+                        print("pattern ============= ", plantony.pattern)
 
-                    line = ser.readline().decode('utf-8').strip()
-                    print("line ====", line)
-                    print("pattern ============= ", plantony.pattern)
+                        condition = bool(re.fullmatch(plantony.pattern, line))
+                        print("condition", condition)
 
-                    condition = bool(re.fullmatch(plantony.pattern, line))
-                    print("condition", condition)
+                        if condition == True:
 
-                    if condition == True:
+                            # Trigger plantony interaction
+                            print("Button was pressed, Invoking Plantony!")
+                            plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
 
-                        # Trigger plantony interaction
-                        print("Button was pressed, Invoking Plantony!")
-                        plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
+                            # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
+                            ser.reset_input_buffer()
 
-                        # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
-                        ser.reset_input_buffer()
-
-                except UnicodeDecodeError:
-                    
-                    print("Received a line that couldn't be decoded!")
+                    except UnicodeDecodeError:
+                        
+                        print("Received a line that couldn't be decoded!")
 
             # only check every 5 seconds
             time.sleep(1)
@@ -140,7 +139,7 @@ def plantoid_event_listen(
         print("Program stopped by the user.")
 
     finally:
-        ser.close()
+        if(ser): ser.close()
 
 
 def web3_setup_loop_goerli(web3_config):
@@ -185,20 +184,20 @@ def main():
 
     load_dotenv()
 
-    use_raspeberry = str_to_bool(os.environ.get("USE_RASPBERRY"))
-    use_arduino = str_to_bool(os.environ.get("USE_ARDUINO"))
     raspberry_path = os.environ.get("RASPBERRY_PATH")
 
     print("raspberry_path === ", raspberry_path)
 
     # load config
-    path = get_working_path(use_raspeberry, raspberry_path)
+    path = get_working_path(raspberry_path)
     config = load_config(path+'/configuration.toml')
 
     cfg = config['general']
     plantoid_number = str(cfg['PLANTOID']) # find out which plantoid we are working on
 
     plantoid_cfg = config[plantoid_number]
+
+    use_serial = str_to_bool(plantoid_cfg['USE_SERIAL'])
 
     eleven_voice_id = plantoid_cfg['ELEVEN_VOICE_ID'] # set up the voice of the plantoid
     max_rounds = plantoid_cfg['max_rounds'] # set up the number of rounds for the plantoid
@@ -227,14 +226,14 @@ def main():
         'plantoid_number': plantoid_number,
     }
 
-    # get output port from ENV
-    PORT = os.environ.get('SERIAL_PORT_OUTPUT')
+    print("setting up serial: ", use_serial)
 
     # setup serial
-    ser = serial_utils.setup_serial(PORT=PORT)
-
-    # setup signals
-    if use_arduino:
+    ser = None;
+    if use_serial:
+        PORT = os.environ.get('SERIAL_PORT_OUTPUT')
+        print("PORT ==== ", PORT)
+        ser = serial_utils.setup_serial(PORT=PORT)
         serial_utils.wait_for_arduino(ser)
         serial_utils.send_to_arduino(ser, "awake")  
 
@@ -252,7 +251,7 @@ def main():
         print(mainnet)
 
 
-    # instantiate plantony with serial
+    # instantiate plantony (with serial)
     plantony = Plantony(ser, eleven_voice_id, int(plantoid_number), path, lang, personality, pattern)
 
     # setup plantony
@@ -266,6 +265,10 @@ def main():
 
     # add listener
     plantony.add_listener('Touched', invoke_plantony)
+    
+    # FIX FIX FIX
+    # plantony.trigger('Touched', plantony, web3_config["goerli"], max_rounds=max_rounds)  ## @@ FAKING A TRIGGER
+
 
     # check for crypto-transactions and serial communications
     plantoid_event_listen(
@@ -273,7 +276,6 @@ def main():
         plantony,
         web3_config,
         max_rounds=max_rounds,
-        use_raspberry=use_raspeberry,
     )
    
     # plantoid_event_listen(ser, plantony, goerli, trigger_line, max_rounds=max_rounds)

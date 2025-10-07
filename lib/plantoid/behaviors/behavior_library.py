@@ -10,6 +10,10 @@ from lib.plantoid.text_content import *
 import lib.plantoid.speech as PlantoidSpeech
 import lib.plantoid.eden as eden
 
+from elevenlabs.client import ElevenLabs
+from elevenlabs import play
+
+
 from pinata import Pinata
 
 from lib.plantoid.pin_utils import * 
@@ -28,7 +32,106 @@ PINATA_API_SECRET = os.environ.get("PINATA_SECRET_KEY")
 PINATA_JWT = os.environ.get('PINATA_JWT')
 
 
+def generate_GPT_response(craft, plantoid, network, audio, tID, credits):
+    plantoid.send_serial_message("thinking")
+    
+    # get the path of the network
+    path = network.plantoid_path
+    print("TRANSCRIBING... in PATH ==== ", path)
+    
+    # get the path to the background music
+    background_music_path = plantoid.path+"/media/ambient3.mp3"
+    
+    # play the background music
+    plantoid.play_background_music(background_music_path)
+    
+    # get generated transcript
+    generated_transcript = PlantoidSpeech.recognize_speech(audio, plantoid.lang)
+    
+    # print the generated transcript
+    print("I heard...: " + generated_transcript)
+    
+    # if no generated transcript, use a default
+    if not generated_transcript:  
+            match craft:
+                case "opera":
+                    generated_transcript = get_default_song_transcript(plantoid.lang)
+                case "oracle":
+                    generated_transcript = get_default_sermon_transcript(plantoid.lang)
+        
+    # save the generated transcript to a file with the seed name
+    path_transcripts = path + "/transcripts/"
+    path_transcripts_network = path_transcripts + str(network.name)
+    
+    if not os.path.exists(path_transcripts):
+        os.makedirs(path_transcripts)
 
+    if not os.path.exists(path_transcripts_network):
+        os.makedirs(path_transcripts_network)
+
+    # save the generated response to a file with the seed name
+    filename = f"{path_transcripts_network}/{tID}_transcript.txt"
+
+    print("saving transcript as ...................................", filename)
+    
+    with open(filename, "w") as f:
+        f.write(generated_transcript)
+
+    print("transcript saved as ..... " + filename)
+    
+    ######## now generate the response ########
+    
+    print("generating transcript with number of credits = " + str(credits))
+
+    # retieve the response prompt
+    prompt = None
+    match craft:
+                case "opera":
+                    prompt = get_song_prompt(
+                        generated_transcript,
+                        plantoid.selected_words_string,
+                        credits,
+                        plantoid.lang
+                    )
+                case "oracle":
+                    prompt = get_sermon_prompt(
+                        generated_transcript,
+                        plantoid.selected_words_string,
+                        credits,
+                        plantoid.lang
+                    )
+    
+    print("PROMPTING with ..............................................", prompt)
+
+    # get GPT response
+    response_text = PlantoidSpeech.GPTmagic(prompt)
+
+    print('response text: ', response_text)
+  
+    #--------
+
+    responses_path = path + "/responses/"
+    responses_path_network = responses_path + str(network.name)
+
+    # save the generated response to a file with the seed name
+    if not os.path.exists(responses_path):
+        os.makedirs(responses_path);
+
+    # save the generated response to a file with the seed name
+    if not os.path.exists(responses_path_network):
+        os.makedirs(responses_path_network);
+    
+    # save the generated response to a file with the seed name
+    filename =  f"{responses_path_network}/{tID}_response.txt"
+    with open(filename, "w") as f:
+        f.write(response_text)
+
+    plantoid.send_serial_message("awake")
+
+    return response_text
+    
+
+# this could theoretically be commented out -- use generate_response() instead !  :)
 def generate_oracle(plantoid, network, audio, tID, amount):
 
     plantoid.send_serial_message("thinking")
@@ -133,24 +236,96 @@ def generate_oracle(plantoid, network, audio, tID, amount):
     return sermon_text
 
 
-def print_oracle(plantoid, network, tID, sermon_text):
+def print_response(plantoid, network, tID, text):
 
     # now let's print to the LP0, with Plantoid signature
     plantoid_sig = get_plantoid_sig(network, tID, plantoid.lang)
 
     # print("LP0 printing sermon text = ", sermon_text)
+    
+    text = unidecode(text)
 
-
-    sermon_text = unidecode(sermon_text)
-
-    print("printing the sermon....")
-    print_thermal_txt(sermon_text)
+    print("printing the response....")
+    print_thermal_txt(text)
     print("printing the signature...")
     print_thermal_txt(plantoid_sig)
 
    # os.system("cat " + filename + " > /dev/usb/lp0") #stdout on PC, only makes sense in the gallery
    #  os.system('echo "' + sermon_text + '" > /dev/usb/lp0')
    #  os.system('echo "' + plantoid_sig + '" > /dev/usb/lp0')
+
+
+
+def generate_song(text, credits):
+    
+    credits = credits + 2
+    if(credits > 6): credits = 6
+    
+    print("generating a song with $$$$$$ CREDITS $$$$$$ =======>>>> ", credits)
+    
+    elevenlabs = ElevenLabs(
+        api_key=os.getenv("ELEVENLABS_MUSIC_KEY")
+    )
+
+    composition_plan = {
+    'positive_global_styles': ['bel canto', 'early 19th-century Italian opera', 'classical aria', 'lyrical', 'woodwinds', 'strings', 'delicate orchestration'],
+    'negative_global_styles': ['electronic', 'heavy percussion', 'modern synth', 'rock'],
+    'sections': [
+        {
+            "section_name": 'Aria', 
+            'positive_local_styles': ['long lyrical vocal lines', 'soprano', 'delicate woodwinds', 'string accompaniment'], 
+            'negative_local_styles': ['heavy brass', 'percussion', 'electronic sounds'], 
+            'duration_ms': 10000 * credits, 
+            'lines': [ text ]
+        }
+    ]
+    }
+    
+    composition = elevenlabs.music.compose(composition_plan=composition_plan)
+    
+    # composition is a generator, so we are first combining it into a byte-like object
+    audio_data = b"".join(composition)
+
+    # Save to file instead of playing
+    with open("/tmp/output_music.mp3", "wb") as f:
+        f.write(audio_data)
+
+    # Return the file path
+    audio_file_path = "/tmp/output_music.mp3"
+    return audio_file_path
+    
+
+
+
+def save_and_play_audio(plantoid, network, tID, audiofile):
+    
+    path = network.plantoid_path
+    
+    songs_path = path + "/audios/"
+    songs_path_network = songs_path + str(network.name)
+    
+    # save the generated sermons to a file with the seed name
+    if not os.path.exists(songs_path):
+        os.makedirs(songs_path)
+
+    if not os.path.exists(songs_path_network):
+        os.makedirs(songs_path_network)
+    
+    subprocess.run(["cp", audiofile, f"{songs_path_network}/{tID}_audio.mp3"])
+
+    # stop the background music
+    plantoid.stop_background_music()
+
+    # play the oracle
+    plantoid.send_serial_message("speaking")
+    plantoid.play_background_music(audiofile, loops=0)
+    time.sleep(1)
+
+    print('audio play completed!')
+    plantoid.send_serial_message("awake")
+    
+    
+    
 
 
 
@@ -162,7 +337,7 @@ def read_oracle(plantoid, network, tID, sermon_text):
     audiofile = PlantoidSpeech.get_text_to_speech_response(sermon_text, plantoid.eleven_voice_id)
     # stop_event.set() # stop the background noise
 
-    sermons_path = path + "/sermons/"
+    sermons_path = path + "/audios/"
     sermons_path_network = sermons_path +str(network.name)
 
     # save the generated sermons to a file with the seed name
@@ -174,7 +349,7 @@ def read_oracle(plantoid, network, tID, sermon_text):
     
     # save mp3 file
     # subprocess.run(["cp", audiofile, f"{path}/sermons/{tID}_sermon.mp3"])
-    subprocess.run(["cp", audiofile, f"{sermons_path_network}/{tID}_sermon.mp3"])
+    subprocess.run(["cp", audiofile, f"{sermons_path_network}/{tID}_audio.mp3"])
 
     # stop the background music
     plantoid.stop_background_music()
@@ -189,6 +364,7 @@ def read_oracle(plantoid, network, tID, sermon_text):
 
     print('oracle read completed!')
     plantoid.send_serial_message("awake")
+    
 
 
 
@@ -304,7 +480,7 @@ def create_video_from_audio(path, tID, network_name, init_img, init_strength):
 
     # construct the API call to Eden (this includes the making of the prompts)
     #eden_config = eden.build_API_request(path, tID, network_name)  
-    eden_config = eden.build_API_request(path, tID, network_name, path + "/sermons/" + network_name + "/" + tID + "_sermon.mp3", init_img, init_strength)
+    eden_config = eden.build_API_request(path, tID, network_name, path + "/audios/" + network_name + "/" + tID + "_audio.mp3", init_img, init_strength)
 
     # get the output file from the eden call
     remote_output_file = eden.make_eden_API_call(eden_config)           
@@ -372,7 +548,7 @@ def make_video(path, video_file_path, seed, network_name):
         # If it doesn't exist, create it
         os.makedirs(video_network_path)
 
-    audio_file_path = path +"/sermons/" + network_name + "/" + seed + "_sermon.mp3"
+    audio_file_path = path +"/audios/" + network_name + "/" + seed + "_audio.mp3"
     output_file_path = path +"/videos/" + network_name + "/" + seed + "_movie.mp4"
 
     print(audio_file_path, video_file_path)
@@ -388,7 +564,7 @@ def make_video(path, video_file_path, seed, network_name):
 
 def fallback_video(path, tID, network_name):
 
-    audiof = MP3(path + "/sermons/" + network_name + "/" + tID + "_sermon.mp3")
+    audiof = MP3(path + "/audios/" + network_name + "/" + tID + "_audio.mp3")
     
     audiolen = int(audiof.info.length) + 1  # seconds of the poem length
 

@@ -20,9 +20,8 @@ echo "this script was run by $(whoami)"
 # /usr/local/bin/python3 -u /home/pi/PLLantoid/plantoid15-raspberry/Plantoid15.py &  > /home/pi/PLLantoid/v4/logs/AIplantony.log 2>&1
 
 
-export USE_RASPBERRY=True
-export USE_ARDUINO=True
 export RASPBERRY_PATH=/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/
 export PYTHONPATH=/home/pi/.local/lib/python3.10/site-packages
+export SERIAL_PORT_OUTPUT=/dev/ttyACM0
 /usr/bin/python3.10 -u /home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py  > /home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/logs/AIplantony.log 2>&1
 

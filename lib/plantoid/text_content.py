@@ -270,6 +270,13 @@ def get_text_content(lang):
     return opening_lines[lang], closing_lines[lang], word_categories[lang]
 
 
+def get_default_song_transcript(lang):
+    generated_transcript = {
+        "en-EN": "A world where Plants collaborate with Humans and with Machines, in a symbiotic dance of co-creation.",
+        "fr-FR": "Un monde où les Plantes collaborent avec les Humains et les Machines, dans une danse symbiotique de co-création."
+    }
+    return generated_transcript[lang]
+
 def get_default_sermon_transcript(lang):
 
     generated_transcript = {
@@ -281,9 +288,12 @@ def get_default_sermon_transcript(lang):
 def get_sermon_prompt(
     generated_transcript,
     selected_words_string,
-    n_lines,
+    credits,
     lang
 ):
+    # define the length of the poem
+    n_lines = credits + 2
+    if n_lines > 6: n_lines = 6
 
     prompt = {
             "en-EN": f"You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem structured around {n_lines} short paragraph, each paragraph is composed of exactly 3 lines:\n\n{generated_transcript}\n\nInclude the following words in your poem: {selected_words_string}. Remember, the poem should be exactly {n_lines} paragraphs long, with {n_lines} lines per paragraph.",
@@ -291,6 +301,25 @@ def get_sermon_prompt(
             }
 
     return prompt[lang]
+
+def get_song_prompt(
+    generated_transcript,
+    selected_words_string,
+    credits,
+    lang
+):
+    # define the length of the lyrics
+    n_lines = credits + 2
+    if n_lines > 6: n_lines = 6
+    
+    prompt = {
+            "en-EN": f"You are Plantoid, an enlightened being from the future. Write the lyrics for an opera song that is made of {n_lines} short sentences, based on the following input:\n\n{generated_transcript}\n\nInclude the following words in the lyrics: {selected_words_string}.",
+            "fr-FR": f"Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. Écrit-moi les paroles d'un chant d'opéra qui fait exactement {n_lines} phrases, à partir des éléments suivants:\n\n{generated_transcript}\n\nInclut les mots suivant dans les paroles: {selected_words_string}. Les paroles doivent être strictement en français."
+ 
+    }
+    
+    return prompt[lang]
+
 
 def get_plantoid_sig(network, tID, lang):
     

@@ -1,3 +1,4 @@
+import lib.plantoid.behaviors.behavior_16 as behavior_16
 import lib.plantoid.behaviors.behavior_15 as behavior_15
 import lib.plantoid.behaviors.behavior_14 as behavior_14
 
@@ -7,6 +8,13 @@ def get_plantoid_function(plantoid_number, fn_name):
 
     print("PLANTOID NUMBER == ", plantoid_number)
     
+    if plantoid_number == 16:
+
+        fn_dict = {
+            'create_seed_metadata': behavior_16.create_seed_metadata,
+            'ingurgitate_crypto': behavior_16.ingurgitate_crypto
+        }
+
     if plantoid_number == 15:
 
         fn_dict = {

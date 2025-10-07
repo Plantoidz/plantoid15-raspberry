@@ -51,7 +51,7 @@ config = {'interpolation_texts':
 load_dotenv()
 
 EDEN_API_URL = "https://api.eden.art"
-#EDEN_API_KEY = os.environ.get("EDEN_API_KEY")
+EDEN_API_KEY = os.environ.get("EDEN_API_KEY")
 # EDEN_API_SECRET = os.environ.get("EDEN_API_SECRET")
 
 print("EDEN_API_KEY", EDEN_API_KEY)

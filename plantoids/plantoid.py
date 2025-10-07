@@ -19,6 +19,7 @@ class Plantony:
 
         # instantaite serial connector
         self.serial_connector = serial_connector
+        self.use_serial = 1 if self.serial_connector else 0
 
         # instantiate plantoid number
         self.plantoid_number = plantoid_number
@@ -29,9 +30,6 @@ class Plantony:
 
         # a list of events
         self._events = {}
-
-        # whether to use the Arduino or not
-        self.use_arduino = True
 
         # lines for the opening and closing
         self.opening = ""
@@ -130,7 +128,7 @@ class Plantony:
 
     def send_serial_message(self, message):
 
-        if self.use_arduino:
+        if self.use_serial:
             PlantoidSerial.send_to_arduino(self.serial_connector, message)
 
     def play_background_music(self, filename, loops=-1):
@@ -150,9 +148,8 @@ class Plantony:
         self.send_serial_message("speaking")
 
 
-        playsound(self.introduction)
-        # audiofile = PlantoidSpeech.get_text_to_speech_response("Hello, my name is SexTony, I'm the founder of the PsychoSexual movement using psychology to provide orgasmic experiences to human beings", self.eleven_voice_id)
-        # playsound(audiofile)
+        # playsound(self.introduction)
+        
 
         audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.eleven_voice_id)
         print('plantony opening', self.opening)
