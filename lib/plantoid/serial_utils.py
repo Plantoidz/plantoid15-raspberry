@@ -134,3 +134,25 @@ def wait_for_arduino(ser):
 
     print("ARDUINO IS READY")
 
+
+
+def check_if_talk(ser, pattern):
+    
+        if ser.in_waiting > 0:
+
+            try:
+
+                        line = ser.readline().decode('utf-8').strip()
+                        print("line ==== ", line, " with pattern ============= ", pattern)
+
+                        condition = bool(re.fullmatch(pattern, line))
+                        
+                        # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
+                        ser.reset_input_buffer()
+                        
+                        return condition
+                    
+                        
+
+            except UnicodeDecodeError:  
+                        print("Received a line that couldn't be decoded!")

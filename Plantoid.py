@@ -2,12 +2,14 @@ import time
 import os
 import sys
 import re
+import lib.plantoid.gpio_utils as gpio_utils
 import lib.plantoid.serial_utils as serial_utils
 import lib.plantoid.web3_utils as web3_utils
 from plantoids.plantoid import Plantony
 from utils.util import load_config, get_working_path, str_to_bool
 from dotenv import load_dotenv
 import regex_spm
+
 
 
 def invoke_plantony(plantony: Plantony, network, max_rounds=12):
@@ -49,7 +51,7 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=12):
     plantony.reset_prompt()
 
 def plantoid_event_listen(
-        ser,
+        io,
         plantony,
         web3config,
         max_rounds=4,
@@ -69,34 +71,29 @@ def plantoid_event_listen(
         while True:
             
         
-            if(plantony.serial_connector):  # only check for button pressed if there is a serial communication with Arduino
+            # check if Plantony should speak
+            talk = False
+            
+            if(plantony.use_serial):  # only check for button pressed if there is a serial communication with Arduino
                 
-                print('checking if button pressed...')
-                print('serial wait count:', ser.in_waiting)
-                if ser.in_waiting > 0:
+                print('checking if button pressed... with serial: ', io)
+                talk = serial_utils.check_if_talk(io, plantony.pattern)
+            
+            elif(plantony.use_gpio):
+                
+                print('checking if button pressed with GPIO')
+                talk = gpio_utils.check_if_talk(io)
+                
+            
+            if talk == True:
 
-                    try:
+                # Trigger plantony interaction
+                print("Button was pressed, Invoking Plantony!")
+                plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
 
-                        line = ser.readline().decode('utf-8').strip()
-                        print("line ====", line)
-                        print("pattern ============= ", plantony.pattern)
-
-                        condition = bool(re.fullmatch(plantony.pattern, line))
-                        print("condition", condition)
-
-                        if condition == True:
-
-                            # Trigger plantony interaction
-                            print("Button was pressed, Invoking Plantony!")
-                            plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
-
-                            # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
-                            ser.reset_input_buffer()
-
-                    except UnicodeDecodeError:
-                        
-                        print("Received a line that couldn't be decoded!")
-
+                                            
+                
+                
             # only check every 5 seconds
             time.sleep(1)
 
@@ -139,7 +136,8 @@ def plantoid_event_listen(
         print("Program stopped by the user.")
 
     finally:
-        if(ser): ser.close()
+        if(plantony.use_serial): plantony.serial_connector.close()
+        if(plantony.use_gpio): gpio_utils.cleanup()
 
 
 def web3_setup_loop_goerli(web3_config):
@@ -197,7 +195,10 @@ def main():
 
     plantoid_cfg = config[plantoid_number]
 
-    use_serial = str_to_bool(plantoid_cfg['USE_SERIAL'])
+    use_serial = plantoid_cfg['USE_SERIAL'] and str_to_bool(plantoid_cfg['USE_SERIAL'])
+    use_gpio = isinstance(plantoid_cfg['USE_GPIO'], dict)
+    if(use_serial and use_GPIO): 
+        raise ValueError("Error: cannot have both USE_SERIAL and USE_GPIO")
 
     eleven_voice_id = plantoid_cfg['ELEVEN_VOICE_ID'] # set up the voice of the plantoid
     max_rounds = plantoid_cfg['max_rounds'] # set up the number of rounds for the plantoid
@@ -226,16 +227,22 @@ def main():
         'plantoid_number': plantoid_number,
     }
 
-    print("setting up serial: ", use_serial)
+    print("setting up i/o communication: ", use_serial)
 
-    # setup serial
-    ser = None;
+    # setup io
+    io = None
     if use_serial:
         PORT = os.environ.get('SERIAL_PORT_OUTPUT')
         print("PORT ==== ", PORT)
-        ser = serial_utils.setup_serial(PORT=PORT)
-        serial_utils.wait_for_arduino(ser)
-        serial_utils.send_to_arduino(ser, "awake")  
+        io = serial_utils.setup_serial(PORT=PORT)
+        serial_utils.wait_for_arduino(io)
+        serial_utils.send_to_arduino(io, "awake")  
+    if use_gpio:
+        io = { 'touch' : plantoid_cfg['USE_GPIO']['touch'],  
+               'led'  : plantoid_cfg['USE_GPIO']['led']
+        }
+    print("setting up GPIO: ", io)
+    
 
     mainnet = None;
     goerli = None;
@@ -252,7 +259,7 @@ def main():
 
 
     # instantiate plantony (with serial)
-    plantony = Plantony(ser, eleven_voice_id, int(plantoid_number), path, lang, personality, pattern)
+    plantony = Plantony(io, eleven_voice_id, int(plantoid_number), path, lang, personality, pattern)
 
     # setup plantony
     plantony.setup()
@@ -272,7 +279,7 @@ def main():
 
     # check for crypto-transactions and serial communications
     plantoid_event_listen(
-        ser,
+        io,
         plantony,
         web3_config,
         max_rounds=max_rounds,

@@ -1,5 +1,5 @@
 [general]
-PLANTOID=16
+PLANTOID=17
 
 
 # Rachel 21m00Tcm4TlvDq8ikWAM 
@@ -9,6 +9,33 @@ PLANTOID=16
 [audio]
 device_bias=-100
 threshold_bias=0
+
+
+[17]
+ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
+max_rounds=4
+USE_GPIO = {led = 10, touch = 26}
+USE_SERIAL = "False"
+#LANG="fr-FR"
+LANG="en-EN"
+PATTERN = "<Touched>"
+#PERSONALITY="./prompt_context/plantony_context-fr.txt"
+PERSONALITY="./prompt_context/plantony_context.txt"
+
+[17.mainnet]
+ACTIVE = "True"
+FAILSAFE = 0
+BLOCKCHAIN_ADDRESS = "0x8acbae9CacC1ab3fB149E214499aFDE8912156B3"
+METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
+
+[17.goerli]
+ACTIVE = "True"
+FAILSAFE = 0
+BLOCKCHAIN_ADDRESS = "0xf89f680542cb0aea55bc4f9c852e228765b9a0c0" ### This is the sepolia address
+METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
+
+
+
 
 [16]
 ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"

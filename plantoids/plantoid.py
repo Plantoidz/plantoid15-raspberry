@@ -6,20 +6,30 @@ import threading
 import time
 import subprocess
 import json
+import serial
 
 from lib.plantoid.text_content import *
 from lib.plantoid.behaviors import behavior_selector
 import lib.plantoid.speech as PlantoidSpeech
 import lib.plantoid.serial_utils as PlantoidSerial
+import lib.plantoid.gpio_utils as PlantoidGPIO
 import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
-    def __init__(self, serial_connector, eleven_voice_id, plantoid_number, path, lang, personality, pattern):
+    def __init__(self, io, eleven_voice_id, plantoid_number, path, lang, personality, pattern):
 
-        # instantaite serial connector
-        self.serial_connector = serial_connector
-        self.use_serial = 1 if self.serial_connector else 0
+        # instantaite i/o communication: serial vs gpio
+        if isinstance(io, serial.Serial):
+            self.use_serial = 1 
+            self.serial_connector = io
+        else:
+            self.use_serial = 0
+            self.use_gpio = 1
+            self.gpio = PlantoidGPIO.GPIOLEDController(io['led'])
+            # self.touch = PlantoidGPIO.setup_button(io['touch'])
+        
+
 
         # instantiate plantoid number
         self.plantoid_number = plantoid_number
@@ -130,6 +140,8 @@ class Plantony:
 
         if self.use_serial:
             PlantoidSerial.send_to_arduino(self.serial_connector, message)
+        elif self.use_gpio:
+            PlantoidGPIO.LEDs_control(self.gpio, message)
 
     def play_background_music(self, filename, loops=-1):
         pygame.mixer.init()
@@ -148,7 +160,7 @@ class Plantony:
         self.send_serial_message("speaking")
 
 
-        # playsound(self.introduction)
+        playsound(self.introduction)
         
 
         audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.eleven_voice_id)
