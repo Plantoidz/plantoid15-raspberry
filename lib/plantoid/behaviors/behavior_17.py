@@ -45,9 +45,9 @@ def create_seed_metadata(plantoid, network, token_Id):
 
     db = dict()
     db['name'] = token_Id
-    db['description'] = "Plantoid #15 - Seed #" + token_Id
+    db['description'] = "Plantoid #17 - Seed #" + token_Id
     db['external_url'] = "http://plantoid.org"
-    db['image'] = "https://ipfs.io/ipfs/QmRcrcn4X6QfSwFnJQ1dNHn8YgW7pbmm6BjZn7t8FW7WFV" # ipfsQpng
+    db['image'] = "https://ipfs.io/ipfs/bafybeihkjh6s7ofaxb2nzjcwod3hs7qvubfftixwu35m35z5ijug25wwx4" # ipfsQpng
 
 
     # check if a movie exists for that particular token_Id
@@ -56,7 +56,7 @@ def create_seed_metadata(plantoid, network, token_Id):
     if os.path.exists(path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"):
         movie_path = path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"
 
-    elif os.path.isfile(path + "/sermons/" + network.name + "/" + token_Id + "_sermon.mp3"):
+    elif os.path.isfile(path + "/audios/" + network.name + "/" + token_Id + "_audio.mp3"):
 
         # if movie doesn't exist, but sermon.mp3 exists, make a new movie based on the recorded audio:
 
@@ -70,9 +70,12 @@ def create_seed_metadata(plantoid, network, token_Id):
 
             print('generating video file with eden')
 
-            init_img = "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg"
-            init_strength = 0
-            movie_path = behavior_library.create_video_from_audio(path, token_Id, network.name, init_img, init_strength)
+            #init_img = "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/44050c3ab6e427ca6fa851f1a66cfe7dcacd996818d05bd09395f1e3790ad91c.jpg"
+            init_img = "https://media.mutualart.com/Images/2011_05/11/19/193914615/14304109-176d-4d7e-87c5-46fe48eef800_570.Jpeg"
+            init_min = 0.1
+            init_max = 0.25
+            init_power = 2.0
+            movie_path = behavior_library.create_video_from_audio(path, token_Id, network.name, init_img, init_min, init_max, init_power)
 
         
         elif(network.failsafe == 1 or movie_path == None):

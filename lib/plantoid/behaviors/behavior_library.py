@@ -363,7 +363,7 @@ def read_oracle(plantoid, network, tID, sermon_text):
     time.sleep(1)
 
     print('oracle read completed!')
-    plantoid.send_serial_message("awake")
+    # plantoid.send_serial_message("awake")
     
 
 
@@ -470,7 +470,7 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
 
 
-def create_video_from_audio(path, tID, network_name, init_img, init_strength):
+def create_video_from_audio(path, tID, network_name, init_img, init_min, init_max, init_power):
 
     # create empty output file
     remote_output_file = None
@@ -480,7 +480,7 @@ def create_video_from_audio(path, tID, network_name, init_img, init_strength):
 
     # construct the API call to Eden (this includes the making of the prompts)
     #eden_config = eden.build_API_request(path, tID, network_name)  
-    eden_config = eden.build_API_request(path, tID, network_name, path + "/audios/" + network_name + "/" + tID + "_audio.mp3", init_img, init_strength)
+    eden_config = eden.build_API_request(path, tID, network_name, path + "/audios/" + network_name + "/" + tID + "_audio.mp3", init_img, init_min, init_max, init_power)
 
     # get the output file from the eden call
     remote_output_file = eden.make_eden_API_call(eden_config)           

@@ -219,6 +219,7 @@ def LEDs_control(gpio, data):
 _button_initialized = False
 _last_button_state = None
 _button_pin = None 
+_debounce_time = 0.05 # 50 milisec
     
 def check_if_talk(gpio):
     global _button_initialized, _last_button_state, _button_pin
@@ -237,8 +238,15 @@ def check_if_talk(gpio):
     
     # Check if state changed
     if current_state != _last_button_state:
-        _last_button_state = current_state
-        return True  # State changed!
+        
+        # State has changed! But is it noise? Wait a moment and check again.
+        time.sleep(_debounce_time)
+        new_current_state = GPIO.input(_button_pin)
+        
+        if current_state == new_current_state:
+            print("Button WAS ACTUALLY PRESSED")
+            _last_button_state = current_state
+            return True  # State changed!
     
     return False  # No change
 

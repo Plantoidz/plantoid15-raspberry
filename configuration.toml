@@ -25,13 +25,13 @@ PERSONALITY="./prompt_context/plantony_context.txt"
 [17.mainnet]
 ACTIVE = "True"
 FAILSAFE = 0
-BLOCKCHAIN_ADDRESS = "0x8acbae9CacC1ab3fB149E214499aFDE8912156B3"
+BLOCKCHAIN_ADDRESS = "0xc4332e6b9a7d04ed20fec9e2f15927e8e26ca154"
 METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 [17.goerli]
 ACTIVE = "True"
 FAILSAFE = 0
-BLOCKCHAIN_ADDRESS = "0xf89f680542cb0aea55bc4f9c852e228765b9a0c0" ### This is the sepolia address
+BLOCKCHAIN_ADDRESS = "0xdd05e577e1b0a7f1ec75e4f764f35fadab249ae7" ### This is the sepolia address
 METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 

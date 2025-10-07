@@ -101,7 +101,7 @@ def create_prompts(path, seed, n_prompt, network_name):
 
 
 
-def build_API_request(path, seed, network_name, audio_file, init_image, init_strength):
+def build_API_request(path, seed, network_name, audio_file, init_image, init_min, init_max, init_power):
 
 
 
@@ -165,9 +165,9 @@ def build_API_request(path, seed, network_name, audio_file, init_image, init_str
 
     config = {"interpolation_prompts": prompts,
               "interpolation_init_images": images,
-              "interpolation_init_images_min_strength": init_strength,
-              "interpolation_init_images_max_strength": init_strength,
-              "interpolation_init_images_power": 0.5,
+              "interpolation_init_images_min_strength": init_min,
+              "interpolation_init_images_max_strength": init_max,
+              "interpolation_init_images_power": init_power,
               "n_film": n_film,
               "latent_blending_skip_f": [0.1,0.9],
               "guidance_scale": 20,
