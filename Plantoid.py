@@ -10,43 +10,43 @@ from dotenv import load_dotenv
 import regex_spm
 
 
-def invoke_plantony(plantony: Plantony, network, max_rounds=12):
+# def invoke_plantony(plantony: Plantony, network, max_rounds=12):
 
-    print('plantony initiating...')
-    plantony.welcome()
+#     print('plantony initiating...')
+#     plantony.welcome()
 
-    print('Iterating on Plantony n of rounds:', len(plantony.rounds), 'max rounds:', max_rounds)
+#     print('Iterating on Plantony n of rounds:', len(plantony.rounds), 'max rounds:', max_rounds)
 
-    while(len(plantony.rounds) < max_rounds):
+#     while(len(plantony.rounds) < max_rounds):
 
-        # create the round
-        plantony.create_round()
+#         # create the round
+#         plantony.create_round()
 
-        print('plantony rounds...')
-        print(len(plantony.rounds))
+#         print('plantony rounds...')
+#         print(len(plantony.rounds))
 
-        print('plantony listening...')
-        audiofile = plantony.listen()
+#         print('plantony listening...')
+#         audiofile = plantony.listen()
 
-        print('plantony responding...')
-        plantony.respond(audiofile)
+#         print('plantony responding...')
+#         plantony.respond(audiofile)
         
 
-    # TODO: sub function without speech
-    print('plantony listening...')
-    plantony.listen()
+#     # TODO: sub function without speech
+#     print('plantony listening...')
+#     plantony.listen()
 
-    print('plantony terminating...')
-    plantony.terminate()
+#     print('plantony terminating...')
+#     plantony.terminate()
 
-    # print('checking if fed...')
-    # plantony.check_if_fed(network)
+#     # print('checking if fed...')
+#     # plantony.check_if_fed(network)
 
-    # print('debug: plantony rounds...')
-    # print(plantony.rounds)
+#     # print('debug: plantony rounds...')
+#     # print(plantony.rounds)
 
-    plantony.reset_rounds()
-    plantony.reset_prompt()
+#     plantony.reset_rounds()
+#     plantony.reset_prompt()
 
 def plantoid_event_listen(
         ser,
@@ -69,33 +69,33 @@ def plantoid_event_listen(
         while True:
             
         
-            if(plantony.serial_connector):  # only check for button pressed if there is a serial communication with Arduino
+            # if(plantony.serial_connector):  # only check for button pressed if there is a serial communication with Arduino
                 
-                print('checking if button pressed...')
-                print('serial wait count:', ser.in_waiting)
-                if ser.in_waiting > 0:
+            #     print('checking if button pressed...')
+            #     print('serial wait count:', ser.in_waiting)
+            #     if ser.in_waiting > 0:
 
-                    try:
+            #         try:
 
-                        line = ser.readline().decode('utf-8').strip()
-                        print("line ====", line)
-                        print("pattern ============= ", plantony.pattern)
+            #             line = ser.readline().decode('utf-8').strip()
+            #             print("line ====", line)
+            #             print("pattern ============= ", plantony.pattern)
 
-                        condition = bool(re.fullmatch(plantony.pattern, line))
-                        print("condition", condition)
+            #             condition = bool(re.fullmatch(plantony.pattern, line))
+            #             print("condition", condition)
 
-                        if condition == True:
+            #             if condition == True:
 
-                            # Trigger plantony interaction
-                            print("Button was pressed, Invoking Plantony!")
-                            plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
+            #                 # Trigger plantony interaction
+            #                 print("Button was pressed, Invoking Plantony!")
+            #                 plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
 
-                            # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
-                            ser.reset_input_buffer()
+            #                 # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
+            #                 ser.reset_input_buffer()
 
-                    except UnicodeDecodeError:
+            #         except UnicodeDecodeError:
                         
-                        print("Received a line that couldn't be decoded!")
+            #             print("Received a line that couldn't be decoded!")
 
             # only check every 5 seconds
             time.sleep(1)
@@ -264,7 +264,7 @@ def main():
     # invoke_plantony(plantony, goerli)
 
     # add listener
-    plantony.add_listener('Touched', invoke_plantony)
+    # plantony.add_listener('Touched', invoke_plantony)
     
     # FIX FIX FIX
     # plantony.trigger('Touched', plantony, web3_config["goerli"], max_rounds=max_rounds)  ## @@ FAKING A TRIGGER
