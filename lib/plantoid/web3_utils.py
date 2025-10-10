@@ -49,7 +49,8 @@ def setup_web3_provider_goerli(config):
         goerli = setup(
             # 'wss://eth-sepolia.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
             # 'wss://eth-goerli.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
-            'wss://sepolia.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
+            'wss://eth-sepolia.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
+            #'wss://sepolia.infura.io/ws/v3/'+INFURA_API_KEY_GOERLI,
             config['use_goerli_address'],
             config['use_metadata_address'],
             name="goerli",
@@ -64,8 +65,8 @@ def setup_web3_provider_goerli(config):
 def setup_web3_provider_mainnet(config):
 
         mainnet = setup(
-            #'wss://eth-mainnet.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
-            'wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
+            'wss://eth-mainnet.g.alchemy.com/v2/m7x4GJTeRCnPV5fkt636eS4OOL9AEuAM',
+            #'wss://mainnet.infura.io/ws/v3/'+INFURA_API_KEY_MAINNET,
             config['use_mainnet_address'],
             config['use_metadata_address'],
             name="mainnet",
@@ -146,7 +147,7 @@ def setup(
     print('plantoid contract === ', network.plantoid_contract)
 
     # instantiate the event filter
-    network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=1)
+    network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=network.w3.eth.block_number - 9)
     print('event filter:', network.event_filter)
     
     # set the path

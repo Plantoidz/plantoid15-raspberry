@@ -65,7 +65,7 @@ def ignoreStderr():
 # FORMAT = pyaudio.paInt16      # standard USB MIC
 FORMAT = pyaudio.paInt32        # mic I2S
 CHANNELS = 1
-RATE = 44100
+RATE = 48000 # 44100
 CHUNK = 512
 
 TIMEOUT = 20
@@ -107,12 +107,16 @@ def GPTmagic(prompt, call_type='chat_completion'):
             response = openai.ChatCompletion.create(messages=[{
                 "role": "user",
                 "content": prompt,
-            }], **config)
+            }], 
+            timeout=30,
+            **config)
 
             messages = response.choices[0].message.content
        
         except Exception as e:
             print("Exception occured", e)
+            import traceback
+            traceback.print_exc()  # Print full error traceback
 
         return messages
     
@@ -329,10 +333,12 @@ def listen_for_speech(path=None): # @@@ remember to add acknowledgements afterwa
             with ignoreStderr():
                 audio = pyaudio.PyAudio()
 
-            stream = audio.open(format=FORMAT, channels=CHANNELS,
-                        rate=RATE, input=True,
-                        # input_device_index = device_index,
-                        frames_per_buffer=CHUNK)
+            stream = audio.open(format=FORMAT, 
+                                channels=CHANNELS,
+                                rate=RATE, 
+                                input=True,
+                                input_device_index = 6,
+                                frames_per_buffer=CHUNK)
             
             #print('quiet! checking noise threshold...')
             # noise_value = adjust_sound_env(stream, device_bias=cfg['device_bias'])

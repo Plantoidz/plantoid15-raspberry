@@ -101,7 +101,7 @@ def plantoid_event_listen(
             # increase counter and only check for deposits events every 10 seconds
 
             counter = counter + 1
-            if(counter % 10):   continue   
+            if(counter % 15):   continue   
 
             
             if(web3config["use_goerli"]):
