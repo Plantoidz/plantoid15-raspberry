@@ -1,0 +1,115 @@
+{
+    "task": {
+        "_id": "68ea922a3b7c4ad5b27c074f",
+        "user": {
+            "_id": "652d4ba4fe557f5a6978ad5c",
+            "userId": "user_2Wqk3gfwnI5AdVd4INL1MEyUJre",
+            "username": "plantoid",
+            "userImage": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18yVXluSWYzVXVRNDdBNEdyZm1ITFdjME1rOWUiLCJyaWQiOiJ1c2VyXzJXcWszZ2Z3bkk1QWRWZDRJTkwxTUV5VUpyZSJ9"
+        },
+        "tool": "real2real",
+        "args": {
+            "mode": "real2real",
+            "negative_prompt": "nude, naked, text, watermark, low-quality, signature, padding, margins, white borders, padded border, moir\u00e9 pattern, downsampling, aliasing, distorted, blurry, blur, jpeg artifacts, compression artifacts, poorly drawn, low-resolution, bad, grainy, error, bad-contrast",
+            "width": 1024,
+            "height": 1024,
+            "checkpoint": "juggernaut_XL2",
+            "use_lora": false,
+            "lora_scale": 0.7,
+            "use_init_image": false,
+            "init_image_strength": 0.05,
+            "adopt_aspect_from_init_img": true,
+            "use_controlnet": false,
+            "controlnet_type": "off",
+            "control_image_strength": 0,
+            "use_ip_image": false,
+            "ip_image_strength": 0.65,
+            "use_audio_file": false,
+            "n_frames": 80,
+            "loop": true,
+            "fps": 10,
+            "n_film": 2,
+            "smooth": true,
+            "use_lcm": false,
+            "use_interpolation_init_images": true,
+            "interpolation_init_images": [
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/6a964945ff55658132d450531220418427da6c82adeb6176a8a4d0782f92dab4.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/6a964945ff55658132d450531220418427da6c82adeb6176a8a4d0782f92dab4.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/6a964945ff55658132d450531220418427da6c82adeb6176a8a4d0782f92dab4.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/6a964945ff55658132d450531220418427da6c82adeb6176a8a4d0782f92dab4.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/6a964945ff55658132d450531220418427da6c82adeb6176a8a4d0782f92dab4.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/6a964945ff55658132d450531220418427da6c82adeb6176a8a4d0782f92dab4.jpg",
+                "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/6a964945ff55658132d450531220418427da6c82adeb6176a8a4d0782f92dab4.jpg"
+            ],
+            "interpolation_init_images_power": 0.5,
+            "interpolation_init_images_min_strength": 0.1,
+            "interpolation_init_images_max_strength": 0.1,
+            "use_latent_blending": false,
+            "n_anchor_imgs": 3,
+            "latent_blending_skip_f": [
+                0.1,
+                0.9
+            ],
+            "seed": 211538440,
+            "sampler": "euler",
+            "steps": 20,
+            "guidance_scale": 20,
+            "upscale_f": 1,
+            "n_samples": 1
+        },
+        "status": "completed",
+        "agent": null,
+        "cost": 80,
+        "output_type": "video",
+        "performance": {
+            "waitTime": 227.683959,
+            "runTime": 305.039978
+        },
+        "result": [
+            {
+                "output": [
+                    {
+                        "filename": "f1574243db5a823ef31091c9e33f071f3b9aca0fc858ee3ffda22ae94be119ee.mp4",
+                        "mediaAttributes": {
+                            "mimeType": "video/mp4",
+                            "width": 1024,
+                            "height": 1024,
+                            "aspectRatio": 1,
+                            "duration": 31,
+                            "blurhash": "U6A+29n30}#,[pJ7Ki$PF0Nv1HtRKO#-V@Na"
+                        },
+                        "creation": {
+                            "mediaAttributes": {
+                                "mimeType": "video/mp4",
+                                "width": 1024,
+                                "height": 1024,
+                                "aspectRatio": 1,
+                                "duration": 31,
+                                "blurhash": "U6A+29n30}#,[pJ7Ki$PF0Nv1HtRKO#-V@Na"
+                            },
+                            "likeCount": 0,
+                            "_id": "68ea943e3b7c4ad5b27c0764",
+                            "agent": null,
+                            "attributes": null,
+                            "createdAt": "2025-10-11T17:30:38.939Z",
+                            "deleted": false,
+                            "filename": "f1574243db5a823ef31091c9e33f071f3b9aca0fc858ee3ffda22ae94be119ee.mp4",
+                            "name": null,
+                            "public": false,
+                            "task": "68ea922a3b7c4ad5b27c074f",
+                            "tool": "real2real",
+                            "updatedAt": "2025-10-11T17:30:38.939Z",
+                            "user": "652d4ba4fe557f5a6978ad5c"
+                        },
+                        "url": "https://d14i3advvh2bvd.cloudfront.net/f1574243db5a823ef31091c9e33f071f3b9aca0fc858ee3ffda22ae94be119ee.mp4",
+                        "thumbnail": "https://d14i3advvh2bvd.cloudfront.net/f1574243db5a823ef31091c9e33f071f3b9aca0fc858ee3ffda22ae94be119ee_1024.webp"
+                    }
+                ]
+            }
+        ],
+        "error": null,
+        "progress": 0,
+        "updatedAt": "2025-10-11T17:30:38.946Z",
+        "createdAt": "2025-10-11T17:21:46.223Z"
+    }
+}

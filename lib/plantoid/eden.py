@@ -195,17 +195,18 @@ def make_eden_API_call(config):
 
         # print(result['output']['files'])
 
-        json_result = json.dumps(task_result, indent=4)
+        # json_result = json.dumps(task_result, indent=4)
 
-        use_output_file = os.getcwd()+"/tmp/sample2.json"
+        # use_output_file = os.getcwd()+"/tmp/sample2.json"
 
-        print('using output file:', use_output_file)
+        # print('using output file:', use_output_file)
 
-        with open(use_output_file, "w") as outfile:
-            outfile.write(json_result)
+        # with open(use_output_file, "w") as outfile:
+        #     outfile.write(json_result)
 
-        # NOTE: this will be stored on replicate servers, and has to be saved locally
-        output_file = task_result['output']['files'][0]
+        # # NOTE: this will be stored on replicate servers, and has to be saved locally
+        # output_file = task_result['output']['files'][0]
+        output_file = task_result
 
         print('output file location:', output_file)
         return output_file

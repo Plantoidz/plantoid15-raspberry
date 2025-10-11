@@ -85,12 +85,26 @@ def create_seed_metadata(plantoid, network, token_Id):
         
         
         movie_path = behavior_library.make_video(path, movie_path, token_Id, network.name)
+        
+        # dirty trick: rename the movie to indicate the information for IPFS Pinata 
+        if movie_path and os.path.exists(movie_path):
+            # Extract directory and original filename
+            directory = os.path.dirname(movie_path)
+            
+            # Create new filename: PlantoidID_network_name_seed_movie.mp4
+            new_filename = f"{plantoid.plantoid_number}_{network.name}_{token_Id}_movie.mp4"
+            new_movie_path = os.path.join(directory, new_filename)
+            
+            # Rename the file
+            os.rename(movie_path, new_movie_path)
+            movie_path = new_movie_path       
 
 
     animurl = behavior_library.pin_movie(movie_path)
     
     if(animurl):  ## only upload metadata if there is an associated video
         behavior_library.record_metadata(plantoid, network, token_Id, db, animurl)
+        os.remove(movie_path)
 
     plantoid.send_serial_message("awake") ## REMOVE
 
