@@ -234,7 +234,9 @@ def main():
     max_rounds = plantoid_cfg['max_rounds'] # set up the number of rounds for the plantoid
     lang = plantoid_cfg['LANG'] # check if a particular language is set
     personality = plantoid_cfg['PERSONALITY'] # load the personality prompt context
-
+    pattern = plantoid_cfg['PATTERN'] # load the pattern for the "Touched" regex
+    
+    serial_speed = plantoid_cfg['SERIAL_SPEED'] # load the baudrate for the Arduino serial connection
 
     plantoid_goerli_cfg = plantoid_cfg["goerli"]
     plantoid_mainnet_cfg = plantoid_cfg["mainnet"]
@@ -272,7 +274,7 @@ def main():
     # PORT = "/dev/ttyUSB1"
 
     # setup serial
-    ser = serial_utils.setup_serial(PORT=PORT)
+    ser = serial_utils.setup_serial(PORT=PORT, baud_rate=serial_speed)
 
     # setup signals
     if use_arduino:

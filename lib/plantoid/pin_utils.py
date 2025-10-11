@@ -50,32 +50,45 @@ def create_ipfs_qr(ipfs_link, output_file="/tmp/ipfs_qrcode.png", size=10):
 
 
 
+
+
+# Endpoint configurations to try
+ENDPOINT_CONFIGS = [
+    {'in_ep': 0x81, 'out_ep': 0x01},
+    {'in_ep': 0x81, 'out_ep': 0x03}
+]
+
 def print_thermal_txt(textual):
-
-    try:
-        p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
-        p.text(textual)
-        p.cut()
-        p.close()
-    except Exception as e:
-        print(f"Error: Thermal printer not connected or accessible - {e}")
-        return False
-    return True
-
+    for config in ENDPOINT_CONFIGS:
+        try:
+            p = Usb(0x0416, 0x5011, **config)
+            p.text(textual)
+            p.cut()
+            p.close()
+            return True
+        except Exception as e:
+            print(f"Attempt with out_ep={hex(config['out_ep'])} failed: {e}")
+            continue
+    
+    print(f"Error: Thermal printer not connected or accessible - all endpoints failed")
+    return False
 
 
 def print_thermal_img(image_file):
+    for config in ENDPOINT_CONFIGS:
+        try:
+            p = Usb(0x0416, 0x5011, **config)
+            
+            img = Image.open(image_file)
+            img = img.resize((400, 400))
+            
+            p.image(img)
+            p.cut()
+            p.close()
+            return True
+        except Exception as e:
+            print(f"Attempt with out_ep={hex(config['out_ep'])} failed: {e}")
+            continue
     
-    try:
-        p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
-
-        img = Image.open(image_file)
-        img = img.resize((400, 400))
-
-        p.image(img)
-        p.cut()
-        
-    except Exception as e:
-        print(f"Error: Thermal printer not connected or accessible - {e}")
-        return False
-    return True
+    print(f"Error: Thermal printer not connected or accessible - all endpoints failed")
+    return False

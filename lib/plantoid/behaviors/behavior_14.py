@@ -46,7 +46,8 @@ def create_seed_metadata(plantoid, network, token_Id):
     db['name'] = token_Id
     db['description'] = "Plantoid #14 - Seed #" + token_Id
     db['external_url'] = "http://plantoid.org"
-    db['image'] = "https://ipfs.io/ipfs/QmRcrcn4X6QfSwFnJQ1dNHn8YgW7pbmm6BjZn7t8FW7WFV" # ipfsQpng
+    # db['image'] = "https://ipfs.io/ipfs/QmRcrcn4X6QfSwFnJQ1dNHn8YgW7pbmm6BjZn7t8FW7WFV" # ipfsQpng
+    db['image'] = "https://ipfs.io/ipfs/QmawAKmJ73HBWt8T82XYWKvcWQdHNAAXKZHQ9enmtzqBb3"
 
 
 

@@ -6,7 +6,7 @@ import random
 import regex_spm
 
 
-def setup_serial(PORT="/dev/ttyUSB0", baud_rate=9600):
+def setup_serial(PORT="/dev/ttyUSB0", baud_rate=115200): # 9600 for P14 -- 115200 for P16
 
     try:
 
@@ -123,13 +123,9 @@ def wait_for_arduino(ser):
 
     print("Waiting for Arduino to reset")
 
-    #reset_arduino_software(ser)
 
-    send_to_arduino(ser, "RESET");
+    send_to_arduino(ser, "RESET")
     
-    print("Sent 1st reset signal")
-
-
     msg = ""
 
 #    start_signal = "<>".encode()
@@ -137,12 +133,8 @@ def wait_for_arduino(ser):
 
     while msg.find("Arduino is ready") == -1:
 
-        print("looping inside the reset loop")
-
-        send_to_arduino(ser, "RESET");
-    #    reset_arduino_software(ser)
-        
-        print("now reading msg")
+        print("inside the reset loop")
+        send_to_arduino(ser, "RESET")
 
         msg = check_received_arduino_signal(ser)
 

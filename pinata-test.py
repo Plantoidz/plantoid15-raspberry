@@ -82,10 +82,10 @@ PINATA_API_KEY = os.environ.get("PINATA_API_KEY")
 PINATA_API_SECRET = os.environ.get("PINATA_SECRET_KEY")
 PINATA_JWT = os.environ.get("PINATA_JWT")
 
-ipfs_link = pin_metadata_to_ipfs("./sys.py")
+ipfs_link = pin_metadata_to_ipfs("./P14.jpg")
 ipfs_link = "https://ipfs.io/ipfs/" + ipfs_link
 print("IPFS link = ", ipfs_link)
 
-qrcode = create_ipfs_qr(ipfs_link, output_file="ipfs_qrcode.png", size=10)
+# qrcode = create_ipfs_qr(ipfs_link, output_file="ipfs_qrcode.png", size=10)
 
-print_thermal(qrcode)
+# print_thermal(qrcode)
