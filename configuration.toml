@@ -21,7 +21,7 @@ PATTERN = "<Touched>"
 PERSONALITY="./prompt_context/plantony_context.txt"
 
 [16.mainnet]
-ACTIVE = "TruE"
+ACTIVE = "True"
 FAILSAFE = 0
 BLOCKCHAIN_ADDRESS = "0x8acbae9CacC1ab3fB149E214499aFDE8912156B3"
 METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"

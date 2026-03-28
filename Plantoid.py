@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import regex_spm
 
 
-def invoke_plantony(plantony: Plantony, network, max_rounds=12):
+def invoke_plantony(plantony: Plantony, network, max_rounds=4):
 
     print('plantony initiating...')
     plantony.welcome()

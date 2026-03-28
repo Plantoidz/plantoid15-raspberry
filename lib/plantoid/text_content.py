@@ -313,7 +313,7 @@ def get_song_prompt(
     if n_lines > 6: n_lines = 6
     
     prompt = {
-            "en-EN": f"You are Plantoid, an enlightened being from the future. Write the lyrics for an opera song that is made of {n_lines} short sentences, based on the following input:\n\n{generated_transcript}\n\nInclude the following words in the lyrics: {selected_words_string}.",
+            "en-EN": f"You are Plantoid, an enlightened being from the future. Write the lyrics for an opera song that is made of {n_lines} lines with only a few words each, based on the following input:\n\n{generated_transcript}\n\nInclude the following words in the lyrics: {selected_words_string}. IMPORTANT: Lines must be less than 200 characters each! Make it as short as possible, not longer than 200 characters per line!",
             "fr-FR": f"Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. Écrit-moi les paroles d'un chant d'opéra qui fait exactement {n_lines} phrases, à partir des éléments suivants:\n\n{generated_transcript}\n\nInclut les mots suivant dans les paroles: {selected_words_string}. Les paroles doivent être strictement en français."
  
     }

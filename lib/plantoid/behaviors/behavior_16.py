@@ -27,11 +27,12 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     # listen for audio
     audiofile = plantoid.listen()
     
-    # generate the response
+    # generate the response ### NB: response is an array of lyrics
     response = behavior_library.generate_GPT_response("opera", plantoid, network, audiofile, tID, credits)
 
     # print response on the LP printer
-    behavior_library.print_response(plantoid, network, tID, response)
+    toprint = '\n'.join(response)
+    behavior_library.print_response(plantoid, network, tID, toprint)
 
     
     # create a song

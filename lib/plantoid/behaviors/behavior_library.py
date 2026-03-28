@@ -107,6 +107,38 @@ def generate_GPT_response(craft, plantoid, network, audio, tID, credits):
     response_text = PlantoidSpeech.GPTmagic(prompt)
 
     print('response text: ', response_text)
+
+
+    # Validate and fix line lengths for opera
+    if craft == "opera":
+        
+        # Split into individual lines and clean them
+        lines = []
+        
+        for line in response_text.split('\n'):
+            line = line.strip()
+            # Remove numbering like "(1)" or "1." from the start
+            line = re.sub(r'^\(\d+\)\s*', '', line)
+            line = re.sub(r'^\d+\.\s*', '', line)
+            # Remove quotes
+            line = line.strip('"\'')
+
+            if line and len(line) > 0:
+                # truncate is too long
+                if len(line) > 200:
+                    last_space = line[:200].rfind(' ')
+                    if last_space > 0:
+                        line = line[:last_space]
+                    else:
+                        line = line[:200]
+                    print(f"Warning: Truncated long line to {len(line)} chars")
+        
+                lines.append(line)
+    
+        response_lines = lines
+        response_text = '\n'.join(lines)
+        print('fixed response text: ', response_text)
+
   
     #--------
 
@@ -128,7 +160,10 @@ def generate_GPT_response(craft, plantoid, network, audio, tID, credits):
 
     plantoid.send_serial_message("awake")
 
-    return response_text
+    if craft == "opera":
+        return response_lines
+    else:
+        return response_text
     
 
 # this could theoretically be commented out -- use generate_response() instead !  :)
@@ -256,7 +291,7 @@ def print_response(plantoid, network, tID, text):
 
 
 
-def generate_song(text, credits):
+def generate_song(text, credits): ### NB: text is an array of lyrics
     
     credits = credits + 2
     if(credits > 6): credits = 6
@@ -276,7 +311,7 @@ def generate_song(text, credits):
             'positive_local_styles': ['long lyrical vocal lines', 'soprano', 'delicate woodwinds', 'string accompaniment'], 
             'negative_local_styles': ['heavy brass', 'percussion', 'electronic sounds'], 
             'duration_ms': 10000 * credits, 
-            'lines': [ text ]
+            'lines':  text 
         }
     ]
     }

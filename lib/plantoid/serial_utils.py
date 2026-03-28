@@ -33,11 +33,12 @@ def send_to_arduino(ser, string_to_send):
     start_marker = '<'
     end_marker = '>'
 
-    string_with_markers = start_marker + string_to_send + end_marker
+    string_with_markers = start_marker + string_to_send + end_marker + '\n'
 
     print('serial string is:', string_with_markers)
 
     ser.write(string_with_markers.encode('utf-8')) # encode needed for Python3
+    ser.flush()
 
 
 data_started = False
