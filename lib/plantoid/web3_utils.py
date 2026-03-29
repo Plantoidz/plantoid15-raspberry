@@ -1,6 +1,6 @@
 from web3 import Web3, EthereumTesterProvider
 from eth_account import Account, messages
-from oz_defender.relay import RelayClient, RelayerClient
+# from oz_defender.relay import RelayClient, RelayerClient
 import subprocess
 import os
 import time
@@ -32,8 +32,8 @@ load_dotenv()
 PINATA_API_KEY = os.environ.get("PINATA_API_KEY")
 PINATA_API_SECRET = os.environ.get("PINATA_SECRET_KEY")
 PINATA_JWT = os.environ.get('PINATA_JWT')
-DEFENDER_API_KEY = os.environ.get("DEFENDER_API_KEY")
-DEFENDER_API_SECRET = os.environ.get("DEFENDER_API_SECRET")
+# DEFENDER_API_KEY = os.environ.get("DEFENDER_API_KEY")
+# DEFENDER_API_SECRET = os.environ.get("DEFENDER_API_SECRET")
 SIGNER_PRIVATE_KEY = os.environ.get("SIGNER_PRIVATE_KEY")
 INFURA_API_KEY_MAINNET = os.environ.get("INFURA_MAINNET")
 INFURA_API_KEY_GOERLI = os.environ.get("INFURA_GOERLI")
@@ -366,17 +366,33 @@ def send_relayer_transaction(metadata_address, data):
 
     # https://github.com/franklin-systems/oz-defender/blob/trunk/oz_defender/relay/client.py
     # https://forum.openzeppelin.com/t/what-exactly-is-the-function-of-defenders-relay-when-using-metatransactions/23122/7
-    relayer = RelayerClient(api_key=DEFENDER_API_KEY, api_secret=DEFENDER_API_SECRET)
+    # relayer = RelayerClient(api_key=DEFENDER_API_KEY, api_secret=DEFENDER_API_SECRET)
 
+    # connect to Polygon
+    w3_polygon = Web3(Web3.HTTPProvider('https://polygon-mainnet.infura.io/v3/' + INFURA_API_KEY_MAINNET))
+
+    signer_private_key = get_signer_private_key()
+    account = Account.from_key(signer_private_key)
+
+    # build the tx
     tx = {
-      'to': metadata_address,
+      'to': Web3.to_checksum_address(metadata_address),
       'data': data,
-      'gasLimit': '100000',
-      'schedule': 'fast',
+      'chainId': 137, # Polygon
+      'gas': 100000,
+#      'schedule': 'fast',
+      'gasPrice': w3_polygon.eth.gas_price,
+      'nonce': w3_polygon.eth.get_transaction_count(account.address),
     }
 
-    response = relayer.send_transaction(tx)
-    print('sent metatransaction. relayer response:', response)
+    # sign and send
+    signed_tx = w3_polygon.eth.account.sign_transaction(tx, signer_private_key)
+    tx_hash = w3_polygon.eth.send_raw_transaction(signed_tx.raw_transaction)
+
+    print('sent transaction on Polygon. tx hash = ', tx_hash.hex())
+
+#    response = relayer.send_transaction(tx)
+#    print('sent metatransaction. relayer response:', response)
 
 def enable_seed_reveal(network, token_Id):
 
