@@ -53,8 +53,8 @@ def create_ipfs_qr(ipfs_link, output_file="/tmp/ipfs_qrcode.png", size=10):
 def print_thermal_txt(textual):
 
     try: 
-        # p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
-        p = Usb(0x0416, 0x5011)
+        p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
+        # p = Usb(0x0416, 0x5011)
         p.text(textual)
         p.cut()
         p.close()
@@ -67,8 +67,8 @@ def print_thermal_txt(textual):
 def print_thermal_img(image_file):
     
     try:
-        # p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
-        p = Usb(0x0416, 0x5011)        
+        p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
+        # p = Usb(0x0416, 0x5011)        
 
         img = Image.open(image_file)
         img = img.resize((400, 400))
