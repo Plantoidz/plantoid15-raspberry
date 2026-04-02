@@ -103,10 +103,10 @@ def GPTmagic(prompt, call_type='chat_completion', model="gpt-4"): # model: "qwen
           print("using local LLM model QWEN on GLITCHBOX")
           url = f"http://192.168.10.190:1234/v1/chat/completions" ## hard-coded, doesn't need to be configured
           payload = {
-              # "model": "qwen/qwen3.5-35b-a3b",
+               "model": "qwen/qwen3.5-35b-a3b",
               # "model": "qwen/qwen3.5-27b",
               # "model": "liquid/lfm2.5-1.2b",
-              "model": model,
+              # "model": model,
               "messages": [{"role": "user", "content": prompt}],
               "temperature": 0.7,
           }
