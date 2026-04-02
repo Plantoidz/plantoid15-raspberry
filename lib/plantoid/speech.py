@@ -87,19 +87,23 @@ def play_background_music_INTERNAL(filename, loops=-1):
     pygame.mixer.music.play(loops)
 
 
-def GPTmagic(prompt, call_type='chat_completion', local=False): 
+def GPTmagic(prompt, call_type='chat_completion', local=True): 
 
     if local == True:  # use Qwen LLM on the GLITCHBOX 
           import requests as req
           print("using local LLM model QWEN on GLITCHBOX")
-          url = f"http://192.168.:1234/v1/chat/completions"
+          url = f"http://192.168.10.130:1234/v1/chat/completions"
           payload = {
-              "model": model,
+              "model": "qwen/qwen3.5-35b-a3b",
               "messages": [{"role": "user", "content": prompt}],
               "temperature": 0.7,
           }
-          resp = req.post(url, json=payload, timeout=120)
+          resp = req.post(url, json=payload, timeout=30)
+          
+          if resp.status_code != 200:
+            print("LLM error: ", resp.status_code, resp.text)
           resp.raise_for_status()
+          
           return resp.json()["choices"][0]["message"]["content"]
 
     # default: OpenAI GPT
