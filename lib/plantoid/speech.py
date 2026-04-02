@@ -98,7 +98,7 @@ def GPTmagic(prompt, call_type='chat_completion', local=True):
               "messages": [{"role": "user", "content": prompt}],
               "temperature": 0.7,
           }
-          resp = req.post(url, json=payload, timeout=30)
+          resp = req.post(url, json=payload, timeout=120)
           
           if resp.status_code != 200:
             print("LLM error: ", resp.status_code, resp.text)
