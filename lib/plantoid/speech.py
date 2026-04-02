@@ -98,6 +98,9 @@ def GPTmagic(prompt, call_type='chat_completion', model="gpt-4"): # model: "qwen
         )
         return response.choices[0].message.content
 
+
+
+
     else :  # use LOCAL LLM on the GLITCHBOX 
           import requests as req
           print("using local LLM model QWEN on GLITCHBOX")
