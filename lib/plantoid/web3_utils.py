@@ -327,7 +327,7 @@ def create_signer_and_sign(msg_hash, private_key):
 
     # CORRECT!!
     prepared_message = messages.defunct_hash_message(primitive=msg_hash)
-    hash_signed_message = Account.signHash(prepared_message, private_key) # '0x' + private_key
+    hash_signed_message = Account.unsafe_sign_hash(prepared_message, private_key) # '0x' + private_key
     sig = hash_signed_message.signature.hex()
 
     # print('signature: ', sig)
