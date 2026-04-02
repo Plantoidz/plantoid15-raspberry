@@ -356,7 +356,7 @@ def encode_function_data(plantoid_address, abi_file_path, token_Id, ipfs_hash, s
     checksum_address =  Web3.to_checksum_address(plantoid_address)
 
     # Encode the function call
-    data = contract.encodeABI(fn_name="revealMetadata", args=[checksum_address, token_Id, token_Uri, sig])
+    data = contract.encodeABI(fn_name="revealMetadata", args=[checksum_address, int(token_Id), token_Uri, bytes.fromhex(sig.replace('0x', '')])
 
     # print('encoded function data: ', data)
 
