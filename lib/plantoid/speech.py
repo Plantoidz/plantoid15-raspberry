@@ -102,13 +102,13 @@ def GPTmagic(prompt, call_type='chat_completion', local=False):
           resp.raise_for_status()
           return resp.json()["choices"][0]["message"]["content"]
 
-      # default: OpenAI GPT
-      print("Using default OpenAI GPT")
-      config = default_chat_completion_config(model="gpt-4")
-      response = openai.ChatCompletion.create(
+    # default: OpenAI GPT
+    print("Using default OpenAI GPT")
+    config = default_chat_completion_config(model="gpt-4")
+    response = openai.ChatCompletion.create(
           messages=[{"role": "user", "content": prompt}], **config
-      )
-      return response.choices[0].message.content
+    )
+    return response.choices[0].message.content
 
 
 
