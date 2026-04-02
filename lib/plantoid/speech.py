@@ -87,15 +87,26 @@ def play_background_music_INTERNAL(filename, loops=-1):
     pygame.mixer.music.play(loops)
 
 
-def GPTmagic(prompt, call_type='chat_completion', local=True): 
+def GPTmagic(prompt, model="gpt-4"): # model: "qwen/qwen3.5-35b-a3b", "qwen/qwen3.5-27b", "liquid/lfm2.5-1.2b" 
 
-    if local == True:  # use Qwen LLM on the GLITCHBOX 
+    # default: OpenAI GPT
+    if (model == "gpt-4"):
+        print("Using default OpenAI GPT")
+        config = default_chat_completion_config(model="gpt-4")
+        response = openai.ChatCompletion.create(
+          messages=[{"role": "user", "content": prompt}], **config
+        )
+        return response.choices[0].message.content
+
+    else :  # use LOCAL LLM on the GLITCHBOX 
           import requests as req
           print("using local LLM model QWEN on GLITCHBOX")
-          url = f"http://192.168.10.130:1234/v1/chat/completions"
+          url = f"http://192.168.10.130:1234/v1/chat/completions" ## hard-coded, doesn't need to be configured
           payload = {
+              # "model": "qwen/qwen3.5-35b-a3b",
               # "model": "qwen/qwen3.5-27b",
-              "model": "liquid/lfm2.5-1.2b",
+              # "model": "liquid/lfm2.5-1.2b",
+              "model": model,
               "messages": [{"role": "user", "content": prompt}],
               "temperature": 0.7,
           }
@@ -107,13 +118,6 @@ def GPTmagic(prompt, call_type='chat_completion', local=True):
           
           return resp.json()["choices"][0]["message"]["content"]
 
-    # default: OpenAI GPT
-    print("Using default OpenAI GPT")
-    config = default_chat_completion_config(model="gpt-4")
-    response = openai.ChatCompletion.create(
-          messages=[{"role": "user", "content": prompt}], **config
-    )
-    return response.choices[0].message.content
 
 
 

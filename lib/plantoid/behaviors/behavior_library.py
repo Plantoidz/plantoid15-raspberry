@@ -104,7 +104,7 @@ def generate_GPT_response(craft, plantoid, network, audio, tID, credits):
     print("PROMPTING with ..............................................", prompt)
 
     # get GPT response
-    response_text = PlantoidSpeech.GPTmagic(prompt)
+    response_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
 
     print('response text: ', response_text)
 
@@ -244,7 +244,7 @@ def generate_oracle(plantoid, network, audio, tID, amount):
     # print(sermon_text)
 
     # get GPT response
-    sermon_text = PlantoidSpeech.GPTmagic(prompt)
+    sermon_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
 
     print('sermon text: ', sermon_text)
   

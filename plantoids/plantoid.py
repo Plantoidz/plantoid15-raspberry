@@ -15,7 +15,7 @@ import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
-    def __init__(self, serial_connector, eleven_voice_id, plantoid_number, path, lang, personality, pattern):
+    def __init__(self, serial_connector, llm_model, eleven_voice_id, plantoid_number, path, lang, personality, pattern):
 
         # instantaite serial connector
         self.serial_connector = serial_connector
@@ -35,6 +35,9 @@ class Plantony:
         self.opening = ""
         self.closing = ""
         self.prompt_text = ""
+
+        # LLM model to use
+        self.llm_model = llm_model
 
         # eleven voice id
         self.eleven_voice_id = eleven_voice_id
@@ -78,6 +81,8 @@ class Plantony:
 
     #     while not stop_event.is_set():
     #         playsound(music)
+
+
 
     def add_listener(self, event_name, callback):
 
@@ -216,7 +221,7 @@ class Plantony:
             # print("new prompt = " + new_prompt)
 
             # generate the response from the GPT model
-            agent_message = PlantoidSpeech.GPTmagic(agent_prompt, call_type='chat_completion')
+            agent_message = PlantoidSpeech.GPTmagic(agent_prompt, call_type='chat_completion', model=self.llm_model)
 
             # append the agent's turn to the latest round
             self.append_turn_to_round(self.AGENT, agent_message)
