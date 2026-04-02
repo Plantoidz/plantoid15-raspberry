@@ -221,7 +221,7 @@ class Plantony:
             # print("new prompt = " + new_prompt)
 
             # generate the response from the GPT model
-            agent_message = PlantoidSpeech.GPTmagic(agent_prompt, call_type='chat_completion', model=self.llm_model)
+            agent_message = PlantoidSpeech.GPTmagic(agent_prompt,  model=self.llm_model)
 
             # append the agent's turn to the latest round
             self.append_turn_to_round(self.AGENT, agent_message)
