@@ -87,7 +87,57 @@ def play_background_music_INTERNAL(filename, loops=-1):
     pygame.mixer.music.play(loops)
 
 
-def GPTmagic(prompt, call_type='chat_completion', model="gpt-4"): # model: "qwen/qwen3.5-35b-a3b", "qwen/qwen3.5-27b", "liquid/lfm2.5-1.2b" 
+
+def GPTmagic(prompt, model="gpt-4"):
+
+    import requests as req
+    
+    #1. Try MacBook LLM Studio
+    try:
+        url = "http://100.67.155.96:1234/v1/chat/completions"
+        payload =  {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.7,
+        } 
+        resp = req.post(url, json=payload, timeout=10)
+        if resp.status_code == 200:
+            print("LLM - using MacBook LM Studio ({model}))
+            return resp.json()["choices"][0]["message"]["content"]
+
+    except Exception:
+        pass
+
+    #2. Try GLITCHBOX LLM Studio (hard-coded model: liquid)
+    try:
+        url = "http://100.79.41.86:1234/v1/chat/completions"
+        payload =  {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.7,
+        } 
+        resp = req.post(url, json=payload, timeout=30)
+        if resp.status_code == 200:
+            print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED))
+            return resp.json()["choices"][0]["message"]["content"]
+
+    except Exception:
+        pass 
+
+   # 3. Fallback to GPT-4
+    if (model == "gpt-4"):
+        print("LLM - Fallbacking to OpenAI GPT-4")
+        config = default_chat_completion_config(model="gpt-4")
+        response = openai.ChatCompletion.create(
+          messages=[{"role": "user", "content": prompt}], **config
+        )
+        return response.choices[0].message.content
+ 
+
+
+
+
+def GPTmagic_old2(prompt, call_type='chat_completion', model="gpt-4"): # model: "qwen/qwen3.5-35b-a3b", "qwen/qwen3.5-27b", "liquid/lfm2.5-1.2b" 
 
     # default: OpenAI GPT
     if (model == "gpt-4"):
@@ -101,15 +151,20 @@ def GPTmagic(prompt, call_type='chat_completion', model="gpt-4"): # model: "qwen
 
 
 
-    else :  # use LOCAL LLM on the GLITCHBOX 
+    else :  # use LOCAL LLM 
+            # --> first try to connect on the local MacBook (100.67.155.96)
+            # --> and then on the GLITCHBOX (100.79.41.86)
+
           import requests as req
-          print("using local LLM model QWEN on GLITCHBOX")
+          print("testing if Studio LLM is running on local MacBook.. ")
+          print("testing if Studio LLM is running on GLITCHBOX.. ")
+
           url = f"http://192.168.10.130:1234/v1/chat/completions" ## hard-coded, doesn't need to be configured
           payload = {
-              "model": "qwen/qwen3.5-35b-a3b",
+              # "model": "qwen/qwen3.5-35b-a3b",
               # "model": "qwen/qwen3.5-27b",
               # "model": "liquid/lfm2.5-1.2b",
-              # "model": model,
+              "model": model,
               "messages": [{"role": "user", "content": prompt}],
               "temperature": 0.7,
           }
