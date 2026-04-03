@@ -118,7 +118,7 @@ def GPTmagic(prompt, model="gpt-4"):
         } 
         resp = req.post(url, json=payload, timeout=30)
         if resp.status_code == 200:
-            print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED))
+            print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED)")
             return resp.json()["choices"][0]["message"]["content"]
 
     except Exception:
