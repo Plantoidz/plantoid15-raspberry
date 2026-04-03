@@ -102,7 +102,7 @@ def GPTmagic(prompt, model="gpt-4"):
         } 
         resp = req.post(url, json=payload, timeout=10)
         if resp.status_code == 200:
-            print("LLM - using MacBook LM Studio ({model}))
+            print("LLM - using MacBook LM Studio ({model})")
             return resp.json()["choices"][0]["message"]["content"]
 
     except Exception:
@@ -112,7 +112,7 @@ def GPTmagic(prompt, model="gpt-4"):
     try:
         url = "http://100.79.41.86:1234/v1/chat/completions"
         payload =  {
-            "model": model,
+            "model": "liquid/lfm2.5-1.2b",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
         } 
