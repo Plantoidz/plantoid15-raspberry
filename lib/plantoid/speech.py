@@ -99,8 +99,11 @@ def GPTmagic(prompt, model="gpt-4"):
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
-        } 
+            "max_tokens": 150,
+        }
         resp = req.post(url, json=payload, timeout=10)
+        print("trying LLM MacBook with resp.status_code = ", resp.status_code) 
+
         if resp.status_code == 200:
             print("LLM - using MacBook LM Studio ({model})")
             return resp.json()["choices"][0]["message"]["content"]
@@ -115,8 +118,11 @@ def GPTmagic(prompt, model="gpt-4"):
             "model": "liquid/lfm2.5-1.2b",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
+            "max_tokens": 150,
         } 
         resp = req.post(url, json=payload, timeout=30)
+        print("trying LLM MacBook with resp.status_code = ", resp.status_code) 
+
         if resp.status_code == 200:
             print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED)")
             return resp.json()["choices"][0]["message"]["content"]
@@ -586,6 +592,8 @@ def recognize_speech(filename, lang=None):
                   files={"file": f},
                   timeout=20,
             )
+            print("trying ASR MacBook with resp.status_code = ", resp.status_code) 
+
         if resp.status_code == 200:
             text = resp.json().get("text", "").strip()
             if text:
@@ -603,6 +611,8 @@ def recognize_speech(filename, lang=None):
                   files={"file": f},
                   timeout=20,
             )
+            print("trying ASR GLITCHBOX with resp.status_code = ", resp.status_code) 
+
         if resp.status_code == 200:
             text = resp.json().get("text", "").strip()
             if text:
@@ -625,9 +635,9 @@ def recognize_speech(filename, lang=None):
       
         try:
             if lang:
-                return r.recognize_google(audio, language=lang)
+                return r.recognize_google(audio, language=lang) or ""
             else: 
-                return r.recognize_google(audio)
+                return r.recognize_google(audio) or ""
 
         except sr.UnknownValueError as e:
             print("Google ASR error: ", e)
