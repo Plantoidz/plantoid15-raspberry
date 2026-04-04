@@ -573,7 +573,73 @@ def record_wav_file(data, audio, audio_file_path):
         #wf.close()
 
 
+
 def recognize_speech(filename, lang=None):
+    
+    import requests as req
+
+    # 1. Try MacBook Whisper server
+    try:
+        with open(filename, 'rb') as f:
+            resp = req.post(
+                "http://100.67.155.96:8005/v1/audio/transcriptions",
+                  files={"file": f},
+                  timeout=20,
+            )
+        if resp.status_code == 200:
+            text = resp.json().get("text", "").strip()
+            if text:
+                print("ASR - using MacBook Whisper")
+                return text
+    except Exception:
+        pass
+
+
+    # 2. Try GLITBOX Whisper server
+    try:
+        with open(filename, 'rb') as f:
+            resp = req.post(
+                "http://100.79.41.86:8005/v1/audio/transcriptions",
+                  files={"file": f},
+                  timeout=20,
+            )
+        if resp.status_code == 200:
+            text = resp.json().get("text", "").strip()
+            if text:
+                print("ASR - using Glitchbox Whisper")
+                return text
+    except Exception:
+        pass
+
+
+    # 3. Fallback to Google Speech Recognition
+    print("ASR - falling back to Google Speech Recognition")
+
+    with sr.AudioFile(filename) as source:
+
+        r = sr.Recognizer()
+        r.energy_threshold = 50
+        r.dynamic_energy_threshold = False
+
+        audio = r.record(source)
+      
+        try:
+            if lang:
+                return r.recognize_google(audio, language=lang)
+            else: 
+                return r.recognize_google(audio)
+
+        except sr.UnknownValueError as e:
+            print("Google ASR error: ", e)
+
+        except sr.RequestError as e:
+            print("Google ASR error: Could not request results from Google Speech Recognition service; {0}".format(e))
+
+
+
+
+
+def recognize_speech_old(filename, lang=None):
     
 
     with sr.AudioFile(filename) as source:
