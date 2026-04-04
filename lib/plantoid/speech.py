@@ -99,14 +99,15 @@ def GPTmagic(prompt, model="gpt-4"):
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
-            "max_tokens": 150,
+            "max_tokens": 128,
         }
         resp = req.post(url, json=payload, timeout=10)
         print("trying LLM MacBook with resp.status_code = ", resp.status_code) 
 
         if resp.status_code == 200:
             print("LLM - using MacBook LM Studio ({model})")
-            return resp.json()["choices"][0]["message"]["content"]
+            content = resp.json()["choices"][0]["message"]["content"]
+            return trim_to_sentence(content)
 
     except Exception:
         pass
@@ -118,14 +119,15 @@ def GPTmagic(prompt, model="gpt-4"):
             "model": "liquid/lfm2.5-1.2b",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
-            "max_tokens": 150,
+            "max_tokens": 128,
         } 
         resp = req.post(url, json=payload, timeout=30)
         print("trying LLM MacBook with resp.status_code = ", resp.status_code) 
 
         if resp.status_code == 200:
             print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED)")
-            return resp.json()["choices"][0]["message"]["content"]
+            content = resp.json()["choices"][0]["message"]["content"]
+            return trim_to_sentence(content)
 
     except Exception:
         pass 
@@ -137,9 +139,17 @@ def GPTmagic(prompt, model="gpt-4"):
         response = openai.ChatCompletion.create(
           messages=[{"role": "user", "content": prompt}], **config
         )
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+        return trim_to_sentence(content)
  
 
+
+def trim_to_sentence(text):
+      # find the last sentence-ending punctuation
+      for i in range(len(text) - 1, -1, -1):
+          if text[i] in '.!?"':
+              return text[:i+1]
+      return text
 
 
 
