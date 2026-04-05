@@ -127,13 +127,13 @@ def GPTmagic(prompt, model="gpt-4"):
     try:
         url = "http://100.79.41.86:1234/v1/chat/completions"
         payload =  {
-            "model": "liquid/lfm2.5-1.2b",
+            "model": "qwen3.5-2b",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
             "max_tokens": 128,
         } 
         resp = req.post(url, json=payload, timeout=30)
-        print("trying LLM MacBook with resp.status_code = ", resp.status_code) 
+        print("trying LLM GLITCHBOX with resp.status_code = ", resp.status_code) 
 
         if resp.status_code == 200:
             print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED)")
