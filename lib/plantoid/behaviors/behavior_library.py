@@ -369,7 +369,7 @@ def read_oracle(plantoid, network, tID, sermon_text):
     path = network.plantoid_path
 
     # now let's read it aloud
-    audiofile = PlantoidSpeech.get_text_to_speech_response(sermon_text, plantoid.eleven_voice_id)
+    audiofile = PlantoidSpeech.get_text_to_speech_response(sermon_text, plantoid.voice_id)
     # stop_event.set() # stop the background noise
 
     sermons_path = path + "/audios/"

@@ -15,7 +15,7 @@ import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
 
-    def __init__(self, serial_connector, llm_model, eleven_voice_id, plantoid_number, path, lang, personality, pattern):
+    def __init__(self, serial_connector, llm_model, voice_id, plantoid_number, path, lang, personality, pattern):
 
         # instantaite serial connector
         self.serial_connector = serial_connector
@@ -40,7 +40,7 @@ class Plantony:
         self.llm_model = llm_model
 
         # eleven voice id
-        self.eleven_voice_id = eleven_voice_id
+        self.voice_id = voice_id
 
         # language selected
         self.lang = lang
@@ -156,20 +156,20 @@ class Plantony:
         # playsound(self.introduction)
         
 
-        audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.eleven_voice_id)
-        print('plantony opening', self.opening)
-        print("welcome plantony... opening = " + audiofile)
-    
-        playsound(audiofile)
+       # audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.voice_id)
+       # playsound(audiofile)
+
+        PlantoidSpeech.stream_response(self.opening, self.voice_id)
 
 
     def terminate(self):
 
         self.send_serial_message("speaking")
 
-        print('plantony closing', self.closing)
-        playsound(PlantoidSpeech.get_text_to_speech_response(self.closing, self.eleven_voice_id)) 
-        playsound(self.outroduction)
+        # playsound(PlantoidSpeech.get_text_to_speech_response(self.closing, self.voice_id)) 
+        # playsound(self.outroduction)
+
+        PlantoidSpeech.stream_response(self.closing, self.voice_id)
 
         self.send_serial_message("asleep") ## REMOVE
 
@@ -236,7 +236,7 @@ class Plantony:
             self.send_serial_message("speaking")
             
 
-            PlantoidSpeech.stream_response(agent_message, self.eleven_voice_id)
+            PlantoidSpeech.stream_response(agent_message, self.voice_id)
 
   #          self.send_serial_message("fire") ## REMOVE
   #          self.send_serial_message("awake") ## REMOVE

@@ -81,6 +81,13 @@ eleven_labs_api_key = os.environ.get("ELEVEN")
 elevenlabs = ElevenLabs(api_key=eleven_labs_api_key)
 
 
+# VOICE_ID to ELEVENLABS_VOICE_ID mapping
+voice_ids["plantony"] = "o7lPjDgzlF8ZloHzVPeK"
+voice_ids["trevor"] = "KRzS7KO2TLlh1BRPgHnB"
+voice_ids["primavera"] = "txtf1EDouKke753vN8SL"
+
+
+
 def play_background_music_INTERNAL(filename, loops=-1):
     pygame.mixer.init()
     pygame.mixer.music.load(filename)
@@ -246,7 +253,7 @@ def GPTmagic_old(prompt, call_type='chat_completion'):
         return response
 
 
-def get_text_to_speech_response(text, eleven_voice_id, callback=None):
+def get_text_to_speech_response(text, voice_id, callback=None):
 
     headers = {
         "Accept": "audio/mpeg",
@@ -255,7 +262,7 @@ def get_text_to_speech_response(text, eleven_voice_id, callback=None):
     }
 
     #eleven_voice_id = '21m00Tcm4TlvDq8ikWAM' # Rachel
-    url = "https://api.elevenlabs.io/v1/text-to-speech/"+eleven_voice_id
+    url = "https://api.elevenlabs.io/v1/text-to-speech/"+ voice_ids[voice_id]
 
     # Request TTS from remote API
     response = requests.post(
@@ -292,7 +299,117 @@ def get_text_to_speech_response(text, eleven_voice_id, callback=None):
     
 
 
-def stream_response(agent_message, voiceid):
+def stream_response(agent_message, voiceid="plantony"):
+
+    import requests as req
+
+    def extract_pcm(data):
+        out, i = bytearray(), 0
+        while i < len(data):
+            if i + 12 <= len(data) and data[i:i+4] == b'RIFF' and data[i+8:i+12] == b'WAVE':
+                j = i + 12
+                while j + 8 <= len(data):
+                    if data[j:j+4] == b'data': i = j + 8; break
+                    j += 8 + struct.unpack_from('<I', data, j+4)[0]
+                else: i +=44
+            else: out.append(data[i]); i += 1
+        return out
+
+    def play_streaming_tts(resp, default_sr=24000):
+        ring, lock, done = bytearray(), threading.Lock(), False
+
+        def cb(in_data, frames, t, status):
+            n = frames * 2
+            with lock:
+                if len(ring) >= n:
+                    out = bytes(ring[:n]); del ring[:n]; return (out, pyaudio.paContinue)
+                if done and not ring: return (b'\x00' * n, pyaudio.paComplete)
+                out = bytes(ring) + b'\x00' * (n - len(ring)); ring.clear()
+                return (out, pyaudio.paContinue)
+
+        p, stream_out, sr = pyaudio.PyAudio(), None, None
+        for chunk in resp.iter_content(chunk_size=4096):
+            if not sr:
+                if len(chunk) >= 44 and chunk[:4] == b'RIFF':
+                    sr = struct.unpack_from('<I', chunk, 24)[0]
+                else:
+                    sr = default_sr
+            
+            pcm = extract_pcm(chunk)
+            if pcm:
+                with lock: ring.extend(pcm)
+            if not stream_out and sr and len(ring) >= 144000:
+                stream_out = p.open(format=pyaudio.paInt16, channels=1, rate=sr,
+                                    output=True, frames_per_buffer=2048, stream_callback=cb)
+                stream_out.start_stream()
+
+        if not stream_out and ring and sr:
+            stream_out = p.open(format=pyaudio.paInt16, channels=1, rate=sr,
+                                output=True, frames_per_buffer=2048, stream_callback=cb)
+            stream_out.start_stream()
+
+        done = True
+        if stream_out:
+            while stream_out.is_active(): time.sleep(0.05)
+            stream_out.stop_stream(); stream_out.close()
+        p.terminate()
+
+    # 1. try MacBookPro
+    try:
+        ref_audio = f"/Users/ya/Desktop/PLANTOID 22/WHISPER/QwenTTS/voice-samples/{voice_name}.mp3"
+        ref_text = "Hello my name is Plantoid, I am a blockchain-based lifeform. I feed off cryptocurrency in order to
+  replicate myself."
+
+        resp = req.post("http://100.67.155.96:8000/v1/audio/speech", json = {
+            "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+            "input": agent_message,
+            "ref_audio": ref_audio, "ref_text": ref_text,
+            "response_format": "wav",
+            "stream": True, "streaming_interval": 2.0,
+          }, timeout=10, stream=True)
+
+        if resp.status_code == 200:
+            print(f"TTS - using MacBookPro ({voice_name})")
+            play_streaming_tts(resp, default_sr=24000)
+            return
+    except Exception as e:
+        print(f"MacBookPro TTS failed: {e}")
+        
+
+    # 2. try Glitchbox
+    try:
+        resp = req.post("http://100.79.41.86:8000/v1/audio/speech", json = {
+            "model" : "qwen-tts",
+            "input" : agent_message,
+            "voice" : f"clone:{voice_name}",
+            "response_format" : "wav",
+            "stream" : True,
+            "streaming_interval" : 2.0,
+        } timeout=10, stream=True)
+
+        if resp.status_code == 200:
+            print(f"TTS - using Glitchbox (clone: {voice_name})")
+            play_streaming_tts(resp, default_sr=24000)
+            return
+    except Exception as e:
+        print("Glitchbox TTS failed: {e}")
+
+
+
+    # 3. fallback to Elevenlabs
+
+    print("TTS - falling back to ElevenLabs")
+    audio_stream = elevenlabs.text_to_speech.stream(
+        text=agent_message,
+        model_id="eleven_multilingual_v2",
+        voice_id=voice_ids[voice_name],
+    )
+    stream(audio_stream)
+
+
+
+
+def stream_response_old(agent_message, voiceid):
             audio_stream = elevenlabs.text_to_speech.stream(
                 text=agent_message,
              #  model="eleven_turbo_v2",

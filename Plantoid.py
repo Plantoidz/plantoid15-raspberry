@@ -200,7 +200,7 @@ def main():
     use_serial = str_to_bool(plantoid_cfg['USE_SERIAL'])
 
     llm_model = plantoid_cfg['LLM_MODEL']
-    eleven_voice_id = plantoid_cfg['ELEVEN_VOICE_ID'] # set up the voice of the plantoid
+    voice_id = plantoid_cfg['VOICE_ID'] # set up the voice of the plantoid
     max_rounds = plantoid_cfg['max_rounds'] # set up the number of rounds for the plantoid
     lang = plantoid_cfg['LANG'] # check if a particular language is set
     personality = plantoid_cfg['PERSONALITY'] # load the personality prompt context
@@ -253,7 +253,7 @@ def main():
 
 
     # instantiate plantony (with serial)
-    plantony = Plantony(ser, llm_model, eleven_voice_id, int(plantoid_number), path, lang, personality, pattern)
+    plantony = Plantony(ser, llm_model, voice_id, int(plantoid_number), path, lang, personality, pattern)
 
     # setup plantony
     plantony.setup()

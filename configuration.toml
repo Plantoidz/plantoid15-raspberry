@@ -11,7 +11,8 @@ device_bias=-100
 threshold_bias=0
 
 [16]
-ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
+# ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
+VOICE_ID="plantony"
 max_rounds=4
 USE_SERIAL = "True"
 #LANG="fr-FR"
@@ -39,7 +40,8 @@ METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 
 [15]
-ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
+#ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
+VOICE_ID="plantony"
 max_rounds=4
 USE_SERIAL = "True"
 #LANG="fr-FR"
@@ -66,7 +68,8 @@ METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 
 [14]
-ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
+#ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
+VOICE_ID="plantony"
 max_rounds=4
 USE_SERIAL = "True"
 LANG="en-EN"
