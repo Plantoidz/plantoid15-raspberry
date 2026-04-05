@@ -357,8 +357,7 @@ def stream_response(agent_message, voiceid="plantony"):
     # 1. try MacBookPro
     try:
         ref_audio = f"/Users/ya/Desktop/PLANTOID 22/WHISPER/QwenTTS/voice-samples/{voice_name}.mp3"
-        ref_text = "Hello my name is Plantoid, I am a blockchain-based lifeform. I feed off cryptocurrency in order to
-  replicate myself."
+        ref_text = "Hello my name is Plantoid, I am a blockchain-based lifeform. I feed off cryptocurrency in order to replicate myself."
 
         resp = req.post("http://100.67.155.96:8000/v1/audio/speech", json = {
             "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
