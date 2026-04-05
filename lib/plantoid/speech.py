@@ -402,7 +402,7 @@ def stream_response(agent_message, voiceid="plantony"):
     audio_stream = elevenlabs.text_to_speech.stream(
         text=agent_message,
         model_id="eleven_multilingual_v2",
-        voice_id=voice_ids[voice_name],
+        voice_id=voice_ids[voiceid],
     )
     stream(audio_stream)
 
