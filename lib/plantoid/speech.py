@@ -369,7 +369,7 @@ def stream_response(agent_message, voiceid="plantony"):
           }, timeout=10, stream=True)
 
         if resp.status_code == 200:
-            print(f"TTS - using MacBookPro ({voice_name})")
+            print(f"TTS - using MacBookPro ({voiceid})")
             play_streaming_tts(resp, default_sr=24000)
             return
     except Exception as e:
@@ -381,7 +381,7 @@ def stream_response(agent_message, voiceid="plantony"):
         resp = req.post("http://100.79.41.86:8000/v1/audio/speech", json = {
             "model" : "qwen-tts",
             "input" : agent_message,
-            "voice" : f"clone:{voice_name}",
+            "voice" : f"clone:{voiceid}",
             "response_format" : "wav",
             "stream" : True,
             "streaming_interval" : 2.0,
@@ -392,7 +392,7 @@ def stream_response(agent_message, voiceid="plantony"):
             play_streaming_tts(resp, default_sr=24000)
             return
     except Exception as e:
-        print("Glitchbox TTS failed: {e}")
+        print(f"Glitchbox TTS failed: {e}")
 
 
 
