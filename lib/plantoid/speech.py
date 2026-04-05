@@ -88,6 +88,7 @@ voice_ids = {}
 voice_ids["plantony"] = "o7lPjDgzlF8ZloHzVPeK"
 voice_ids["trevor"] = "KRzS7KO2TLlh1BRPgHnB"
 voice_ids["primavera"] = "txtf1EDouKke753vN8SL"
+voice_ids["iannis"] = "ejJ1ETWS2ohLMMeCu1H3"
 
 
 
@@ -728,6 +729,7 @@ def recognize_speech(filename, lang=None):
             if text:
                 print("ASR - using MacBook Whisper")
                 return text
+            else: return ""
     except Exception:
         pass
 
@@ -747,6 +749,7 @@ def recognize_speech(filename, lang=None):
             if text:
                 print("ASR - using Glitchbox Whisper")
                 return text
+            else: return ""
     except Exception:
         pass
 
