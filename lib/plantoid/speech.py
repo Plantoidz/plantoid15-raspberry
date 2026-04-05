@@ -82,6 +82,7 @@ elevenlabs = ElevenLabs(api_key=eleven_labs_api_key)
 
 
 # VOICE_ID to ELEVENLABS_VOICE_ID mapping
+voice_ids = []
 voice_ids["plantony"] = "o7lPjDgzlF8ZloHzVPeK"
 voice_ids["trevor"] = "KRzS7KO2TLlh1BRPgHnB"
 voice_ids["primavera"] = "txtf1EDouKke753vN8SL"
