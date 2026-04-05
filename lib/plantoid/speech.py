@@ -384,7 +384,7 @@ def stream_response(agent_message, voiceid="plantony"):
             "response_format" : "wav",
             "stream" : True,
             "streaming_interval" : 2.0,
-        } timeout=10, stream=True)
+        }, timeout=10, stream=True)
 
         if resp.status_code == 200:
             print(f"TTS - using Glitchbox (clone: {voice_name})")
