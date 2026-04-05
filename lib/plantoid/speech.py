@@ -357,7 +357,7 @@ def stream_response(agent_message, voiceid="plantony"):
 
     # 1. try MacBookPro
     try:
-        ref_audio = f"/Users/ya/Desktop/PLANTOID 22/WHISPER/QwenTTS/voice-samples/{voice_name}.mp3"
+        ref_audio = f"/Users/ya/Desktop/PLANTOID 22/WHISPER/QwenTTS/voice-samples/{voiceid}.mp3"
         ref_text = "Hello my name is Plantoid, I am a blockchain-based lifeform. I feed off cryptocurrency in order to replicate myself."
 
         resp = req.post("http://100.67.155.96:8000/v1/audio/speech", json = {
@@ -388,7 +388,7 @@ def stream_response(agent_message, voiceid="plantony"):
         }, timeout=10, stream=True)
 
         if resp.status_code == 200:
-            print(f"TTS - using Glitchbox (clone: {voice_name})")
+            print(f"TTS - using Glitchbox (clone: {voiceid})")
             play_streaming_tts(resp, default_sr=24000)
             return
     except Exception as e:
