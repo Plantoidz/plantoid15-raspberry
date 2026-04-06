@@ -334,7 +334,7 @@ def stream_response(agent_message, voiceid="plantony"):
         with ignoreStderr():
             p = pyaudio.PyAudio()
         stream_out, sr = None, None
-        
+
         for chunk in resp.iter_content(chunk_size=4096):
             if not sr:
                 if len(chunk) >= 44 and chunk[:4] == b'RIFF':
@@ -887,40 +887,45 @@ def listen_smartASR():
     ## Fallback to Deepgram cloud
     print("Smart ASR - falling back to DeepGram")
     try:
-        from deepgram import DeepgramClient, LiveTranscriptionEvents, LiveOptions
+        from deepgram import DeepgramClient, LiveOptions
 
         dg = DeepgramClient(os.environ.get("DEEPGRAM_API_KEY"))
         result_text = []
-        done = asyncio.Event()
+        done_event = asyncio.Event()
 
         async def _deepgram_stream():
             connection = dg.listen.asyncwebsocket.v("1")
 
-            async def on_message(self, result, **kwargs):
+            def on_message(self, result, **kwargs):
                 transcript = result.channel.alternatives[0].transcript
                 if result.is_final and transcript:
                     result_text.append(transcript)
                 if result.speech_final:
-                    done.set()
+                    done_event.set()
 
-            connection.on(LiveTranscriptionEvents.Transcript, on_message)
+            connection.on("Results", on_message)
 
-            await connection.start(LiveOptions(
+            options = LiveOptions(
                     model="nove-3", language="en",
-                    endpointing=300, smart_format=True, ))
+                    endpointing=300, smart_format=True, 
+                    sample_rate=16000, channels=1, encoding="linear16")
+
+            connection.start(LiveOptions)
                 
             with ignoreStderr():
                 audio = pyaudio.PyAudio()
             mic = audio.open(format = pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=512)
 
+            print("Streaming on Deepgram...")
+
             try:
-                while not done.is_set():
+                while not done_event.is_set():
                     data = mic.read(512, exception_on_overflow=False)
-                    await connection.send(data)
+                    connection.send(data)
 
             finally:
                 mic.stop_stream(); mic.close(); audio.terminate()
-                await connection.finish()
+                connection.finish()
 
             return " ".join(result_text)
             
