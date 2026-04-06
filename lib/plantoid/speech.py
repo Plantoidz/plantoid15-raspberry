@@ -331,7 +331,10 @@ def stream_response(agent_message, voiceid="plantony"):
                 out = bytes(ring) + b'\x00' * (n - len(ring)); ring.clear()
                 return (out, pyaudio.paContinue)
 
-        p, stream_out, sr = pyaudio.PyAudio(), None, None
+        with ignoreStderr():
+            p = pyaudio.PyAudio()
+        stream_out, sr = None, None
+        
         for chunk in resp.iter_content(chunk_size=4096):
             if not sr:
                 if len(chunk) >= 44 and chunk[:4] == b'RIFF':
