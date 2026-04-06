@@ -851,7 +851,7 @@ def smart_listen_ASR():
                         print("Speech detected")
 
                     elif event["event"] == "incomplete":
-                        print(f"Still talking (prob={event[probability']:.2f})...")
+                        print(f"Still talking (prob={event['probability']:.2f})...")
                     
                     elif event['event'] = "transcription":
                         text = event.get("text", "").strip()
