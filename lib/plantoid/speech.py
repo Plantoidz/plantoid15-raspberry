@@ -533,7 +533,9 @@ def return_noise_threshold(noisy, threshold_bias=0):
         
     return max(0,thresholds[-1] + threshold_bias)
 
-def listen_for_speech(path=None): # @@@ remember to add acknowledgements afterwards
+
+
+def listen_for_speech(): # @@@ remember to add acknowledgements afterwards
 
     # config = load_config(path+'/configuration.toml')
 
@@ -544,7 +546,9 @@ def listen_for_speech(path=None): # @@@ remember to add acknowledgements afterwa
 
     # define the audio file path
     # TODO: pass as param
-    audio_file_path = path + "/tmp/temp_reco.wav"
+    
+    # audio_file_path = path + "/tmp/temp_reco.wav"
+    audio_file_path = "/tmp/temp_reco.wav"
 
     # audio = pyaudio.PyAudio()
 
@@ -692,12 +696,14 @@ def listen_for_speech(path=None): # @@@ remember to add acknowledgements afterwa
         
         except OSError as error:
        
-            error_sound_path = path+"/media/say_again.mp3"
+            # error_sound_path = path+"/media/say_again.mp3"
             print('OS Error encountered:', error)
             #playsound(error_sound_path)
-            play_background_music_INTERNAL(error_sound_path, loops=0)
+            # play_background_music_INTERNAL(error_sound_path, loops=0)
 
     return audio_file_path
+
+
 
 def record_wav_file(data, audio, audio_file_path):
 
@@ -808,4 +814,72 @@ def recognize_speech_old(filename, lang=None):
 
         return usertext
     
+
+
+
+def smart_listen_ASR():
+
+    # Stream audio to 1. MacBookPro or 2. GLITCHBOX for VAD + Smart Turn + ASR
+    # Fall back to local recording + standard ASR failsafe system if servers are unavaible
+
+    import asyncio, json
+    import websockets
+
+    SERVERS = [
+        ("MackBook",  "ws://100.67.155.96:8200/v1/listen"),
+        ("Glitchbox", "ws://100.79.41.86:8200/v1/listen"),
+    ]    
+
+    async def _stream(name, uri):
+        async with websockets.connect(uri, open_timeout=5) as ws:
+            with ignoreStderr():
+                audio = pyaudio.PyAudio()
+
+            mic = audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=512)
+
+            print(f"Smart ASR - steraming to {name} ...")
+
+            while True:
+                data = mic.read(512, exception_on_overflow=False)
+                await ws.send(data)
+
+                try:
+                    msg = await asyncio.wait_for(ws.recv(), timeout=0.001)
+                    event = json.loads(msg)
+
+                    if event["event"] == "speech_start":
+                        print("Speech detected")
+
+                    elif event["event"] == "incomplete":
+                        print(f"Still talking (prob={event[probability']:.2f})...")
+                    
+                    elif event['event'] = "transcription":
+                        text = event.get("text", "").strip()
+                        print(f"Heard: {text}")
+                        mic.stop_stream()
+                        mic.sclose()
+                        audio.terminate()
+                        return text
+                
+                except asyncio.TimeoutError:
+                    pass
+    
+    for name, uri in SERVERS:
+        try:
+            result = asyncio.get_event_loop().run_until_complete(_stream(name, uri))
+            if result: 
+                return result
+        except Exception as e:
+            print(f"Smart ASR - {name} failed: {e}")
+    
+    print("Smart ASR - falling back to local")
+    return listen_and_transcribe()
+
+
+def listen_and_transcribe():
+
+    # Local recording into local file + separate ASR
+
+    audiofile = listen_for_speech()
+    return recognize_speech(audiofile) or ""
 

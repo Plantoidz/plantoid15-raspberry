@@ -177,6 +177,17 @@ class Plantony:
     def listen(self):
 
         self.send_serial_message("listening")
+        self.play_background_music(self.cleanse, loops=0)
+        user_message = PlantoidSpeech.smart_listen_ASR()
+        playsound(self.acknowledge())
+        print("Plantony has heard -----> ", user_message)
+        return user_message
+
+
+
+    def listen_old(self):
+
+        self.send_serial_message("listening")
 
         #playsound(self.beep_start)
         self.play_background_music(self.cleanse, loops=0)
@@ -189,7 +200,42 @@ class Plantony:
 
         return audiofile
 
-    def respond(self, audio):
+
+
+
+    def respond(self, user_message):
+
+        self.send_serial_message("thinking")
+       
+        # get the path to the background music and play it
+        background_music_path = self.path+"/media/ambient3.mp3" 
+        self.play_background_music(background_music_path)
+
+        if len(user_message) == 0:
+                print('no text heard, using default text')
+                user_message = "Tell me more..."
+
+        # append the user's turn to the latest round
+        self.append_turn_to_round(self.USER, user_message) 
+
+        agent_prompt = self.update_prompt()
+
+       # generate the response from the GPT model
+        agent_message = PlantoidSpeech.GPTmagic(agent_prompt,  model=self.llm_model) 
+
+        # append the agent's turn to the latest round
+        self.append_turn_to_round(self.AGENT, agent_message)
+
+        self.stop_background_music()
+
+        self.send_serial_message("speaking")
+
+       PlantoidSpeech.stream_response(agent_message, self.voice_id) 
+
+
+
+
+    def respond_old(self, audio):
 
      #   def prompt_agent_and_respond(audio, callback):
 
