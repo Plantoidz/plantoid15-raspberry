@@ -898,6 +898,8 @@ def listen_smartASR():
 
         async def _deepgram_stream():
             headers = { "Authorization": f"Token {DEEPGRAM_KEY}"}
+            mic = None
+            audio = None
 
             async with ws_lib.connect(DG_URL, additional_headers=headers) as ws:
                 with ignoreStderr():
@@ -908,22 +910,23 @@ def listen_smartASR():
                 print("Mic opened. starting send ...")
 
                 print("Streaming on Deepgram...")
+                result_holder = [ None ]
+
                 import json as json_lib
 
                 async def send_audio():
                     try:
-                        while True:
+                        while result_holder[0] is None:
                            data = mic.read(512, exception_on_overflow=False)
                            samples32 = np.frombuffer(data, dtype=np.int32)
                            samples16 = (samples32 >> 16).astype(np.int16)
                            await ws.send(samples16.tobytes()) 
+                           await asyncio.sleep(0) # yield control
                     except Exception:
                         pass
-                
-                send_task = asyncio.ensure_future(send_audio())
 
-                transcripts = []
-                try:
+                async def recv_results():
+                    transcripts = []
                     async for msg in ws:
                         result = json_lib.loads(msg)
                         # DEBUG
@@ -932,18 +935,19 @@ def listen_smartASR():
                             if transcript:
                                 transcripts.append(transcript)
                             if result.get("speech_final"):
-                                send_task.cancel()
-                            return " ".join(transcripts)
+                                result_holder[0] = " ".join(transcripts)
+                                return
+                
+                try:
+                    asyncio.gather(send_audi(), recv_results())
                 finally:
                     if mic:
                         mic.stop_stream(); mic.close(); 
                     if audio:
                         audio.terminate()
                
-            
-        text = asyncio.get_event_loop().run_until_complete(_deepgram_stream())
-        if text:
-            return text
+               return result_holder[0]
+               
 
     except Exception as e:
         print(f"Deepgram failed: {e}")
