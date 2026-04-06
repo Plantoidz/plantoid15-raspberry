@@ -897,7 +897,10 @@ def listen_smartASR():
             async with ws_lib.connect(DG_URL, additional_headers=headers) as ws:
                 with ignoreStderr():
                     audio = pyaudio.PyAudio()
+
+                print("Opening mic...")
                 mic = audio.open(format = pyaudio.paInt32, channels=1, rate=44100, input=True, frames_per_buffer=512)
+                print("Mic opened. starting send ...")
 
                 print("Streaming on Deepgram...")
                 import json as json_lib
@@ -924,7 +927,10 @@ def listen_smartASR():
                                 send_task.cancel()
                                 return transcript
                 finally:
-                    mic.stop_stream(); mic.close(); audio.terminate()
+                    if mic:
+                        mic.stop_stream(); mic.close(); 
+                    if audio:
+                        audio.terminate()
                
             
         text = asyncio.get_event_loop().run_until_complete(_deepgram_stream())
