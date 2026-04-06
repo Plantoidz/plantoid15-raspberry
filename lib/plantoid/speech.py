@@ -906,7 +906,7 @@ def listen_smartASR():
                     try:
                         while True:
                            data = mic.read(512, exception_on_overflow=False)
-                            await ws.send(data) 
+                           await ws.send(data) 
                     except Exception:
                         pass
                 
