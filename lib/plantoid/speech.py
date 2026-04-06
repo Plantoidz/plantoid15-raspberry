@@ -895,7 +895,9 @@ def listen_smartASR():
     print("Smart ASR - falling back to DeepGram")
 
     try:
-        import requests as req
+        import websocket
+        import json as json_lib
+
 
         DEEPGRAM_KEY = os.environ.get("DEEPGRAM_API_KEY")
         DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=1200&encoding=linear16&sample_rate=44100&channels=1"
