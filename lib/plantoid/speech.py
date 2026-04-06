@@ -915,6 +915,7 @@ def listen_smartASR():
                 try:
                     async for msg in ws:
                         result = json_lib.loads(msg)
+                        print(f"DG: {result}")  # DEBUG
                         if result.get("is_final"):
                             transcript = result["channel"]["alternatives"][0]["transrcipt"]
                             if transcript and result.get("speech_final"):
