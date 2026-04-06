@@ -902,7 +902,8 @@ def listen_smartASR():
         DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=1200&encoding=linear16&sample_rate=44100&channels=1"
 
         result = [None]
-        ws = websocket.create_connection(DG_URL, header=[f"Authorization: Token {DEEPGRAM_KEY}"])
+        ws = websocket.create_connection(DG_URL, header=[f"Authorization: Token {DEEPGRAM_KEY}"], timeout=5)
+        print(f"DG connected, key starts with: {DEEPGRAM_KEY[:8]}...")
 
         with ignoreStderr():
             audio = pyaudio.PyAudio()
