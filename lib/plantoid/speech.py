@@ -884,7 +884,7 @@ def listen_smartASR():
     ## Fallback to Deepgram cloud
     print("Smart ASR - falling back to DeepGram")
     try:
-        from deepgram import DeepgramClient. LiveTranscriptionEvents, LiveOptions
+        from deepgram import DeepgramClient, LiveTranscriptionEvents, LiveOptions
 
         dg = DeepgramClient(os.environ.get("DEEPGRAM_API_KEY"))
         result_text = []
