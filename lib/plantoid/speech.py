@@ -915,15 +915,15 @@ def listen_smartASR():
                     data = mic.read(512, exception_on_overflow=False)
                     await connection.send(data)
 
-                finally:
-                    mic.stop_stream(); mic.close(); audio.terminate()
-                    await connection.finish()
+            finally:
+                mic.stop_stream(); mic.close(); audio.terminate()
+                await connection.finish()
 
-                return " ".join(result_text)
+            return " ".join(result_text)
             
-            text = asyncio.get_event_loop().run_until_complete(_deepgram_stream())
-            if text:
-                return text
+        text = asyncio.get_event_loop().run_until_complete(_deepgram_stream())
+        if text:
+            return text
 
     except Exception as e:
         print(f"Deepgram failed: {e}")
