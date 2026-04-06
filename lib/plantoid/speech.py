@@ -817,7 +817,7 @@ def recognize_speech_old(filename, lang=None):
 
 
 
-def smart_listen_ASR():
+def listen_smartASR():
 
     # Stream audio to 1. MacBookPro or 2. GLITCHBOX for VAD + Smart Turn + ASR
     # Fall back to local recording + standard ASR failsafe system if servers are unavaible
@@ -837,7 +837,7 @@ def smart_listen_ASR():
 
             mic = audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=512)
 
-            print(f"Smart ASR - steraming to {name} ...")
+            print(f"Smart ASR - streaming to {name} ...")
 
             try:
 
@@ -877,8 +877,58 @@ def smart_listen_ASR():
         except Exception as e:
             print(f"Smart ASR - {name} failed: {e}")
     
-    print("Smart ASR - falling back to local")
-    return listen_and_transcribe()
+    ## Fallback to local recording and remote ASR transcription
+    # print("Smart ASR - falling back to local")
+    # return listen_and_transcribe()
+
+    ## Fallback to Deepgram cloud
+    print("Smart ASR - falling back to DeepGram")
+    try:
+        from deepgram import DeepgramClient. LiveTranscriptionEvents, LiveOptions
+
+        dg = DeepgramClient(os.environ.get("DEEPGRAM_API_KEY"))
+        result_text = []
+        done = asyncio.Event()
+
+        async def _deepgram_stream():
+            connection = dg.listen.asyncwebsocket.v("1")
+
+            async def on_message(self, result, **kwargs):
+                transcript = result.channel.alternatives[0].transcript
+                if result.is_final and transcript:
+                    result_text.append(transcript)
+                if result.speech_final:
+                    done.set()
+
+            connection.on(LiveTranscriptionEvents.Transcript, on_message)
+
+            await connection.start(LiveOptions(
+                    model="nove-3", language="en",
+                    endpointing=300, smart_format=True, ))
+                
+            with ignoreStderr():
+                audio = pyaudio.PyAudio()
+            mic = audio.open(format = pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=512)
+
+            try:
+                while not done.is_set():
+                    data = mic.read(512, exception_on_overflow=False)
+                    await connection.send(data)
+
+                finally:
+                    mic.stop_stream(); mic.close(); audio.terminate()
+                    await connection.finish()
+
+                return " ".join(result_text)
+            
+            text = asyncio.get_event_loop().run_until_complete(_deepgram_stream())
+            if text:
+                return text
+
+    except Exception as e:
+        print(f"Deepgram failed: {e}")
+        
+
 
 
 def listen_and_transcribe():
