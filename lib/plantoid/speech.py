@@ -903,14 +903,9 @@ def listen_smartASR():
         DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=1200&encoding=linear16&sample_rate=44100&channels=1"
 
         result = [None]
-        ws = websocket.create_connection(DG_URL, header=[f"Authorization: Token {DEEPGRAM_KEY}"], timeout=5)
+        ws = websocket.create_connection(DG_URL, header=[f"Authorization: Token {DEEPGRAM_KEY}"])
         print(f"DG connected, key starts with: {DEEPGRAM_KEY[:8]}...")
 
-        with ignoreStderr():
-            audio = pyaudio.PyAudio()
-        mic = audio.open(format=pyaudio.paInt32, channels=1, rate=44100, input=True, frames_per_buffer=1024)
-
-        print("Mic opened. Streaming on Deepgram ...")
         transcripts = []
 
         def recv_thread():
@@ -941,7 +936,11 @@ def listen_smartASR():
 
         t = threading.Thread(target=recv_thread, daemon=True)
         t.start()
-        time.sleep(0.1) # let recv thread connect
+
+        with ignoreStderr():
+            audio = pyaudio.PyAudio()
+        mic = audio.open(format=pyaudio.paInt32, channels=1, rate=44100, input=True, frames_per_buffer=1024)
+        print("Mic opened -- streaming to Deepgram")
 
         while result[0] is None:
             data = mic.read(1024, exception_on_overflow=False)
