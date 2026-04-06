@@ -895,66 +895,51 @@ def listen_smartASR():
     print("Smart ASR - falling back to DeepGram")
 
     try:
-        import websockets as ws_lib
+        import websockets
+        import json as json_lib
+
         DEEPGRAM_KEY = os.environ.get("DEEPGRAM_API_KEY")
-        DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=1500&encoding=linear16&sample_rate=44100&channels=1"
+        DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=1200&encoding=linear16&sample_rate=44100&channels=1"
 
-        async def _deepgram_stream():
-            headers = { "Authorization": f"Token {DEEPGRAM_KEY}"}
-            mic = None
-            audio = None
+        result = [None]
+        ws = websocket.create_connection(DG_URL, header=[f"Authorization: Token {DEEPGRAM_KEY}"])
 
-            async with ws_lib.connect(DG_URL, additional_headers=headers) as ws:
-                with ignoreStderr():
-                    audio = pyaudio.PyAudio()
+        with ignoreStderr():
+            audio = pyaudio.PyAudio()
+        mic = audio.open(format=pyaudio.paInt32, channels=1, rate=44100, input=True, frames_per_buffer=1024)
 
-                print("Opening mic...")
-                mic = audio.open(format = pyaudio.paInt32, channels=1, rate=44100, input=True, frames_per_buffer=512)
-                print("Mic opened. Streaming on Deepgram ...")
+        print("Mic opened. Streaming on Deepgram ...")
+        transcripts = []
 
-                result_holder = [ None ]
-                import json as json_lib
-
-                async def send_audio():
-                    try:
-                        while result_holder[0] is None:
-                           data = mic.read(512, exception_on_overflow=False)
-                           samples32 = np.frombuffer(data, dtype=np.int32)
-                           samples16 = (samples32 >> 16).astype(np.int16)
-                           await ws.send(samples16.tobytes()) 
-                           await asyncio.sleep(0) # yield control
-                    except Exception:
-                        pass
-
-                async def recv_results():
-                    transcripts = []
-                    async for msg in ws:
-                        result = json_lib.loads(msg)
-                        # DEBUG
-                        if result.get("is_final"):
-                            transcript = result["channel"]["alternatives"][0]["transcript"]
-                            if transcript:
-                                transcripts.append(transcript)
-                            if result.get("speech_final"):
-                                result_holder[0] = " ".join(transcripts)
-                                return
-                
+        def recv_threads():
+            while result[0] is None:
                 try:
-                    await asyncio.gather(send_audio(), recv_results())
-                finally:
-                    if mic:
-                        mic.stop_stream(); mic.close(); 
-                    if audio:
-                        audio.terminate()
-               
-                return result_holder[0]
-               
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        text = loop.run_until_complete(_deepgram_stream())
-        # loop.close()
-        if text:
-                return text
+                    msg = ws.recv()
+                    data = json_lib.loads(msg)
+                    if data.get()"is_final"):
+                        t = data["channel"]["alternatives"][0]["transcript"] 
+                        if t:
+                            transcripts.append(t)
+                            print(f"DG: {t}")
+                        if data.get("speech_final"):
+                            result[0] = " ".joint(transcripts)
+                except:
+                    break
+
+        t = threading.Thread(target=recv_thread, daemon=True)
+        t.start()
+
+        while result[0] is None:
+            data = mic.read(512, exception_on_overflow=False)
+            samples32 = np.frombuffer(data, dtype=np.int32)
+            samples16 = (samples32 >> 16).astype(np.int16)
+            ws.send(samples16.tobytes()) 
+
+        mic.stop_stream(); mic.close(); 
+        audio.terminate()
+        ws.close()
+
+        if result[0]: return result[0]
 
     except Exception as e:
         print(f"Deepgram failed: {e}")
