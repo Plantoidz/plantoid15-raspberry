@@ -911,7 +911,7 @@ def listen_smartASR():
         print("Mic opened. Streaming on Deepgram ...")
         transcripts = []
 
-        def recv_threads():
+        def recv_thread():
             while result[0] is None:
                 try:
                     msg = ws.recv()
