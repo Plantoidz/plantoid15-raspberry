@@ -891,6 +891,7 @@ def listen_smartASR():
 
     ## Fallback to Deepgram cloud
     print("Smart ASR - falling back to DeepGram")
+
     try:
         import websockets as ws_lib
         DEEPGRAM_KEY = os.environ.get("DEEPGRAM_API_KEY")
@@ -907,11 +908,9 @@ def listen_smartASR():
 
                 print("Opening mic...")
                 mic = audio.open(format = pyaudio.paInt32, channels=1, rate=44100, input=True, frames_per_buffer=512)
-                print("Mic opened. starting send ...")
+                print("Mic opened. Streaming on Deepgram ...")
 
-                print("Streaming on Deepgram...")
                 result_holder = [ None ]
-
                 import json as json_lib
 
                 async def send_audio():
@@ -939,7 +938,7 @@ def listen_smartASR():
                                 return
                 
                 try:
-                    asyncio.gather(send_audi(), recv_results())
+                    await asyncio.gather(send_audio(), recv_results())
                 finally:
                     if mic:
                         mic.stop_stream(); mic.close(); 
@@ -948,11 +947,15 @@ def listen_smartASR():
                
                 return result_holder[0]
                
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        text = loop.run_until_complete(_deepgram_stream())
+        loop.close()
+        if text:
+                return text
 
     except Exception as e:
-        import traceback
         print(f"Deepgram failed: {e}")
-        traceback.print_exc()
         
 
 
