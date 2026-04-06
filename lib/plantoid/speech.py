@@ -860,8 +860,8 @@ def smart_listen_ASR():
                             print(f"Heard: {text}")
                             return text
                 
-                except asyncio.TimeoutError:
-                    pass
+                    except asyncio.TimeoutError:
+                        pass
 
             finally:
                 mic.stop_stream()
