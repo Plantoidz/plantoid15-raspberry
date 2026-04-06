@@ -916,7 +916,7 @@ def listen_smartASR():
                 try:
                     msg = ws.recv()
                     data = json_lib.loads(msg)
-                    if data.get()"is_final"):
+                    if data.get("is_final"):
                         t = data["channel"]["alternatives"][0]["transcript"] 
                         if t:
                             transcripts.append(t)
