@@ -946,7 +946,7 @@ def listen_smartASR():
                     if audio:
                         audio.terminate()
                
-               return result_holder[0]
+                return result_holder[0]
                
 
     except Exception as e:
