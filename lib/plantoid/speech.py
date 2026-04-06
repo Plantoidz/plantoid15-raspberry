@@ -839,7 +839,9 @@ def smart_listen_ASR():
 
             print(f"Smart ASR - steraming to {name} ...")
 
-            while True:
+            try:
+
+                while True:
                 data = mic.read(512, exception_on_overflow=False)
                 await ws.send(data)
 
@@ -856,13 +858,16 @@ def smart_listen_ASR():
                     elif event['event'] == "transcription":
                         text = event.get("text", "").strip()
                         print(f"Heard: {text}")
-                        mic.stop_stream()
-                        mic.sclose()
-                        audio.terminate()
                         return text
                 
                 except asyncio.TimeoutError:
                     pass
+
+            finally:
+                mic.stop_stream()
+                mic.close()
+                audio.terminate()           
+
     
     for name, uri in SERVERS:
         try:
