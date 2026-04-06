@@ -919,7 +919,7 @@ def listen_smartASR():
                         result = json_lib.loads(msg)
                         print(f"DG: {result}")  # DEBUG
                         if result.get("is_final"):
-                            transcript = result["channel"]["alternatives"][0]["transrcipt"]
+                            transcript = result["channel"]["alternatives"][0]["transcript"]
                             if transcript and result.get("speech_final"):
                                 send_task.cancel()
                                 return transcript
