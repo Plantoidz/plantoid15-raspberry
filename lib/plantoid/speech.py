@@ -879,6 +879,8 @@ def listen_smartASR():
     
     for name, uri in SERVERS:
         try:
+            loop = asyncio.new_event_loop
+            asyncio.set_event_loop(loop)
             result = asyncio.get_event_loop().run_until_complete(_stream(name, uri))
             if result: 
                 return result
@@ -895,7 +897,7 @@ def listen_smartASR():
     try:
         import websockets as ws_lib
         DEEPGRAM_KEY = os.environ.get("DEEPGRAM_API_KEY")
-        DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=300&encoding=linear16&sample_rate=44100&channels=1"
+        DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=1500&encoding=linear16&sample_rate=44100&channels=1"
 
         async def _deepgram_stream():
             headers = { "Authorization": f"Token {DEEPGRAM_KEY}"}
@@ -950,7 +952,7 @@ def listen_smartASR():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         text = loop.run_until_complete(_deepgram_stream())
-        loop.close()
+        # loop.close()
         if text:
                 return text
 
