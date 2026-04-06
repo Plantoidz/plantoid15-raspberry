@@ -895,8 +895,7 @@ def listen_smartASR():
     print("Smart ASR - falling back to DeepGram")
 
     try:
-        import websocket
-        import json as json_lib
+        import requests as req
 
         DEEPGRAM_KEY = os.environ.get("DEEPGRAM_API_KEY")
         DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=1200&encoding=linear16&sample_rate=44100&channels=1"
@@ -931,7 +930,7 @@ def listen_smartASR():
                             transcripts.append(t)
                             print(f"DG: {t}")
                         if data.get("speech_final"):
-                            result[0] = " ".joint(transcripts)
+                            result[0] = " ".join(transcripts)
                 except websocket.WebSocketConnectionClosedException:
                     break
                 except Exception as e:
@@ -946,7 +945,7 @@ def listen_smartASR():
             data = mic.read(1024, exception_on_overflow=False)
             samples32 = np.frombuffer(data, dtype=np.int32)
             samples16 = (samples32 >> 16).astype(np.int16)
-            ws.send(samples16.tobytes()) 
+            ws.send_binary(samples16.tobytes()) 
 
         mic.stop_stream(); mic.close(); 
         audio.terminate()
