@@ -842,23 +842,23 @@ def smart_listen_ASR():
             try:
 
                 while True:
-                data = mic.read(512, exception_on_overflow=False)
-                await ws.send(data)
+                    data = mic.read(512, exception_on_overflow=False)
+                    await ws.send(data)
 
-                try:
-                    msg = await asyncio.wait_for(ws.recv(), timeout=0.001)
-                    event = json.loads(msg)
+                    try:
+                        msg = await asyncio.wait_for(ws.recv(), timeout=0.001)
+                        event = json.loads(msg)
 
-                    if event["event"] == "speech_start":
-                        print("Speech detected")
+                        if event["event"] == "speech_start":
+                            print("Speech detected")
 
-                    elif event["event"] == "incomplete":
-                        print(f"Still talking (prob={event['probability']:.2f})...")
-                    
-                    elif event['event'] == "transcription":
-                        text = event.get("text", "").strip()
-                        print(f"Heard: {text}")
-                        return text
+                        elif event["event"] == "incomplete":
+                            print(f"Still talking (prob={event['probability']:.2f})...")
+                        
+                        elif event['event'] == "transcription":
+                            text = event.get("text", "").strip()
+                            print(f"Heard: {text}")
+                            return text
                 
                 except asyncio.TimeoutError:
                     pass
