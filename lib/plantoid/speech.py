@@ -895,7 +895,7 @@ def listen_smartASR():
     print("Smart ASR - falling back to DeepGram")
 
     try:
-        import websockets
+        import websocket
         import json as json_lib
 
         DEEPGRAM_KEY = os.environ.get("DEEPGRAM_API_KEY")

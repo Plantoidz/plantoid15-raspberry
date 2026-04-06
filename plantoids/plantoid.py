@@ -220,7 +220,7 @@ class Plantony:
 
         agent_prompt = self.update_prompt()
 
-        print(f"DEBUG PROMPT: \n {agent_prompt}")
+        # print(f"DEBUG PROMPT: \n {agent_prompt}")
 
        # generate the response from the GPT model
         agent_message = PlantoidSpeech.GPTmagic(agent_prompt,  model=self.llm_model) 
