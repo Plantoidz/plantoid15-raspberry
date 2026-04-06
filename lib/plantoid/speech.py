@@ -853,7 +853,7 @@ def smart_listen_ASR():
                     elif event["event"] == "incomplete":
                         print(f"Still talking (prob={event['probability']:.2f})...")
                     
-                    elif event['event'] = "transcription":
+                    elif event['event'] == "transcription":
                         text = event.get("text", "").strip()
                         print(f"Heard: {text}")
                         mic.stop_stream()
