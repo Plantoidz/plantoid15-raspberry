@@ -889,8 +889,7 @@ def listen_smartASR():
     try:
         import websockets as ws_lib
         DEEPGRAM_KEY = os.environ.get("DEEPGRAM_API_KEY")
-        DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=300&encoding=linear16&sample
-  _rate=16000&channels=1"
+        DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=300&encoding=linear16&sample_rate=16000&channels=1"
 
         async def _deepgram_stream():
             headers = { "Authorization": f"Token {DEEPGRAM_KEY}"}
