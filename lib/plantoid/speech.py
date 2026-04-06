@@ -118,7 +118,9 @@ def GPTmagic(prompt, model="gpt-4"):
         if resp.status_code == 200:
             print("LLM - using MacBook LM Studio ({model})")
             content = resp.json()["choices"][0]["message"]["content"]
-            return trim_to_sentence(content)
+            print("Trimmed content ==> ", content)
+            trimmed = trim_to_sentence(content)
+            return trimmed
 
     except Exception:
         pass
@@ -138,7 +140,9 @@ def GPTmagic(prompt, model="gpt-4"):
         if resp.status_code == 200:
             print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED)")
             content = resp.json()["choices"][0]["message"]["content"]
-            return trim_to_sentence(content)
+            print("Trimmed content ==> ", content)
+            trimmed = trim_to_sentence(content)
+            return trimmed
 
     except Exception:
         pass 
@@ -151,8 +155,9 @@ def GPTmagic(prompt, model="gpt-4"):
           messages=[{"role": "user", "content": prompt}], **config
         )
         content = response.choices[0].message.content
-        return trim_to_sentence(content)
- 
+        print("Trimmed content ==> ", content)
+        trimmed = trim_to_sentence(content)
+        return trimmed
 
 
 def trim_to_sentence(text):
@@ -391,7 +396,7 @@ def stream_response(agent_message, voiceid="plantony"):
             "response_format" : "wav",
             "stream" : True,
             "streaming_interval" : 2.0,
-        }, timeout=10, stream=True)
+        }, timeout=20, stream=True)
 
         if resp.status_code == 200:
             print(f"TTS - using Glitchbox (clone: {voiceid})")
@@ -917,15 +922,18 @@ def listen_smartASR():
                 
                 send_task = asyncio.ensure_future(send_audio())
 
+                transcripts = []
                 try:
                     async for msg in ws:
                         result = json_lib.loads(msg)
-                        print(f"DG: {result}")  # DEBUG
+                        # DEBUG
                         if result.get("is_final"):
                             transcript = result["channel"]["alternatives"][0]["transcript"]
-                            if transcript and result.get("speech_final"):
+                            if transcript:
+                                transcripts.append(transcript)
+                            if result.get("speech_final"):
                                 send_task.cancel()
-                                return transcript
+                            return " ".join(transcripts)
                 finally:
                     if mic:
                         mic.stop_stream(); mic.close(); 
