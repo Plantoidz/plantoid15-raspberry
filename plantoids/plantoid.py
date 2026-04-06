@@ -230,7 +230,7 @@ class Plantony:
 
         self.send_serial_message("speaking")
 
-       PlantoidSpeech.stream_response(agent_message, self.voice_id) 
+        PlantoidSpeech.stream_response(agent_message, self.voice_id) 
 
 
 
