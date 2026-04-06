@@ -887,47 +887,43 @@ def listen_smartASR():
     ## Fallback to Deepgram cloud
     print("Smart ASR - falling back to DeepGram")
     try:
-        from deepgram import DeepgramClient, LiveOptions
-
-        dg = DeepgramClient(os.environ.get("DEEPGRAM_API_KEY"))
-        result_text = []
-        done_event = asyncio.Event()
+        import websockets as ws_lib
+        DEEPGRAM_KEY = os.environ.get("DEEPGRAM_API_KEY")
+        DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=300&encoding=linear16&sample
+  _rate=16000&channels=1"
 
         async def _deepgram_stream():
-            connection = dg.listen.asyncwebsocket.v("1")
+            headers = { "Authorization": f"Token {DEEPGRAM_KEY}"}
 
-            def on_message(self, result, **kwargs):
-                transcript = result.channel.alternatives[0].transcript
-                if result.is_final and transcript:
-                    result_text.append(transcript)
-                if result.speech_final:
-                    done_event.set()
+            async with ws_lib.connect(DG_URL, additional_headers=headers) as ws:
+                with ignoreStderr():
+                    audio = pyaudio.PyAudio()
+                mic = audio.open(format = pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=512)
 
-            connection.on("Results", on_message)
+                print("Streaming on Deepgram...")
+                import json as json_lib
 
-            options = LiveOptions(
-                    model="nove-3", language="en",
-                    endpointing=300, smart_format=True, 
-                    sample_rate=16000, channels=1, encoding="linear16")
-
-            connection.start(LiveOptions)
+                async def send_audio():
+                    try:
+                        while True:
+                           data = mic.read(512, exception_on_overflow=False)
+                            await ws.send(data) 
+                    except Exception:
+                        pass
                 
-            with ignoreStderr():
-                audio = pyaudio.PyAudio()
-            mic = audio.open(format = pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=512)
+                send_task = asyncio.ensure_future(send_audio())
 
-            print("Streaming on Deepgram...")
-
-            try:
-                while not done_event.is_set():
-                    data = mic.read(512, exception_on_overflow=False)
-                    connection.send(data)
-
-            finally:
-                mic.stop_stream(); mic.close(); audio.terminate()
-                connection.finish()
-
-            return " ".join(result_text)
+                try:
+                    async for msg in ws:
+                        result = json_lib.loads(msg)
+                        if result.get("is_final"):
+                            transcript = result["channel"]["alternatives"][0]["transrcipt"]
+                            if transcript and result.get("speech_final"):
+                                send_task.cancel()
+                                return transcript
+                finally:
+                    mic.stop_stream(); mic.close(); audio.terminate()
+               
             
         text = asyncio.get_event_loop().run_until_complete(_deepgram_stream())
         if text:
