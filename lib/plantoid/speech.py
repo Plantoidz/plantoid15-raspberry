@@ -916,8 +916,15 @@ def listen_smartASR():
             while result[0] is None:
                 try:
                     msg = ws.recv()
+                    if not msg: continue
                     print(f"DG raw: {msg}")
+
                     data = json_lib.loads(msg)
+
+                    if data.get("type") == "Metadata":
+                        print(f"DG connected: {data.get('request_id')}")
+                        continue
+                    
                     if data.get("is_final"):
                         t = data["channel"]["alternatives"][0]["transcript"] 
                         if t:
@@ -925,14 +932,18 @@ def listen_smartASR():
                             print(f"DG: {t}")
                         if data.get("speech_final"):
                             result[0] = " ".joint(transcripts)
-                except:
+                except websocket.WebSocketConnectionClosedException:
+                    break
+                except Exception as e:
+                    print(f"DG recv error: {e}")
                     break
 
         t = threading.Thread(target=recv_thread, daemon=True)
         t.start()
+        time.sleep(0.1) # let recv thread connect
 
         while result[0] is None:
-            data = mic.read(512, exception_on_overflow=False)
+            data = mic.read(1024, exception_on_overflow=False)
             samples32 = np.frombuffer(data, dtype=np.int32)
             samples16 = (samples32 >> 16).astype(np.int16)
             ws.send(samples16.tobytes()) 
