@@ -950,7 +950,9 @@ def listen_smartASR():
                
 
     except Exception as e:
+        import traceback
         print(f"Deepgram failed: {e}")
+        traceback.print_exc()
         
 
 
