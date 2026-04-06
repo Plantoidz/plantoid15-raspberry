@@ -916,6 +916,7 @@ def listen_smartASR():
             while result[0] is None:
                 try:
                     msg = ws.recv()
+                    print(f"DG raw: {msg}")
                     data = json_lib.loads(msg)
                     if data.get("is_final"):
                         t = data["channel"]["alternatives"][0]["transcript"] 
