@@ -889,7 +889,7 @@ def listen_smartASR():
     try:
         import websockets as ws_lib
         DEEPGRAM_KEY = os.environ.get("DEEPGRAM_API_KEY")
-        DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=300&encoding=linear16&sample_rate=16000&channels=1"
+        DG_URL =  f"wss://api.deepgram.com/v1/listen?model=nova-2&language=en&smart_format=true&endpointing=300&encoding=linear16&sample_rate=44100&channels=1"
 
         async def _deepgram_stream():
             headers = { "Authorization": f"Token {DEEPGRAM_KEY}"}
@@ -897,7 +897,7 @@ def listen_smartASR():
             async with ws_lib.connect(DG_URL, additional_headers=headers) as ws:
                 with ignoreStderr():
                     audio = pyaudio.PyAudio()
-                mic = audio.open(format = pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=512)
+                mic = audio.open(format = pyaudio.paInt32, channels=1, rate=44100, input=True, frames_per_buffer=512)
 
                 print("Streaming on Deepgram...")
                 import json as json_lib
@@ -906,7 +906,9 @@ def listen_smartASR():
                     try:
                         while True:
                            data = mic.read(512, exception_on_overflow=False)
-                           await ws.send(data) 
+                           samples32 = np.frombuffer(data, dtype=np.int32)
+                           samples16 = (samples32 >> 16).astype(np.int16)
+                           await ws.send(samples16.tobytes()) 
                     except Exception:
                         pass
                 
