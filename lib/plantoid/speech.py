@@ -399,6 +399,7 @@ def stream_response(agent_message, voiceid="plantony"):
             "streaming_interval" : 2.0,
         }, timeout=20, stream=True)
 
+        print("status code ===> ", resp.status_code)
         if resp.status_code == 200:
             print(f"TTS - using Glitchbox (clone: {voiceid})")
             play_streaming_tts(resp, default_sr=24000)
