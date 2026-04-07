@@ -125,6 +125,7 @@ def GPTmagic(prompt, model="gpt-4"):
 
     except Exception as e:
         print(f"MackBook LLM failed {e}")
+        
 
     #2. Try GLITCHBOX LLM Studio (hard-coded model: liquid)
     try:
@@ -144,26 +145,28 @@ def GPTmagic(prompt, model="gpt-4"):
             print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED)")
             content = resp.json()["choices"][0]["message"]["content"]
             print("Content ==> ", content)
-            trimmed = trim_to_sentence(content)
+            trimmed = clean_trim_to_sentence(content)
             print("Trimmed content ==> ", content)
             return trimmed
 
     except Exception as e:
         print(f"GLITCHBOX LLM failed {e}")
+        
   
 
    # 3. Fallback to GPT-4
-    if (model == "gpt-4"):
-        print("LLM - Fallbacking to OpenAI GPT-4")
-        config = default_chat_completion_config(model="gpt-4")
-        response = openai.ChatCompletion.create(
-          messages=[{"role": "user", "content": prompt}], **config
-        )
-        content = response.choices[0].message.content
-        trimmed = clean_trim_to_sentence(content)
-        print("Trimmed content ==> ", content)
-        return trimmed
-
+   try:
+            print("LLM - Fallbacking to OpenAI GPT-4")
+            config = default_chat_completion_config(model="gpt-4")
+            response = openai.ChatCompletion.create(
+            messages=[{"role": "user", "content": prompt}], **config
+            )
+            content = response.choices[0].message.content
+            trimmed = clean_trim_to_sentence(content)
+            print("Trimmed content ==> ", content)
+            return trimmed
+    except Exception as e:
+        print(f"GPT-llm failed {e}")
 
 def clean_trim_to_sentence(text):
 
@@ -423,12 +426,16 @@ def stream_response(agent_message, voiceid="plantony"):
     # 3. fallback to Elevenlabs
 
     print("TTS - falling back to ElevenLabs")
-    audio_stream = elevenlabs.text_to_speech.stream(
-        text=agent_message,
-        model_id="eleven_multilingual_v2",
-        voice_id=voice_ids[voiceid],
-    )
-    stream(audio_stream)
+    try:
+        audio_stream = elevenlabs.text_to_speech.stream(
+            text=agent_message,
+            model_id="eleven_multilingual_v2",
+            voice_id=voice_ids[voiceid],
+        )
+        stream(audio_stream)
+    
+    except Exception as e:
+        print(f"Elevenlabs failed {e}")
 
 
 
