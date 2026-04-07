@@ -188,7 +188,7 @@ def clean_trim_to_sentence(text):
 
     # find the last sentence-ending punctuation
     for i in range(len(text) - 1, -1, -1):
-          if text[i] in '.!?"':
+          if text[i] in '.!?':
               return text[:i+1]
     return text
 
