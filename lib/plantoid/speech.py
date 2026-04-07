@@ -177,6 +177,9 @@ def clean_trim_to_sentence(text):
     if match:
         text = match.group(1)
 
+    # remove parenthical stage directions:
+    text = re.sub(r'\([^)]*?\)', '', text)
+
     # remove markdown from the response
     # text = re.sub(r'\*\*[^*]+?\*\*', '', text) # bold
     # text = re.sub(r'\*[^*]*?\*', '', text) # italic, non-greedy
