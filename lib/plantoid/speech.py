@@ -118,8 +118,9 @@ def GPTmagic(prompt, model="gpt-4"):
         if resp.status_code == 200:
             print("LLM - using MacBook LM Studio ({model})")
             content = resp.json()["choices"][0]["message"]["content"]
-            print("Trimmed content ==> ", content)
+            print("Content ==> ", content)
             trimmed = trim_to_sentence(content)
+            print("Trimmed content ==> ", content)
             return trimmed
 
     except Exception:
@@ -127,7 +128,7 @@ def GPTmagic(prompt, model="gpt-4"):
 
     #2. Try GLITCHBOX LLM Studio (hard-coded model: liquid)
     try:
-        url = "http://100.79.41.86:1234/v1/chat/completions"
+        url = "http://100.79.41.86:1235/v1/chat/completions"
         payload =  {
             "model": "qwen3.5-2b",
             "messages": [{"role": "user", "content": prompt}],
@@ -140,8 +141,9 @@ def GPTmagic(prompt, model="gpt-4"):
         if resp.status_code == 200:
             print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED)")
             content = resp.json()["choices"][0]["message"]["content"]
-            print("Trimmed content ==> ", content)
+            print("Content ==> ", content)
             trimmed = trim_to_sentence(content)
+            print("Trimmed content ==> ", content)
             return trimmed
 
     except Exception:
