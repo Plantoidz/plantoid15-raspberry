@@ -119,7 +119,7 @@ def GPTmagic(prompt, model="gpt-4"):
             print("LLM - using MacBook LM Studio ({model})")
             content = resp.json()["choices"][0]["message"]["content"]
             print("Content ==> ", content)
-            trimmed = trim_to_sentence(content)
+            trimmed = clean_trim_to_sentence(content)
             print("Trimmed content ==> ", content)
             return trimmed
 
@@ -160,16 +160,22 @@ def GPTmagic(prompt, model="gpt-4"):
         )
         content = response.choices[0].message.content
         print("Trimmed content ==> ", content)
-        trimmed = trim_to_sentence(content)
+        trimmed = clean_trim_to_sentence(content)
         return trimmed
 
 
-def trim_to_sentence(text):
-      # find the last sentence-ending punctuation
-      for i in range(len(text) - 1, -1, -1):
+def clean_trim_to_sentence(text):
+
+    # remove markdown from the response
+    text = re.sub(r'\**', '', text) # bold
+    text = re.sub(r'#+\s*', '', text) # headers
+    text = re.sub(r'\**(Human|Plantoid|User|Assistant)\**:\s*', '', text)
+
+    # find the last sentence-ending punctuation
+    for i in range(len(text) - 1, -1, -1):
           if text[i] in '.!?"':
               return text[:i+1]
-      return text
+    return text
 
 
 
