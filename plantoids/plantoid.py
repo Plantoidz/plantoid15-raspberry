@@ -143,7 +143,8 @@ class Plantony:
 
     def stop_background_music(self):
         print('stop background music')
-        pygame.mixer.music.stop()
+        if pygame.mixer.get_init():
+            pygame.mixer.music.stop()
 
     def welcome(self):
 
