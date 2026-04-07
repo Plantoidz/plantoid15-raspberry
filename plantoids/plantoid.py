@@ -211,7 +211,7 @@ class Plantony:
         background_music_path = self.path+"/media/ambient3.mp3" 
         self.play_background_music(background_music_path)
 
-        if len(user_message) == 0:
+        if len(user_message) == "":
                 print('no text heard, using default text')
                 user_message = "Tell me more..."
 
@@ -228,7 +228,7 @@ class Plantony:
         # append the agent's turn to the latest round
         self.append_turn_to_round(self.AGENT, agent_message)
 
-        self.stop_background_music()
+        # self.stop_background_music() 
 
         self.send_serial_message("speaking")
 
