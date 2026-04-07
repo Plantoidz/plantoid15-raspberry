@@ -915,7 +915,7 @@ def listen_smartASR():
         print(f"DG connected, key starts with: {DEEPGRAM_KEY[:8]}...")
 
         transcripts = []
-        empty_finals = []
+        empty_finals = [0]
 
         def recv_thread():
             while result[0] is None:
@@ -941,9 +941,9 @@ def listen_smartASR():
                             empty_finals[0] += 1
 
                         # stop if speech_final or if we get text and then 2 consecutive empty finals
-                        if data.get("speech_final") or (trascripts and empty_finals[0]) >= 2:
+                        if data.get("speech_final") or transcripts and empty_finals[0] >= 2:
                             result[0] = " ".join(transcripts)
-                            
+
                 except websocket.WebSocketConnectionClosedException:
                     break
                 except Exception as e:
