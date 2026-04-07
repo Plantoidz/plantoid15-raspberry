@@ -123,8 +123,8 @@ def GPTmagic(prompt, model="gpt-4"):
             print("Trimmed content ==> ", content)
             return trimmed
 
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"MackBook LLM failed {e}")
 
     #2. Try GLITCHBOX LLM Studio (hard-coded model: liquid)
     try:
@@ -148,8 +148,9 @@ def GPTmagic(prompt, model="gpt-4"):
             print("Trimmed content ==> ", content)
             return trimmed
 
-    except Exception:
-        pass 
+    except Exception as e:
+        print(f"GLITCHBOX LLM failed {e}")
+  
 
    # 3. Fallback to GPT-4
     if (model == "gpt-4"):
@@ -159,8 +160,8 @@ def GPTmagic(prompt, model="gpt-4"):
           messages=[{"role": "user", "content": prompt}], **config
         )
         content = response.choices[0].message.content
-        print("Trimmed content ==> ", content)
         trimmed = clean_trim_to_sentence(content)
+        print("Trimmed content ==> ", content)
         return trimmed
 
 
@@ -756,8 +757,9 @@ def recognize_speech(filename, lang=None):
                 print("ASR - using MacBook Whisper")
                 return text
             else: return ""
-    except Exception:
-        pass
+    
+    except Exception as e:
+        print(f"MackBook ASR failed {e}")
 
 
     # 2. Try GLITBOX Whisper server
@@ -776,8 +778,9 @@ def recognize_speech(filename, lang=None):
                 print("ASR - using Glitchbox Whisper")
                 return text
             else: return ""
-    except Exception:
-        pass
+
+    except Exception as e:
+        print(f"GLITCHBOX ASR failed {e}")
 
 
     # 3. Fallback to Google Speech Recognition
