@@ -979,7 +979,7 @@ def listen_smartASR():
             samples32 = np.frombuffer(data, dtype=np.int32)
             samples16 = (samples32 >> 15).clip(-32768, 32767).astype(np.int16)
             rms = np.sqrt(np.mean(samples16.astype(np.float64)**2))
-            print(f"\r Audio level: {rms: 0f}\n", end='', flush=True)
+            print(f"\r Audio level: {rms: 0f}", end='', flush=True)
             ws.send_binary(samples16.tobytes()) 
 
         mic.stop_stream(); mic.close(); 
