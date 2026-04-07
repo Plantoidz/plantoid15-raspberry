@@ -154,8 +154,8 @@ def GPTmagic(prompt, model="gpt-4"):
         
   
 
-   # 3. Fallback to GPT-4
-   try:
+    # 3. Fallback to GPT-4
+    try:
             print("LLM - Fallbacking to OpenAI GPT-4")
             config = default_chat_completion_config(model="gpt-4")
             response = openai.ChatCompletion.create(
