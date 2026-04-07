@@ -913,7 +913,7 @@ def listen_smartASR():
     
     for name, uri in SERVERS:
         try:
-            loop = asyncio.new_event_loop
+            loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             result = asyncio.get_event_loop().run_until_complete(_stream(name, uri))
             if result: 
