@@ -400,7 +400,7 @@ def stream_response(agent_message, voiceid="plantony"):
             "voice" : f"clone:{voiceid}",
             "response_format" : "wav",
             "stream" : True,
-            "streaming_interval" : 2.0,
+            "streaming_interval" : 0.5,
         }, timeout=20, stream=True)
 
         print("status code ===> ", resp.status_code)
