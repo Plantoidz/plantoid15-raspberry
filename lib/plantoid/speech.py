@@ -333,9 +333,16 @@ def get_text_to_speech_response(text, voice_id, callback=None):
     
 
 
-def stream_response(plantoid, agent_message, voiceid="plantony"):
+def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=None):
 
     import requests as req
+
+    def save_stream(resp):
+        with open(save_to_file, "wb") as f:
+            for chunk in resp.iter_content(chunk_size=4096):
+                f.write(chunk)
+        return save_to_file
+
 
     def extract_pcm(data):
         out, i = bytearray(), 0
@@ -406,8 +413,13 @@ def stream_response(plantoid, agent_message, voiceid="plantony"):
 
         if resp.status_code == 200:
             print(f"TTS - using MacBookPro ({voiceid})")
+
+            if save_to_file:
+                return save_stream(resp)
+
             play_streaming_tts(resp, default_sr=24000)
             return
+
     except Exception as e:
         print(f"MacBookPro TTS failed: {e}")
         
@@ -426,10 +438,16 @@ def stream_response(plantoid, agent_message, voiceid="plantony"):
 
         print("status code ===> ", resp.status_code)
         if resp.status_code == 200:
+
             plantoid.stop_background_music() ### THIS IS FUCKING UGLY
             print(f"TTS - using Glitchbox (clone: {voiceid})")
+
+            if save_to_file:
+                return save_stream(resp)
+
             play_streaming_tts(resp, default_sr=24000)
             return
+
     except Exception as e:
         print(f"Glitchbox TTS failed: {e}")
 
@@ -439,12 +457,24 @@ def stream_response(plantoid, agent_message, voiceid="plantony"):
 
     print("TTS - falling back to ElevenLabs")
     try:
-        audio_stream = elevenlabs.text_to_speech.stream(
-            text=agent_message,
-            model_id="eleven_multilingual_v2",
-            voice_id=voice_ids[voiceid],
-        )
-        stream(audio_stream)
+
+        if save_to_file:
+            audio = elevenlabs.text_to_speech.convert(
+                text=agent_message,
+                model_id="eleven_multilingual_v2",
+                voice_id=voice_ids[voicedi],
+            )
+            with open(save_to_file, "wb") as f:
+                for chunk in audio:
+                    f.write(chunk)
+            return save_to_file
+        else:
+            audio_stream = elevenlabs.text_to_speech.stream(
+                text=agent_message,
+                model_id="eleven_multilingual_v2",
+                voice_id=voice_ids[voiceid],
+            )
+            stream(audio_stream)
     
     except Exception as e:
         print(f"Elevenlabs failed {e}")
