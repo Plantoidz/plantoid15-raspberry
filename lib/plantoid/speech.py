@@ -140,7 +140,7 @@ def GPTmagic(prompt, model="gpt-4"):
         } 
         resp = req.post(url, json=payload, timeout=30)
         print("trying LLM GLITCHBOX with resp.status_code = ", resp.status_code) 
-        print(resp)
+        print(resp.json())
 
         if resp.status_code == 200:
             print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED)")
@@ -915,6 +915,7 @@ def listen_smartASR():
         print(f"DG connected, key starts with: {DEEPGRAM_KEY[:8]}...")
 
         transcripts = []
+        empty_finals = []
 
         def recv_thread():
             while result[0] is None:
@@ -933,9 +934,16 @@ def listen_smartASR():
                         t = data["channel"]["alternatives"][0]["transcript"] 
                         if t:
                             transcripts.append(t)
+                            empty_finals[0] = 0
                             print(f"DG: {t}")
-                        if data.get("speech_final"):
+                        # if data.get("speech_final"):
+                        else:
+                            empty_finals[0] += 1
+
+                        # stop if speech_final or if we get text and then 2 consecutive empty finals
+                        if data.get("speech_final") or (trascripts and empty_finals[0]) >= 2:
                             result[0] = " ".join(transcripts)
+                            
                 except websocket.WebSocketConnectionClosedException:
                     break
                 except Exception as e:
