@@ -132,7 +132,8 @@ def GPTmagic(prompt, model="gpt-4"):
     try:
         url = "http://100.79.41.86:1235/v1/chat/completions"
         payload =  {
-            "model": "qwen3.5-2b",
+            # "model": "qwen3.5-2b",
+            "model": "LFM2.5-VL-1.6B-Q8_0.gguf",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
             "max_tokens": 128,
@@ -177,7 +178,7 @@ def clean_trim_to_sentence(text):
 
     # remove markdown from the response
     text = re.sub(r'\*\*[^*]+?\*\*', '', text) # bold
-    # text = re.sub(r'\*[^*]*?\*', '', text) # italic, non-greedy
+    text = re.sub(r'\*[^*]*?\*', '', text) # italic, non-greedy
     # text = re.sub(r'#+\s*[^*]+', '', text) # headers
     text = re.sub(r'\**(Human|Plantoid|User|Assistant)\**:\s*', '', text)
 
