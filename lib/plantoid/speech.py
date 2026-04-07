@@ -171,9 +171,14 @@ def GPTmagic(prompt, model="gpt-4"):
 
 def clean_trim_to_sentence(text):
 
+     # cut off anything after **Human:** (LLM roleplaying both sides)
+    cut = re.split(r'\*{0,2}Human\*{0,2}\s*:', text)
+    text = cut[0]
+
     # remove markdown from the response
-    text = re.sub(r'\*[^*]+\*', '', text) # bold
-    text = re.sub(r'#+\s*[^*]+', '', text) # headers
+    text = re.sub(r'\*\*[^*]+?\*\*', '', text) # bold
+    text = re.sub(r'\*[^*]*?\*', '', text) # italic, non-greedy
+    # text = re.sub(r'#+\s*[^*]+', '', text) # headers
     text = re.sub(r'\**(Human|Plantoid|User|Assistant)\**:\s*', '', text)
 
     # find the last sentence-ending punctuation
