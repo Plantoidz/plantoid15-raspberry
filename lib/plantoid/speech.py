@@ -323,7 +323,7 @@ def get_text_to_speech_response(text, voice_id, callback=None):
     
 
 
-def stream_response(agent_message, voiceid="plantony"):
+def stream_response(plantoid, agent_message, voiceid="plantony"):
 
     import requests as req
 
@@ -416,6 +416,7 @@ def stream_response(agent_message, voiceid="plantony"):
 
         print("status code ===> ", resp.status_code)
         if resp.status_code == 200:
+            plantoid.stop_background_music() ### THIS IS FUCKING UGLY
             print(f"TTS - using Glitchbox (clone: {voiceid})")
             play_streaming_tts(resp, default_sr=24000)
             return

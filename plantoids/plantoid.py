@@ -159,7 +159,7 @@ class Plantony:
        # audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.voice_id)
        # playsound(audiofile)
 
-        PlantoidSpeech.stream_response(self.opening, self.voice_id)
+        PlantoidSpeech.stream_response(self, self.opening, self.voice_id)
 
 
     def terminate(self):
@@ -169,7 +169,7 @@ class Plantony:
         # playsound(PlantoidSpeech.get_text_to_speech_response(self.closing, self.voice_id)) 
         # playsound(self.outroduction)
 
-        PlantoidSpeech.stream_response(self.closing, self.voice_id)
+        PlantoidSpeech.stream_response(self, self.closing, self.voice_id)
 
         self.send_serial_message("asleep") ## REMOVE
 
@@ -232,7 +232,7 @@ class Plantony:
 
         self.send_serial_message("speaking")
 
-        PlantoidSpeech.stream_response(agent_message, self.voice_id) 
+        PlantoidSpeech.stream_response(self, agent_message, self.voice_id) 
 
 
 
