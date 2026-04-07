@@ -388,6 +388,7 @@ def stream_response(agent_message, voiceid="plantony"):
         
 
     # 2. try Glitchbox
+    print("option 3: trying GLITCHBOX")
     try:
         resp = req.post("http://100.79.41.86:8000/v1/audio/speech", json = {
             "model" : "qwen-tts",
@@ -947,7 +948,7 @@ def listen_smartASR():
             samples32 = np.frombuffer(data, dtype=np.int32)
             samples16 = (samples32 >> 14).clip(-32768, 32767).astype(np.int16)
             rms = np.sqrt(np.mean(samples16.astype(np.float64)**2))
-            print(f"\r Audio level: {rms: 0f}", end='', flush=True)
+            print(f"\r Audio level: {rms: 0f}\n", end='', flush=True)
             ws.send_binary(samples16.tobytes()) 
 
         mic.stop_stream(); mic.close(); 
