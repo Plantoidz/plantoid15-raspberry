@@ -933,13 +933,13 @@ def listen_smartASR():
                         if t:
                             transcripts.append(t)
                             empty_finals[0] = 0
-                            print(f"DG: {t}")
+                        
                         # if data.get("speech_final"):
                         else:
                             empty_finals[0] += 1
 
                         # stop if speech_final or if we get text and then 2 consecutive empty finals
-                        if data.get("speech_final") or transcripts and empty_finals[0] >= 2:
+                        if data.get("speech_final") or transcripts and empty_finals[0]:
                             result[0] = " ".join(transcripts)
 
                 except websocket.WebSocketConnectionClosedException:
@@ -959,7 +959,7 @@ def listen_smartASR():
         while result[0] is None:
             data = mic.read(1024, exception_on_overflow=False)
             samples32 = np.frombuffer(data, dtype=np.int32)
-            samples16 = (samples32 >> 14).clip(-32768, 32767).astype(np.int16)
+            samples16 = (samples32 >> 15).clip(-32768, 32767).astype(np.int16)
             rms = np.sqrt(np.mean(samples16.astype(np.float64)**2))
             print(f"\r Audio level: {rms: 0f}\n", end='', flush=True)
             ws.send_binary(samples16.tobytes()) 
