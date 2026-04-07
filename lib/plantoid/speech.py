@@ -172,8 +172,8 @@ def GPTmagic(prompt, model="gpt-4"):
 def clean_trim_to_sentence(text):
 
     # remove markdown from the response
-    text = re.sub(r'\*+', '', text) # bold
-    text = re.sub(r'#+\s*', '', text) # headers
+    text = re.sub(r'\*[^*]+\*', '', text) # bold
+    text = re.sub(r'#+\s*[^*]+', '', text) # headers
     text = re.sub(r'\**(Human|Plantoid|User|Assistant)\**:\s*', '', text)
 
     # find the last sentence-ending punctuation
