@@ -354,7 +354,7 @@ def stream_response(agent_message, voiceid="plantony"):
             pcm = extract_pcm(chunk)
             if pcm:
                 with lock: ring.extend(pcm)
-            if not stream_out and sr and len(ring) >= 144000:
+            if not stream_out and sr and len(ring) >= 48000:
                 stream_out = p.open(format=pyaudio.paInt16, channels=1, rate=sr,
                                     output=True, frames_per_buffer=2048, stream_callback=cb)
                 stream_out.start_stream()
