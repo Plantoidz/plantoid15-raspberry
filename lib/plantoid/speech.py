@@ -121,7 +121,7 @@ def GPTmagic(prompt, model="gpt-4"):
             content = resp.json()["choices"][0]["message"]["content"]
             print("Content ==> ", content)
             trimmed = clean_trim_to_sentence(content)
-            print("Trimmed content ==> ", content)
+            print("Trimmed content ==> ", trimmed)
             return trimmed
 
     except Exception as e:
@@ -147,7 +147,7 @@ def GPTmagic(prompt, model="gpt-4"):
             content = resp.json()["choices"][0]["message"]["content"]
             print("Content ==> ", content)
             trimmed = clean_trim_to_sentence(content)
-            print("Trimmed content ==> ", content)
+            print("Trimmed content ==> ", trimmed)
             return trimmed
 
     except Exception as e:
@@ -164,7 +164,7 @@ def GPTmagic(prompt, model="gpt-4"):
             )
             content = response.choices[0].message.content
             trimmed = clean_trim_to_sentence(content)
-            print("Trimmed content ==> ", content)
+            print("Trimmed content ==> ", trimmed)
             return trimmed
     except Exception as e:
         print(f"GPT-llm failed {e}")
