@@ -134,6 +134,9 @@ def GPTmagic(prompt, model="gpt-4"):
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
             "max_tokens": 128,
+            "extra_body" : {
+                "chat_template_kwargs": {"enable_thinking": False},
+            },
         } 
         resp = req.post(url, json=payload, timeout=30)
         print("trying LLM GLITCHBOX with resp.status_code = ", resp.status_code) 
