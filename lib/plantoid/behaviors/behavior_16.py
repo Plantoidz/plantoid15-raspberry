@@ -2,7 +2,7 @@
 from lib.plantoid.behaviors import behavior_library
 #from plantoids.plantoid import Plantony
 import lib.plantoid.eden as eden
-
+import lib.plantoid.speech as PlantoidSpeech
 
 import os
 from dotenv import load_dotenv
