@@ -74,6 +74,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
         
                 lines.append(line)
     
+    lines = [l for l in lines if not re.match(r'^\*\*.*\*\*$', l)]
     response = '\n'.join(lines)
     print('fixed response text: ', response)
 
@@ -84,11 +85,10 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     # response = behavior_library.generate_GPT_response("opera", plantoid, network, audiofile, tID, credits)
 
     # print response on the LP printer
-    toprint = '\n'.join(response)
-    behavior_library.print_response(plantoid, network, tID, toprint)
+    behavior_library.print_response(plantoid, network, tID, response)
     
     # create a song
-    audiofile = behavior_library.generate_song(response, credits)
+    audiofile = behavior_library.generate_song(lines, credits)
 
 
     plantoid.send_serial_message("awake")
