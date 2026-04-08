@@ -55,7 +55,7 @@ def archive(type, folder, user_speech, tID, network):
                 f.write(user_speech)
 
 
-    print(f"{folder}" saved as ..... " + filename)
+    print(f"{folder} saved as ..... " + filename)
 
 
 
