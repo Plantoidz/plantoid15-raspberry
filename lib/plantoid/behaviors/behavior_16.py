@@ -45,7 +45,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
                         credits,
                         plantoid.lang)
 
-    response_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
+    response_text = PlantoidSpeech.GPTmagic(prompt, model=plantoid.llm_model)
     print('response text: ', response_text)
 
     # Validate and fix line lengths for opera
@@ -87,6 +87,9 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     
     # create a song
     audiofile = behavior_library.generate_song(response, credits)
+
+
+    plantoid.send_serial_message("awake")
     
     # save and play the song
     behavior_library.save_and_play_audio(plantoid, network, tID, audiofile)
