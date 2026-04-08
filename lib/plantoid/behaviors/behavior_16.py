@@ -72,8 +72,8 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
         
                 lines.append(line)
     
-        response = '\n'.join(lines)
-        print('fixed response text: ', response)
+    response = '\n'.join(lines)
+    print('fixed response text: ', response)
 
 
     behavior_library.archive("text", "response", response, tID, network)
