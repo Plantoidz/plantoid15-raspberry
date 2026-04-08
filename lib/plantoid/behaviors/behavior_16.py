@@ -5,6 +5,8 @@ import lib.plantoid.eden as eden
 import lib.plantoid.speech as PlantoidSpeech
 
 import os
+import re
+
 from dotenv import load_dotenv
 from pinata import Pinata
 load_dotenv()
