@@ -32,7 +32,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     
     print("I heard...: ", user_speech)
 
-    behavior_library.archive("text", "transcript", response, tID, network)
+    behavior_library.archive("text", "transcript", user_speech, tID, network)
 
 
     
