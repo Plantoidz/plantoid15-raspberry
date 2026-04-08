@@ -21,19 +21,69 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     # one line every 0.01 ETH for mainnet, one line every 0.001 ETH for goerli
     credits = int(amount / network.min_amount)  
 
-    # do weaving
+    # do weaving : ask "what future are you dreaming of ?"
     plantoid.weaving()
         
-    # listen for audio
-    audiofile = plantoid.listen()
+    # listen for audio and obtain the transcript
+    user_speech = plantoid.listen()
+
+    if user_speech == "":
+        user_speech = get_default_song_transcript(plantoid.lang)
     
-    # generate the response ### NB: response is an array of lyrics
-    response = behavior_library.generate_GPT_response("opera", plantoid, network, audiofile, tID, credits)
+    print("I heard...: ", user_speech)
+
+    behavior_library.archive("text", "transcript", response, tID, network)
+
+
+    
+    # Generate response  ..
+    plantoid.send_serial_message("thinking")
+
+    prompt = get_song_prompt(
+                        user_speech,
+                        plantoid.selected_words_string,
+                        credits,
+                        plantoid.lang)
+
+    response_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
+    print('response text: ', response_text)
+
+    # Validate and fix line lengths for opera
+    lines = []
+    
+    # Split into individual lines and clean them
+    for line in response_text.split('\n'):
+            line = line.strip()
+            # Remove numbering like "(1)" or "1." from the start
+            line = re.sub(r'^\(\d+\)\s*', '', line)
+            line = re.sub(r'^\d+\.\s*', '', line)
+            # Remove quotes
+            line = line.strip('"\'')
+
+            if line and len(line) > 0:
+                # truncate if too long
+                if len(line) > 200:
+                    last_space = line[:200].rfind(' ')
+                    if last_space > 0:
+                        line = line[:last_space]
+                    else:
+                        line = line[:200]
+                    print(f"Warning: Truncated long line to {len(line)} chars")
+        
+                lines.append(line)
+    
+        response = '\n'.join(lines)
+        print('fixed response text: ', response)
+
+
+    behavior_library.archive("text", "response", response, tID, network)
+
+    # # generate the response ### NB: response is an array of lyrics
+    # response = behavior_library.generate_GPT_response("opera", plantoid, network, audiofile, tID, credits)
 
     # print response on the LP printer
     toprint = '\n'.join(response)
     behavior_library.print_response(plantoid, network, tID, toprint)
-
     
     # create a song
     audiofile = behavior_library.generate_song(response, credits)

@@ -32,6 +32,52 @@ PINATA_API_SECRET = os.environ.get("PINATA_SECRET_KEY")
 PINATA_JWT = os.environ.get('PINATA_JWT')
 
 
+def archive(type, folder, user_speech, tID, network):
+   
+    path = network.plantoid_path
+    path_transcripts = path + "/" + folder + "s/"
+    path_transcripts_network = path_transcripts + str(network.name)
+
+    if not os.path.exists(path_transcripts):
+        os.makedirs(path_transcripts)
+
+    if not os.path.exists(path_transcripts_network):
+        os.makedirs(path_transcripts_network)
+
+    # save the generated response to a file with the seed name
+    filename = f"{path_transcripts_network}/{tID}_{folder}.txt"
+
+
+    match type:
+        case "text":
+    
+            with open(filename, "w") as f:
+                f.write(user_speech)
+
+
+    print(f"{folder}" saved as ..... " + filename)
+
+
+
+# def save_response(response, tID, network):
+
+#     path = network.plantoid_path
+#     responses_path = path + "/responses/"
+#     responses_path_network = responses_path + str(network.name)
+
+#     if not os.path.exists(responses_path):
+#         os.makedirs(responses_path);
+
+#     if not os.path.exists(responses_path_network):
+#         os.makedirs(responses_path_network);
+    
+#     # save the generated response to a file with the seed name
+#     filename =  f"{responses_path_network}/{tID}_response.txt"
+
+#     with open(filename, "w") as f:
+#         f.write(response_text) 
+
+
 def generate_GPT_response(craft, plantoid, network, audio, tID, credits):
     plantoid.send_serial_message("thinking")
     
