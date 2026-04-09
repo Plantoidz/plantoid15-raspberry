@@ -428,7 +428,7 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
     print("option 3: trying GLITCHBOX")
     try:
         resp = req.post("http://100.79.41.86:8000/v1/audio/speech", json = {
-            "model" : "qwen-tts",
+            "model" : "qwen3-tts",
             "input" : agent_message,
             "voice" : f"clone:{voiceid}",
             "response_format" : "wav",
