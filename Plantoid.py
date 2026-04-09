@@ -234,7 +234,7 @@ def main():
     if use_serial:
         PORT = os.environ.get('SERIAL_PORT_OUTPUT')
         print("PORT ==== ", PORT)
-        ser = serial_utils.setup_serial(PORT=PORT, baudrate = 9600 if plantoid_number == "14" else 115200) 
+        ser = serial_utils.setup_serial(PORT=PORT, baud_rate = 9600 if plantoid_number == "14" else 115200) 
         serial_utils.wait_for_arduino(ser)
         serial_utils.send_to_arduino(ser, "awake")  
 
