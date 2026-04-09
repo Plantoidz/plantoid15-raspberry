@@ -126,6 +126,7 @@ def wait_for_arduino(ser):
 
     while msg.find("Arduino is ready") == -1:
 
+        send_to_arduino(ser, "RESET")
 
         msg = check_received_arduino_signal(ser)
 
@@ -135,3 +136,10 @@ def wait_for_arduino(ser):
 
     print("ARDUINO IS READY")
 
+
+
+
+def reset_arduino_software(ser):
+    ser.write(b'<RESET>\n')
+    time.sleep(2)
+    ser.flushInput()
