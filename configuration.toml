@@ -12,7 +12,7 @@ threshold_bias=0
 
 [16]
 # ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
-VOICE_ID="plantony"
+VOICE_ID="iannis"
 max_rounds=4
 USE_SERIAL = "True"
 #LANG="fr-FR"
