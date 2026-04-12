@@ -134,6 +134,7 @@ def wait_for_arduino(ser):
 
             print("[",msg,"]")
 
+    ser.flushInput()
     print("ARDUINO IS READY")
 
 
