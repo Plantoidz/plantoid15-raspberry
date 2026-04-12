@@ -371,6 +371,7 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
         with ignoreStderr():
             p = pyaudio.PyAudio()
         stream_out, sr = None, None
+        print(f"[TTS DEBUG] Starting play_streaming_tts")
 
         for chunk in resp.iter_content(chunk_size=4096):
             if not sr:
@@ -380,6 +381,8 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
                     sr = default_sr
             
             pcm = extract_pcm(chunk)
+            print(f"[TTS DEBUG] chunk={len(chunk)} bytes, pcm={len(pcm)} bytes, ring={len(ring)} bytes")
+
             if pcm:
                 with lock: ring.extend(pcm)
             if not stream_out and sr and len(ring) >= 48000:
@@ -391,10 +394,15 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
             stream_out = p.open(format=pyaudio.paInt16, channels=1, rate=sr,
                                 output=True, frames_per_buffer=2048, stream_callback=cb)
             stream_out.start_stream()
+            print(f"[TTS DEBUG] Late-started stream, ring={len(ring)}")
 
         done = True
+        print(f"[TTS DEBUG] Done receiving. stream_out={stream_out is not None}, ring={len(ring)}")
+
         if stream_out:
+            print(f"[TTS DEBUG] is_active={stream_out.is_active()}")
             while stream_out.is_active(): time.sleep(0.05)
+            print("[TTS DEBUG] Playback finished")
             stream_out.stop_stream(); stream_out.close()
         p.terminate()
 
