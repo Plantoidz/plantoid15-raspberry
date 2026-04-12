@@ -22,6 +22,8 @@ echo "this script was run by $(whoami)"
 
 export RASPBERRY_PATH=/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/
 export PYTHONPATH=/home/pi/.local/lib/python3.10/site-packages
-export SERIAL_PORT_OUTPUT=/dev/ttyACM0
+# export SERIAL_PORT_OUTPUT=/dev/ttyACM0 (for P16)
+# export SERIAL_PORT_OUTPUT=/dev/ttyUSB0(for P14)
+
 /usr/bin/python3.10 -u /home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py  > /home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/logs/AIplantony.log 2>&1
 
