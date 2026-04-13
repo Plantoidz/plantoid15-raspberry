@@ -349,7 +349,7 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
         import wave
         with wave.open(save_to_file, 'wb') as wf:
             wf.setnchannels(1)
-            wf.setampwidth(2) # 16-bit
+            wf.setsampwidth(2) # 16-bit
             wf.setframerate(sr)
             wf.writeframes(bytes(pcm_data))
 
@@ -492,7 +492,7 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
             audio = elevenlabs.text_to_speech.convert(
                 text=agent_message,
                 model_id="eleven_multilingual_v2",
-                voice_id=voice_ids[voicedi],
+                voice_id=voice_ids[voiceid],
             )
             with open(save_to_file, "wb") as f:
                 for chunk in audio:
