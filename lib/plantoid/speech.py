@@ -338,9 +338,24 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
     import requests as req
 
     def save_stream(resp):
-        with open(save_to_file, "wb") as f:
-            for chunk in resp.iter_content(chunk_size=4096):
-                f.write(chunk)
+        pcm_data = bytearray()
+        sr = 24000
+
+        for chunk in resp.iter_content(chunk_size=4096):
+            if len(chunk) >= 44 and chunk[:4] == b'RIFF':
+                sr = struct.unpack_from('<I', chunk, 24)[0]
+            pcm_data.extend(extract_pcm(chunk))
+        
+        import wave
+        with wave.open(save_to_file, 'wb') as wf:
+            wf.setnchannels(1)
+            wf.setampwidth(2) # 16-bit
+            wf.setframerate(sr)
+            wf.writeframes(bytes(pcm_data))
+
+        # with open(save_to_file, "wb") as f:
+        #    for chunk in resp.iter_content(chunk_size=4096):
+        #        f.write(chunk)
         return save_to_file
 
 
