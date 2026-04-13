@@ -2,7 +2,7 @@
 from lib.plantoid.behaviors import behavior_library
 #from plantoids.plantoid import Plantony
 import lib.plantoid.eden as eden
-
+import lib.plantoid.speech as PlantoidSpeech
 
 import os
 from dotenv import load_dotenv
@@ -16,6 +16,8 @@ PINATA_JWT = os.environ.get('PINATA_JWT')
 
 
 def ingurgitate_crypto(plantoid, network, tID, amount):
+
+    credits = int(amount / network.min_amount)  
 
     # do weaving : ask "what future are you dreaming of ?"
     plantoid.weaving()
@@ -36,9 +38,9 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     print('response text: ', response_text)
 
     # generate, print, and read the oracle
-    oracle = behavior_library.generate_oracle(plantoid, network, audiofile, tID, amount)
+    # oracle = behavior_library.generate_oracle(plantoid, network, audiofile, tID, amount)
 
-    behavior_library.archive("text", "response", response, tID, network)
+    behavior_library.archive("text", "response", response_text, tID, network)
 
     # print oracle on the LP printer
     behavior_library.print_response(plantoid, network, tID, oracle)
