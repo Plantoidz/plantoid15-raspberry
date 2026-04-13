@@ -76,8 +76,11 @@ def plantoid_event_listen(
                 if ser.in_waiting > 0:
 
                     try:
-
-                        line = ser.readline().decode('utf-8').strip()
+                        # Drain buffer, keep last line
+                        # line = ser.readline().decode('utf-8').strip()
+                        raw = ser.read(ser.in_waiting).decode('utf-8', errors='ignore')
+                        lines = raw.strip().split('\n')
+                        line = lines[-1].strip()
                         print("line ====", line)
                         print("pattern ============= ", plantony.pattern)
 
