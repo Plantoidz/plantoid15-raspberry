@@ -48,6 +48,13 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     # generate audio file
     audiofile = PlantoidSpeech.stream_response(plantoid, response_text, plantoid.voice_id, save_to_file="/tmp/output_oracle.wav")
 
+    # convert to .mp3
+    import subprocess
+    mp3_file = "/tmp/output_oracle.mp3"
+    subprocess.run(["ffmpeg", "-y", "-i", audiofile, mp3_file])
+    audiofile = mp3_file
+
+
     # read oracle out loud
     # behavior_library.read_oracle(plantoid, network, tID, oracle)
 
