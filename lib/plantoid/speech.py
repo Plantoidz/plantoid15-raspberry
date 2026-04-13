@@ -1012,7 +1012,7 @@ def listen_smartASR():
                             empty_finals[0] += 1
 
                         # stop if speech_final or if we get text and then 2 consecutive empty finals
-                        if data.get("speech_final") or transcripts and empty_finals[0]:
+                        if data.get("speech_final") or (transcripts and empty_finals[0]) or empty_finals[0] >= 3:
                             result[0] = " ".join(transcripts)
 
                 except websocket.WebSocketConnectionClosedException:
