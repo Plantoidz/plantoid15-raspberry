@@ -46,7 +46,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     behavior_library.print_response(plantoid, network, tID, response_text)
 
     # generate audio file
-    audiofile = PlantoidSpeech.stream_response(plantoid, response_text, plantoid.voice_id, save_to_file="/tmp/output_oracle.mp3")
+    audiofile = PlantoidSpeech.stream_response(plantoid, response_text, plantoid.voice_id, save_to_file="/tmp/output_oracle.wav")
 
     # read oracle out loud
     # behavior_library.read_oracle(plantoid, network, tID, oracle)
