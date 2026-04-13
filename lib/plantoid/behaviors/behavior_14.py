@@ -40,7 +40,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     # generate, print, and read the oracle
     # oracle = behavior_library.generate_oracle(plantoid, network, audiofile, tID, amount)
 
-    behavior_library.archive("text", "sermon", response_text, tID, network)
+    behavior_library.archive("text", "response", response_text, tID, network)
 
     # print oracle on the LP printer
     behavior_library.print_response(plantoid, network, tID, response_text)
@@ -78,7 +78,7 @@ def create_seed_metadata(plantoid, network, token_Id):
     if os.path.exists(path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"):
         movie_path = path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"
 
-    elif os.path.isfile(path + "/sermons/" + network.name + "/" + token_Id + "_sermon.mp3"):
+    elif os.path.isfile(path + "/audios/" + network.name + "/" + token_Id + "_audio.mp3"):
 
         # if movie doesn't exist, but sermon.mp3 exists, make a new movie based on the recorded audio:
 
