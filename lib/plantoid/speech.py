@@ -381,7 +381,7 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
                     sr = default_sr
             
             pcm = extract_pcm(chunk)
-            print(f"[TTS DEBUG] chunk={len(chunk)} bytes, pcm={len(pcm)} bytes, ring={len(ring)} bytes")
+            # print(f"[TTS DEBUG] chunk={len(chunk)} bytes, pcm={len(pcm)} bytes, ring={len(ring)} bytes")
 
             if pcm:
                 with lock: ring.extend(pcm)
@@ -394,17 +394,24 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
             stream_out = p.open(format=pyaudio.paInt16, channels=1, rate=sr,
                                 output=True, frames_per_buffer=2048, stream_callback=cb)
             stream_out.start_stream()
-            print(f"[TTS DEBUG] Late-started stream, ring={len(ring)}")
+            # print(f"[TTS DEBUG] Late-started stream, ring={len(ring)}")
 
         done = True
-        print(f"[TTS DEBUG] Done receiving. stream_out={stream_out is not None}, ring={len(ring)}")
+        # print(f"[TTS DEBUG] Done receiving. stream_out={stream_out is not None}, ring={len(ring)}")
 
         if stream_out:
-            print(f"[TTS DEBUG] is_active={stream_out.is_active()}")
+            # print(f"[TTS DEBUG] is_active={stream_out.is_active()}")
             while stream_out.is_active(): time.sleep(0.05)
             print("[TTS DEBUG] Playback finished")
             stream_out.stop_stream(); stream_out.close()
+        
+        stdout_fd = os.dup(1)
+        stderr_fd = os.dup(2)
         p.terminate()
+        os.dup2(stdout_fd, 1)
+        os.dup2(stderr_fd, 2)
+        os.close(stdout_fd)
+        os.close(stderr_fd)
 
     # 1. try MacBookPro
     try:
@@ -954,7 +961,7 @@ def listen_smartASR():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             result = asyncio.get_event_loop().run_until_complete(_stream(name, uri))
-            if result: 
+            if result is not None: 
                 return result
         except Exception as e:
             print(f"Smart ASR - {name} failed: {e}")
