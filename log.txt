@@ -1,0 +1,58 @@
+<frozen importlib._bootstrap>:241: RuntimeWarning: Your system is neon capable but pygame was not built with support for it. The performance of some of your blits could be adversely affected. Consider enabling compile time detection with environment variables like PYGAME_DETECT_AVX2=1 if you are compiling without cross compilation.
+Traceback (most recent call last):
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py", line 117, in plantoid_event_listen
+    plantony.check_if_fed(web3config["goerli"])
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/plantoids/plantoid.py", line 556, in check_if_fed
+    self.ingurgitate_crypto(network, token_Id, amount)
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/plantoids/plantoid.py", line 390, in ingurgitate_crypto
+    eat_crypto(
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/lib/plantoid/behaviors/behavior_14.py", line 54, in ingurgitate_crypto
+    plantoid.send_serial_message("awake")
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/plantoids/plantoid.py", line 137, in send_serial_message
+    PlantoidSerial.send_to_arduino(self.serial_connector, message)
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/lib/plantoid/serial_utils.py", line 38, in send_to_arduino
+    print('serial string is:', string_with_markers)
+OSError: [Errno 9] Bad file descriptor
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py", line 293, in <module>
+    main()
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py", line 278, in main
+    plantoid_event_listen(
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py", line 120, in plantoid_event_listen
+    print("********* ERROR on websocket: ", e)
+OSError: [Errno 9] Bad file descriptor
+Error in sys.excepthook:
+Traceback (most recent call last):
+  File "/home/pi/.local/lib/python3.10/site-packages/exceptiongroup/_formatting.py", line 71, in exceptiongroup_excepthook
+    sys.stderr.write("".join(traceback.format_exception(etype, value, tb)))
+KeyboardInterrupt
+
+Original exception was:
+Traceback (most recent call last):
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py", line 117, in plantoid_event_listen
+    plantony.check_if_fed(web3config["goerli"])
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/plantoids/plantoid.py", line 556, in check_if_fed
+    self.ingurgitate_crypto(network, token_Id, amount)
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/plantoids/plantoid.py", line 390, in ingurgitate_crypto
+    eat_crypto(
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/lib/plantoid/behaviors/behavior_14.py", line 54, in ingurgitate_crypto
+    plantoid.send_serial_message("awake")
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/plantoids/plantoid.py", line 137, in send_serial_message
+    PlantoidSerial.send_to_arduino(self.serial_connector, message)
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/lib/plantoid/serial_utils.py", line 38, in send_to_arduino
+    print('serial string is:', string_with_markers)
+OSError: [Errno 9] Bad file descriptor
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py", line 293, in <module>
+    main()
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py", line 278, in main
+    plantoid_event_listen(
+  File "/home/pi/PLLantoid/plantoid-raspberry/plantoid15-raspberry/Plantoid.py", line 120, in plantoid_event_listen
+    print("********* ERROR on websocket: ", e)
+OSError: [Errno 9] Bad file descriptor
