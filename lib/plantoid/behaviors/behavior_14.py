@@ -16,23 +16,43 @@ PINATA_JWT = os.environ.get('PINATA_JWT')
 
 
 def ingurgitate_crypto(plantoid, network, tID, amount):
-    print("trying to get the oracle library........")
 
-
-    # do weaving
+    # do weaving : ask "what future are you dreaming of ?"
     plantoid.weaving()
         
-    # listen for audio
-    audiofile = plantoid.listen()
-        
+    # listen for audio and obtain the transcript
+    user_speech = plantoid.listen() or behavior_library.get_default_transcript(plantoid.plantoid_number, plantoid.lang)
+
+    print("I heard ..", user_speech)  
+    
+    behavior_library.archive("text", "transcript", user_speech, tID, network)
+
+    # Generate response
+    plantoid.send_serial_message("thinking")
+
+    prompt = behavior_library.get_prompt(plantoid.plantoid_number, user_speech, plantoid.selected_words_string, credits, plantoid.lang)
+
+    response_text = PlantoidSpeech.GPTmagic(prompt, model=plantoid.llm_model)
+    print('response text: ', response_text)
+
     # generate, print, and read the oracle
     oracle = behavior_library.generate_oracle(plantoid, network, audiofile, tID, amount)
+
+    behavior_library.archive("text", "response", response, tID, network)
 
     # print oracle on the LP printer
     behavior_library.print_response(plantoid, network, tID, oracle)
 
+    # generate audio file
+    audiofile = PlantoidSpeech.stream_response(plantoid, oracle, plantoid.voice_id, save_to_file=True)
+
     # read oracle out loud
-    behavior_library.read_oracle(plantoid, network, tID, oracle)
+    # behavior_library.read_oracle(plantoid, network, tID, oracle)
+
+    plantoid.send_serial_message("awake")
+
+    # save and play the oracle
+    behavior_library.save_and_play_audio(plantoid, network, tID, audiofile)
 
 
 

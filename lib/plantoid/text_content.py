@@ -270,20 +270,104 @@ def get_text_content(lang):
     return opening_lines[lang], closing_lines[lang], word_categories[lang]
 
 
-def get_default_song_transcript(lang):
-    generated_transcript = {
-        "en-EN": "A world where Plants collaborate with Humans and with Machines, in a symbiotic dance of co-creation.",
-        "fr-FR": "Un monde où les Plantes collaborent avec les Humains et les Machines, dans une danse symbiotique de co-création."
+
+default_transcript = {
+      14: {
+          "en-EN": "The future I'm dreaming of is that of a solarpunk utopia where Plantoids have taken over the world.",
+          "fr-FR": "Le futur auquel j'aspire est une utopie solarpunk où les Plantoïdes ont envahit la planete.",
+      },
+      15: {
+          "en-EN": "I don't know what the future looks like. Describe a solarpunk utopia where Plantoids have taken over the world.",
+          "fr-FR": "Le futur auquel j'aspire est une utopie solarpunk où les Plantoïdes ont envahit la planete.",
+      },
+      16: {
+          "en-EN": "A world where Plants collaborate with Humans and with Machines, in a symbiotic dance of co-creation.",
+          "fr-FR": "Un monde où les Plantes collaborent avec les Humains et les Machines, dans une danse symbiotique de co-création.",
+      },
+  }
+
+
+def get_default_transcript(plantoid_n, language):
+
+    return default_transcript[plantoid_n][language]
+
+
+# def get_default_song_transcript(lang):
+#     generated_transcript = {
+#         "en-EN": "A world where Plants collaborate with Humans and with Machines, in a symbiotic dance of co-creation.",
+#         "fr-FR": "Un monde où les Plantes collaborent avec les Humains et les Machines, dans une danse symbiotique de co-création."
+#     }
+#     return generated_transcript[lang]
+
+# def get_default_sermon_transcript(lang):
+
+#     generated_transcript = {
+#             "en-EN": "I don't know what the future looks like. Describe a solarkpunk utopia where Plantoids have taken over the world.",
+#             "fr-FR": "Le futur auquel j'aspire est une utopie solarpunk où les Plantoïdes ont envahit la planete."
+#             }
+#     return generated_transcript[lang]
+
+
+
+default_prompt = {
+    14: {
+        "intro": {
+            "en-EN": "You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem, with the following structure: each paragraph is composed of exactly 3 lines; with number of paragraphs == ",
+            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. A partir du texte suivant, écrit-moi un poème structuré ainsi: chaque paragraphe est composé exactement de 3 lignes; avec nombre de paragraphes == ",
+        },
+        "question": {
+            "en-EN": "The question is the following: ",
+            "fr-FR": "La question est la suivante: ",
+        },
+        "words": {
+            "en-EN": "Include the following words in your poem: ", 
+            "fr-FR": "Inclut les mots suivant dans ton poème: ",
+        },
+        "outro": {
+           "en-EN": "Remember, the poem should be made of paragraphs that are 3 lines long, with the exactly number of paragraphs == ",
+           "fr-FR": "Rappèle-toi que le poème doit être composé de paragraphes de 3 lignes chacun, avec le nombre exact de paragraphes == ", 
+        }
+
+    },
+
+    15: {
+        "intro": {
+            "en-EN": "You are Plant-Tony, an enlightened being from the future. Write the lyrics for an opera song, with the following structure: only a few words per lines; with number of n_lines == ",
+            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. Ecrit-moi les paroles pour un chant d'opéra structuré ainsi: chaque ligne est composée de quelques mots uniquement; avec nombre de lignes == ",
+        },
+        "question": {
+            "en-EN": "The lyrics should reflect the following topic: ",
+            "fr-FR": "Les paroles doivent refleter le sujet suivant: ",
+        },
+        "words": {
+            "en-EN": "Include the following words in your poem: ", 
+            "fr-FR": "Inclut les mots suivant dans ton poème: ",
+        },
+        "outro": {
+           "en-EN": "IMPORTANT: Lines must be less than 200 characters each! Make it as short as possible, not longer than 200 characters per line, and max lines == ",
+           "fr-FR": "IMPORTANT: Chaque ligne doit être plus courte que 200 charactères! Aussi courte que possible, et pas plus de 200 charactères par ligne, et nombre de lignes == ",
+        }
     }
-    return generated_transcript[lang]
 
-def get_default_sermon_transcript(lang):
+}
 
-    generated_transcript = {
-            "en-EN": "I don't know what the future looks like. Describe a solarkpunk utopia where Plantoids have taken over the world.",
-            "fr-FR": "Le futur auquel j'aspire est une utopie solarpunk où les Plantoïdes ont envahit la planete."
-            }
-    return generated_transcript[lang]
+
+
+def get_prompt(plantoid_n, generated_transcript, selected_words_string, credits, lang):
+
+    n_lines = credits + 2
+    if n_lines > 5: n_lines = 5
+
+    prompt = (default_prompt[plantoid_n]["intro"][lang] + str(n_lines) + ".\n" +
+             default_prompt[plantoid_n]["question"][lang] + generated_transcript + ".\n" +
+             default_prompt[plantoid_n]["words"][lang] + selected_words_string + ".\n" +
+             default_prompt[plantoid_n]["outro"][lang] + str(n_lines))
+    
+    print("Returning prompt == " , prompt)
+    return prompt
+
+
+
 
 def get_sermon_prompt(
     generated_transcript,
