@@ -330,7 +330,7 @@ default_prompt = {
 
     },
 
-    15: {
+    16: {
         "intro": {
             "en-EN": "You are Plant-Tony, an enlightened being from the future. Write the lyrics for an opera song, with the following structure: only a few words per lines; with number of n_lines == ",
             "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. Ecrit-moi les paroles pour un chant d'opéra structuré ainsi: chaque ligne est composée de quelques mots uniquement; avec nombre de lignes == ",
