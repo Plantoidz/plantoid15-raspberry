@@ -439,7 +439,7 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
             "ref_audio": ref_audio, "ref_text": ref_text,
             "response_format": "wav",
             "stream": True, "streaming_interval": 2.0,
-          }, timeout=10, stream=True)
+          }, timeout=(2, 30), stream=True)
 
         if resp.status_code == 200:
             print(f"TTS - using MacBookPro ({voiceid})")
@@ -464,7 +464,7 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
             "response_format" : "wav",
             "stream" : True,
             "streaming_interval" : 0.5,
-        }, timeout=20, stream=True)
+        }, timeout=(2, 30), stream=True)
 
         print("status code ===> ", resp.status_code)
         if resp.status_code == 200:
