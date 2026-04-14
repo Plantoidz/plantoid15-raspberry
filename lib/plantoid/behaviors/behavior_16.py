@@ -155,7 +155,7 @@ def create_seed_metadata(plantoid, network, token_Id):
         audio_mp3 = path + "/audios/" + network.name + "/" + token_Id + "_audio.mp3"
         init_img = glitchbox_path + 'input2.jpg'
         fps = "15"
-        duration = audio(audio_mp3).info.length
+        duration = MP3(audio_mp3).info.length
         loras = "21" # twisted bodies & water
 
         os.system('python3.10 ' + glitchbox_path + f"grpc_prompt_journey.py --server {glitchbox_server} --scheduler --fps {fps} --init-image {init_img} --audio {audio_mp3} --duration {duration} --curation {loras} --output {movie_path}" )

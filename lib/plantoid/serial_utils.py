@@ -62,7 +62,7 @@ def check_received_arduino_signal(ser):
         x = ser.read().decode("utf-8") # ser.readline().decode('utf-8').strip()
 
 
-        print("["+x+"]")
+        # print("["+x+"]")
 
 
         if data_started == True:
@@ -73,14 +73,14 @@ def check_received_arduino_signal(ser):
                 data_started = False
                 message_complete = True
 
-            print("databuf = " , data_buf); 
+            # print("databuf = " , data_buf); 
 
         elif x == start_marker:
 
             data_buf = ''
             data_started = True
 
-        print("["+x+"] == ["+ start_marker+"] == ",  x == start_marker)
+        # print("["+x+"] == ["+ start_marker+"] == ",  x == start_marker)
 
 
     if message_complete == True:
