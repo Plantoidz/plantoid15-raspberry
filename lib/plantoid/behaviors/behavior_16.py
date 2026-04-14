@@ -158,7 +158,7 @@ def create_seed_metadata(plantoid, network, token_Id):
         duration = audio(audio_mp3).info.length
         loras = "21" # twisted bodies & water
 
-        os.system('python3.10 ' + glitchbox_path + f"grpc_prompt_journey.py --server {glitchbox_server} --scheduler --fps {fps} --init-image {init_img} --audio {audio_mp3} --duration {duration} --curation {loras} --output {movie_path}' )
+        os.system('python3.10 ' + glitchbox_path + f"grpc_prompt_journey.py --server {glitchbox_server} --scheduler --fps {fps} --init-image {init_img} --audio {audio_mp3} --duration {duration} --curation {loras} --output {movie_path}" )
 
         # movie_path = behavior_library.make_video(path, movie_path, token_Id, network.name)
 
