@@ -140,13 +140,26 @@ def create_seed_metadata(plantoid, network, token_Id):
         #     #print("PlantoidEden.make_eden_API_call return Null -- going to use a fallback video !")
         #     movie_path = behavior_library.fallback_video(path, token_Id, network.name)
         
-        os.system('python3.10 ' + path + '/../lib/plantoid/behaviors/sound_visualisation.py ' + 
-                  path + "/audios/" + network.name + "/" + token_Id + "_audio.mp3" +
-                  " -o " + path + "/videos/" + network.name + "/" + token_Id + "_movie.mp4 " +
-                  " --size 800 --fps 24")
+
+        ## VISUALISATION GEN-ART on RASPBERRY
+        # os.system('python3.10 ' + path + '/../lib/plantoid/behaviors/sound_visualisation.py ' + 
+        #          path + "/audios/" + network.name + "/" + token_Id + "_audio.mp3" +
+        #          " -o " + path + "/videos/" + network.name + "/" + token_Id + "_movie.mp4 " +
+        #          " --size 800 --fps 24")
         
+        from mutagen.mp3 import MP3
+
+        glitchbox_server = "100.79.41.86" # GLITCHBOX on TAILSCALE
+        glitchbox_path = path + '/../lib/plantoid/behaviours/glitchbox/'
         movie_path = path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"
-        
+        audio_mp3 = path + "/audios/" + network.name + "/" + token_Id + "_audio.mp3"
+        init_img = glitchbox_path + 'input2.jpg'
+        fps = "15"
+        duration = audio(audio_mp3).info.length
+        loras = "21" # twisted bodies & water
+
+        os.system('python3.10 ' + glitchbox_path + f"grpc_prompt_journey.py --server {glitchbox_server} --scheduler --fps {fps} --init-image {init_img} --audio {audio_mp3} --duration {duration} --curation {loras} --output {movie_path}' )
+
         # movie_path = behavior_library.make_video(path, movie_path, token_Id, network.name)
 
 
