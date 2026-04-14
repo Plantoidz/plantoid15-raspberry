@@ -933,7 +933,7 @@ def listen_smartASR():
     ]    
 
     async def _stream(name, uri):
-        async with websockets.connect(uri, open_timeout=5) as ws:
+        async with websockets.connect(uri, open_timeout=2) as ws:
             with ignoreStderr():
                 audio = pyaudio.PyAudio()
 

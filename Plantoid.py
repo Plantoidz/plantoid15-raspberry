@@ -26,10 +26,10 @@ def invoke_plantony(plantony: Plantony, network, max_rounds=4):
         print(len(plantony.rounds))
 
         print('plantony listening...')
-        audiofile = plantony.listen()
+        user_speech = plantony.listen()
 
         print('plantony responding...')
-        plantony.respond(audiofile)
+        plantony.respond(user_speech)
         
 
     # TODO: sub function without speech
