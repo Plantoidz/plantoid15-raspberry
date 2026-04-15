@@ -10,7 +10,7 @@ import subprocess
 from lib.plantoid.text_content import *
 import lib.plantoid.speech as PlantoidSpeech
 
-# import lib.plantoid.eden as eden
+import lib.plantoid.eden as eden
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "glitchbox"))
 from grpc_prompt_journey_http import run_journey
 
@@ -552,15 +552,15 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
 
 
-def glitchbox_video_journey(path, tID, network_name):
+def glitchbox_video_journey(path, tID, network_name, init_img, init_strength):
 
     from mutagen.mp3 import MP3
 
     audio_file = path + "/audios/" + network_name + "/" + tID + "_audio.mp3"
-    output_file = path + "/videos/" + nework_name + "/" + tID + "_movie.mp4"
+    output_file = path + "/videos/" + network_name + "/" + tID + "_movie.mp4"
 
     # ensure video dir exists
-    os.makedirs(os.path.dirname(outputfile), exist_ok=True)
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     # generate prompt fromm the response text (reuse eden.create_prompts
     duration = MP3(audio_file).info.length
@@ -574,15 +574,15 @@ def glitchbox_video_journey(path, tID, network_name):
     run_journey(
         prompts = prompts,
         server_ip = "100.79.41.86", # GLITCHBOX ON TAILSCALE
-        grpc_port = 50053,
-        zmq_port = 5555,
+        port = 7860, ## HTTP PORT
         transition_frames = 30,
-        hald_frames = 15,
+        hold_frames = 15,
         fps = 20,
         output = output_file,
         loop = False,
         init_image = init_img,
         curation_index = 28, # NO LORA
+        strength = init_strength
     )
 
     if so.path.exists(output_file):
