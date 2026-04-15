@@ -8,7 +8,10 @@ import subprocess
 #from plantoids.plantoid import Plantony
 from lib.plantoid.text_content import *
 import lib.plantoid.speech as PlantoidSpeech
-import lib.plantoid.eden as eden
+
+# import lib.plantoid.eden as eden
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "glitchbox"))
+from grpc_prompt_journey import run_journey
 
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play
@@ -78,243 +81,243 @@ def archive(type, folder, user_speech, tID, network):
 #         f.write(response_text) 
 
 
-def generate_GPT_response(craft, plantoid, network, audio, tID, credits):
-    plantoid.send_serial_message("thinking")
+# def generate_GPT_response(craft, plantoid, network, audio, tID, credits):
+#     plantoid.send_serial_message("thinking")
     
-    # get the path of the network
-    path = network.plantoid_path
-    print("TRANSCRIBING... in PATH ==== ", path)
+#     # get the path of the network
+#     path = network.plantoid_path
+#     print("TRANSCRIBING... in PATH ==== ", path)
     
-    # get the path to the background music
-    background_music_path = plantoid.path+"/media/ambient3.mp3"
+#     # get the path to the background music
+#     background_music_path = plantoid.path+"/media/ambient3.mp3"
     
-    # play the background music
-    plantoid.play_background_music(background_music_path)
+#     # play the background music
+#     plantoid.play_background_music(background_music_path)
     
-    # get generated transcript
-    generated_transcript = PlantoidSpeech.recognize_speech(audio, plantoid.lang)
+#     # get generated transcript
+#     generated_transcript = PlantoidSpeech.recognize_speech(audio, plantoid.lang)
     
-    # print the generated transcript
-    print("I heard...: " + generated_transcript)
+#     # print the generated transcript
+#     print("I heard...: " + generated_transcript)
     
-    # if no generated transcript, use a default
-    if not generated_transcript:  
-            match craft:
-                case "opera":
-                    generated_transcript = get_default_song_transcript(plantoid.lang)
-                case "oracle":
-                    generated_transcript = get_default_sermon_transcript(plantoid.lang)
+#     # if no generated transcript, use a default
+#     if not generated_transcript:  
+#             match craft:
+#                 case "opera":
+#                     generated_transcript = get_default_song_transcript(plantoid.lang)
+#                 case "oracle":
+#                     generated_transcript = get_default_sermon_transcript(plantoid.lang)
         
-    # save the generated transcript to a file with the seed name
-    path_transcripts = path + "/transcripts/"
-    path_transcripts_network = path_transcripts + str(network.name)
+#     # save the generated transcript to a file with the seed name
+#     path_transcripts = path + "/transcripts/"
+#     path_transcripts_network = path_transcripts + str(network.name)
     
-    if not os.path.exists(path_transcripts):
-        os.makedirs(path_transcripts)
+#     if not os.path.exists(path_transcripts):
+#         os.makedirs(path_transcripts)
 
-    if not os.path.exists(path_transcripts_network):
-        os.makedirs(path_transcripts_network)
+#     if not os.path.exists(path_transcripts_network):
+#         os.makedirs(path_transcripts_network)
 
-    # save the generated response to a file with the seed name
-    filename = f"{path_transcripts_network}/{tID}_transcript.txt"
+#     # save the generated response to a file with the seed name
+#     filename = f"{path_transcripts_network}/{tID}_transcript.txt"
 
-    print("saving transcript as ...................................", filename)
+#     print("saving transcript as ...................................", filename)
     
-    with open(filename, "w") as f:
-        f.write(generated_transcript)
+#     with open(filename, "w") as f:
+#         f.write(generated_transcript)
 
-    print("transcript saved as ..... " + filename)
+#     print("transcript saved as ..... " + filename)
     
-    ######## now generate the response ########
+#     ######## now generate the response ########
     
-    print("generating transcript with number of credits = " + str(credits))
+#     print("generating transcript with number of credits = " + str(credits))
 
-    # retieve the response prompt
-    prompt = None
-    match craft:
-                case "opera":
-                    prompt = get_song_prompt(
-                        generated_transcript,
-                        plantoid.selected_words_string,
-                        credits,
-                        plantoid.lang
-                    )
-                case "oracle":
-                    prompt = get_sermon_prompt(
-                        generated_transcript,
-                        plantoid.selected_words_string,
-                        credits,
-                        plantoid.lang
-                    )
+#     # retieve the response prompt
+#     prompt = None
+#     match craft:
+#                 case "opera":
+#                     prompt = get_song_prompt(
+#                         generated_transcript,
+#                         plantoid.selected_words_string,
+#                         credits,
+#                         plantoid.lang
+#                     )
+#                 case "oracle":
+#                     prompt = get_sermon_prompt(
+#                         generated_transcript,
+#                         plantoid.selected_words_string,
+#                         credits,
+#                         plantoid.lang
+#                     )
     
-    print("PROMPTING with ..............................................", prompt)
+#     print("PROMPTING with ..............................................", prompt)
 
-    # get GPT response
-    response_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
+#     # get GPT response
+#     response_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
 
-    print('response text: ', response_text)
+#     print('response text: ', response_text)
 
 
-    # Validate and fix line lengths for opera
-    if craft == "opera":
+#     # Validate and fix line lengths for opera
+#     if craft == "opera":
         
-        # Split into individual lines and clean them
-        lines = []
+#         # Split into individual lines and clean them
+#         lines = []
         
-        for line in response_text.split('\n'):
-            line = line.strip()
-            # Remove numbering like "(1)" or "1." from the start
-            line = re.sub(r'^\(\d+\)\s*', '', line)
-            line = re.sub(r'^\d+\.\s*', '', line)
-            # Remove quotes
-            line = line.strip('"\'')
+#         for line in response_text.split('\n'):
+#             line = line.strip()
+#             # Remove numbering like "(1)" or "1." from the start
+#             line = re.sub(r'^\(\d+\)\s*', '', line)
+#             line = re.sub(r'^\d+\.\s*', '', line)
+#             # Remove quotes
+#             line = line.strip('"\'')
 
-            if line and len(line) > 0:
-                # truncate is too long
-                if len(line) > 200:
-                    last_space = line[:200].rfind(' ')
-                    if last_space > 0:
-                        line = line[:last_space]
-                    else:
-                        line = line[:200]
-                    print(f"Warning: Truncated long line to {len(line)} chars")
+#             if line and len(line) > 0:
+#                 # truncate is too long
+#                 if len(line) > 200:
+#                     last_space = line[:200].rfind(' ')
+#                     if last_space > 0:
+#                         line = line[:last_space]
+#                     else:
+#                         line = line[:200]
+#                     print(f"Warning: Truncated long line to {len(line)} chars")
         
-                lines.append(line)
+#                 lines.append(line)
     
-        response_lines = lines
-        response_text = '\n'.join(lines)
-        print('fixed response text: ', response_text)
+#         response_lines = lines
+#         response_text = '\n'.join(lines)
+#         print('fixed response text: ', response_text)
 
   
-    #--------
+#     #--------
 
-    responses_path = path + "/responses/"
-    responses_path_network = responses_path + str(network.name)
+#     responses_path = path + "/responses/"
+#     responses_path_network = responses_path + str(network.name)
 
-    # save the generated response to a file with the seed name
-    if not os.path.exists(responses_path):
-        os.makedirs(responses_path);
+#     # save the generated response to a file with the seed name
+#     if not os.path.exists(responses_path):
+#         os.makedirs(responses_path);
 
-    # save the generated response to a file with the seed name
-    if not os.path.exists(responses_path_network):
-        os.makedirs(responses_path_network);
+#     # save the generated response to a file with the seed name
+#     if not os.path.exists(responses_path_network):
+#         os.makedirs(responses_path_network);
     
-    # save the generated response to a file with the seed name
-    filename =  f"{responses_path_network}/{tID}_response.txt"
-    with open(filename, "w") as f:
-        f.write(response_text)
+#     # save the generated response to a file with the seed name
+#     filename =  f"{responses_path_network}/{tID}_response.txt"
+#     with open(filename, "w") as f:
+#         f.write(response_text)
 
-    plantoid.send_serial_message("awake")
+#     plantoid.send_serial_message("awake")
 
-    if craft == "opera":
-        return response_lines
-    else:
-        return response_text
+#     if craft == "opera":
+#         return response_lines
+#     else:
+#         return response_text
     
 
 # this could theoretically be commented out -- use generate_response() instead !  :)
-def generate_oracle(plantoid, network, audio, tID, amount):
+# def generate_oracle(plantoid, network, audio, tID, amount):
 
-    plantoid.send_serial_message("thinking")
-    plantoid.send_serial_message("asleep") ## REMOVE
+#     plantoid.send_serial_message("thinking")
+#     plantoid.send_serial_message("asleep") ## REMOVE
 
 
-    # get the path of the network
-    path = network.plantoid_path
-    print("TRANSCRIBING... in PATH ==== ", path)
+#     # get the path of the network
+#     path = network.plantoid_path
+#     print("TRANSCRIBING... in PATH ==== ", path)
 
-    # get the path to the background music
-    background_music_path = plantoid.path+"/media/ambient3.mp3"
+#     # get the path to the background music
+#     background_music_path = plantoid.path+"/media/ambient3.mp3"
 
-    # play the background music
-    plantoid.play_background_music(background_music_path)
+#     # play the background music
+#     plantoid.play_background_music(background_music_path)
 
-    # get generated transcript
-    generated_transcript = PlantoidSpeech.recognize_speech(audio, plantoid.lang)
+#     # get generated transcript
+#     generated_transcript = PlantoidSpeech.recognize_speech(audio, plantoid.lang)
 
-    # print the generated transcript
-    print("I heard... (oracle): " + generated_transcript)
+#     # print the generated transcript
+#     print("I heard... (oracle): " + generated_transcript)
 
-    # if no generated transcript, use a default
-    if not generated_transcript: 
-        generated_transcript = get_default_sermon_transcript(plantoid.lang)
+#     # if no generated transcript, use a default
+#     if not generated_transcript: 
+#         generated_transcript = get_default_sermon_transcript(plantoid.lang)
 
-    # save the generated transcript to a file with the seed name
-    path_transcripts = path + "/transcripts/"
-    path_transcripts_network = path_transcripts + str(network.name)
+#     # save the generated transcript to a file with the seed name
+#     path_transcripts = path + "/transcripts/"
+#     path_transcripts_network = path_transcripts + str(network.name)
 
-    if not os.path.exists(path_transcripts):
-        os.makedirs(path_transcripts)
+#     if not os.path.exists(path_transcripts):
+#         os.makedirs(path_transcripts)
 
-    if not os.path.exists(path_transcripts_network):
-        os.makedirs(path_transcripts_network)
+#     if not os.path.exists(path_transcripts_network):
+#         os.makedirs(path_transcripts_network)
 
-    # save the generated response to a file with the seed name
-    filename = f"{path_transcripts_network}/{tID}_transcript.txt"
+#     # save the generated response to a file with the seed name
+#     filename = f"{path_transcripts_network}/{tID}_transcript.txt"
 
-    print("saving transcript as ...................................", filename)
+#     print("saving transcript as ...................................", filename)
 
-    with open(filename, "w") as f:
-        f.write(generated_transcript)
+#     with open(filename, "w") as f:
+#         f.write(generated_transcript)
 
-    print("transcript saved as ..... " + filename)
+#     print("transcript saved as ..... " + filename)
 
-    # TODO: re-enable
-    # calculate the length of the poem
-    # one line every 0.01 ETH for mainnet, one line every 0.001 ETH for goerli
-    n_lines = int(amount / network.min_amount)  
+#     # TODO: re-enable
+#     # calculate the length of the poem
+#     # one line every 0.01 ETH for mainnet, one line every 0.001 ETH for goerli
+#     n_lines = int(amount / network.min_amount)  
 
-    n_lines = n_lines + 2
+#     n_lines = n_lines + 2
     
-    if n_lines > 6: 
-        n_lines = 6
+#     if n_lines > 6: 
+#         n_lines = 6
 
-    # n_lines = 4
+#     # n_lines = 4
 
-    print("generating transcript with number of lines = " + str(n_lines))
+#     print("generating transcript with number of lines = " + str(n_lines))
 
-    # generate the sermon prompt
-    prompt = get_sermon_prompt(
-        generated_transcript,
-        plantoid.selected_words_string,
-        n_lines,
-        plantoid.lang
-    )
-    print("PROMPTING with ..............................................", prompt)
+#     # generate the sermon prompt
+#     prompt = get_sermon_prompt(
+#         generated_transcript,
+#         plantoid.selected_words_string,
+#         n_lines,
+#         plantoid.lang
+#     )
+#     print("PROMPTING with ..............................................", prompt)
 
-    # get GPT response
-    # response = PlantoidSpeech.GPTmagic(prompt, call_type='completion')
-    # sermon_text = response.choices[0].text
+#     # get GPT response
+#     # response = PlantoidSpeech.GPTmagic(prompt, call_type='completion')
+#     # sermon_text = response.choices[0].text
 
-    # print('sermon text 1:')
-    # print(sermon_text)
+#     # print('sermon text 1:')
+#     # print(sermon_text)
 
-    # get GPT response
-    sermon_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
+#     # get GPT response
+#     sermon_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
 
-    print('sermon text: ', sermon_text)
+#     print('sermon text: ', sermon_text)
   
-    #--------
+#     #--------
 
-    responses_path = path + "/responses/"
-    responses_path_network = responses_path + str(network.name)
+#     responses_path = path + "/responses/"
+#     responses_path_network = responses_path + str(network.name)
 
-    # save the generated response to a file with the seed name
-    if not os.path.exists(responses_path):
-        os.makedirs(responses_path);
+#     # save the generated response to a file with the seed name
+#     if not os.path.exists(responses_path):
+#         os.makedirs(responses_path);
 
-    # save the generated response to a file with the seed name
-    if not os.path.exists(responses_path_network):
-        os.makedirs(responses_path_network);
+#     # save the generated response to a file with the seed name
+#     if not os.path.exists(responses_path_network):
+#         os.makedirs(responses_path_network);
     
-    # save the generated response to a file with the seed name
-    filename =  f"{responses_path_network}/{tID}_response.txt"
-    with open(filename, "w") as f:
-        f.write(sermon_text)
+#     # save the generated response to a file with the seed name
+#     filename =  f"{responses_path_network}/{tID}_response.txt"
+#     with open(filename, "w") as f:
+#         f.write(sermon_text)
 
-    plantoid.send_serial_message("awake")
+#     plantoid.send_serial_message("awake")
 
-    return sermon_text
+#     return sermon_text
 
 
 def print_response(plantoid, network, tID, text):
@@ -410,7 +413,7 @@ def save_and_play_audio(plantoid, network, tID, audiofile):
 
 
 
-def read_oracle(plantoid, network, tID, sermon_text):
+def read_oracle(plantoid, network, tID, sermon_text): # I think it is no longer used
 
     path = network.plantoid_path
 
@@ -548,8 +551,42 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
 
 
+def glitchbox_video_journey(path, tID, network_name):
 
+    from mutagen.mp3 import MP3
 
+    audio_file = path + "/audios/" + network_name + "/" + tID + "_audio.mp3"
+    output_file = path + "/videos/" + nework_name + "/" + tID + "_movie.mp4"
+
+    # ensure video dir exists
+    os.makedirs(os.path.dirname(outputfile), exist_ok=True)
+
+    # generate prompt fromm the response text (reuse eden.create_prompts
+    duration = MP3(audio_file).info.length
+    n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
+    prompts = eden.create_prompts(path, tID, n_prompt, network_name)
+
+    if len(prompts) < 2:
+        print("not enough prompts for Glitchbox Journey")
+        return None
+    
+    run_journey(
+        prompts = prompts,
+        server_ip = "100.79.41.86", # GLITCHBOX ON TAILSCALE
+        grpc_port = 50053,
+        zmq_port = 5555,
+        transition_frames = 30,
+        hald_frames = 15,
+        fps = 20,
+        output = output_file,
+        loop = False,
+        init_image = init_img,
+        curation_index = 28, # NO LORA
+    )
+
+    if so.path.exists(output_file):
+        return output_file
+    return None
 
 
 def create_video_from_audio(path, tID, network_name, init_img, init_strength):

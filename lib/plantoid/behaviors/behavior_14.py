@@ -97,13 +97,15 @@ def create_seed_metadata(plantoid, network, token_Id):
     
         if(network.failsafe  == 0):
 
-            print('generating video file with eden')
-
-            #init_img = "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/c25c6b80c347d214eef34d67ee9b586f8e7de90662076667563f781c504f2877.webp"
-            init_img = "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/6a964945ff55658132d450531220418427da6c82adeb6176a8a4d0782f92dab4.jpg"
-            init_strength = 0.1
-            movie_path = behavior_library.create_video_from_audio(path, token_Id, network.name, init_img, init_strength)
-
+            # print('generating video file with eden')
+            #init_img = "https://edenartlab-prod-data.s3.us-east-1.amazonaws.com/6a964945ff55658132d450531220418427da6c82adeb6176a8a4d0782f92dab4.jpg"
+            # init_strength = 0.1
+            # movie_path = behavior_library.create_video_from_audio(path, token_Id, network.name, init_img, init_strength)
+            
+            print('GENERATING NEW VIDEO with GLITCHBOX')
+            init_img = path + "./init_img.jpg"
+            init_strength = 0.7
+            moviepath = behavior_library.create_video_from_audio(path, token_Id, network.name, init_img, init_strength)
         
         elif(network.failsafe == 1 or movie_path == None):
             
