@@ -585,7 +585,7 @@ def glitchbox_video_journey(path, tID, network_name, init_img, init_strength):
         strength = init_strength
     )
 
-    if so.path.exists(output_file):
+    if os.path.exists(output_file):
         return output_file
     return None
 
