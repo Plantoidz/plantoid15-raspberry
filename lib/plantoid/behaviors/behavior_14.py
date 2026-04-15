@@ -105,7 +105,7 @@ def create_seed_metadata(plantoid, network, token_Id):
             print('GENERATING NEW VIDEO with GLITCHBOX')
             init_img = path + "./init_img.jpg"
             init_strength = 0.7
-            moviepath = behavior_library.create_video_from_audio(path, token_Id, network.name, init_img, init_strength)
+            moviepath = behavior_library.glitchbox_video_journey(path, token_Id, network.name, init_img, init_strength)
         
         elif(network.failsafe == 1 or movie_path == None):
             
