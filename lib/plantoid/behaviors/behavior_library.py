@@ -557,27 +557,33 @@ def glitchbox_video_journey(path, tID, network_name, init_img, init_strength):
     from mutagen.mp3 import MP3
 
     audio_file = path + "/audios/" + network_name + "/" + tID + "_audio.mp3"
-    output_file = path + "/videos/" + network_name + "/" + tID + "_movie.mp4"
+    output_file = "/tmp/generated_journey_video.mp4"
 
     # ensure video dir exists
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     # generate prompt fromm the response text (reuse eden.create_prompts
     duration = MP3(audio_file).info.length
+    fps = 20
     n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
     prompts = eden.create_prompts(path, tID, n_prompt, network_name)
 
-    if len(prompts) < 2:
-        print("not enough prompts for Glitchbox Journey")
-        return None
+    # calculate transition / hold frames to match audio duration
+    total_frames = int(duration * fps)
+    n = len(prompts)
+    # total_frames = (n-1)*transition * n*hold
+    # pick hold_frames = 15, solve for transition_frames
+    hold_frames = 15
+    transition_frames = max(1, total_frames - n * hold_frames) // (n -1)
+
     
     run_journey(
         prompts = prompts,
         server_ip = "100.79.41.86", # GLITCHBOX ON TAILSCALE
         port = 7860, ## HTTP PORT
-        transition_frames = 30,
-        hold_frames = 15,
-        fps = 20,
+        transition_frames = transition_frames,
+        hold_frames = hold_frames,
+        fps = fps,
         output = output_file,
         loop = False,
         init_image = init_img,
