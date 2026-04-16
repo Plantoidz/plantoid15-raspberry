@@ -135,7 +135,7 @@ def set_params(server_ip, port, **params):
 
 
 def poll_until_done(server_ip, port):
-    """Poll journey status until completed. Returns final frame count."""
+    """Poll journey status until completed. Returns (frame_count, output_file)."""
     signal.signal(signal.SIGINT, lambda *_: sys.exit(0))
 
     while True:
@@ -146,10 +146,10 @@ def poll_until_done(server_ip, port):
             print(f"  Frame {status['current_frame']}/{total} generated...", end="\r")
             if status["completed"]:
                 print(f"\n\n[Server] Generation complete: {status['current_frame']} frames")
-                return status["current_frame"]
+                return status["current_frame"], status.get("output_file", "")
         except Exception as e:
             print(f"\n[HTTP] Connection lost: {e}")
-            return 0
+            return 0, ""
 
 
 def run_journey(prompts, server_ip, port, fps, output, transition_frames,
@@ -202,11 +202,12 @@ def run_journey(prompts, server_ip, port, fps, output, transition_frames,
     print(f"\nServer generating video to: {server_output}")
     print("Waiting for generation to complete... (Ctrl+C to abort)\n")
 
-    poll_until_done(server_ip, port)
+    _, actual_output = poll_until_done(server_ip, port)
+    actual_output = actual_output or server_output
 
     # Download
     video_only = output.replace(".mp4", "_noaudio.mp4") if local_audio_path else output
-    if not download_file(server_ip, port, server_output, video_only):
+    if not download_file(server_ip, port, actual_output, video_only):
         return
 
     if local_audio_path and os.path.exists(local_audio_path):
@@ -274,11 +275,12 @@ def run_scheduler(server_ip, port, fps, output, duration_seconds,
     print(f"Duration: {duration_seconds}s @ {fps}fps")
     print("Waiting for generation to complete... (Ctrl+C to abort)\n")
 
-    poll_until_done(server_ip, port)
+    _, actual_output = poll_until_done(server_ip, port)
+    actual_output = actual_output or server_output
 
     # Download
     video_only = output.replace(".mp4", "_noaudio.mp4") if (audio_file or local_audio_path) else output
-    if not download_file(server_ip, port, server_output, video_only):
+    if not download_file(server_ip, port, actual_output, video_only):
         return
 
     audio_source = local_audio_path or audio_file
