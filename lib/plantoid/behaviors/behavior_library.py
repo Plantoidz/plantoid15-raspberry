@@ -517,7 +517,7 @@ def save_video_fallback(path, movie_file):
     seconds = int(get_media_duration(movie_file))
     newfilename = finalpath + str(seconds) + "_" + md5sum + ".mp4"
     
-    os.system("mv " + movie_file + " " + newfilename) 
+    os.system("cp " + movie_file + " " + newfilename) 
     print('fallback movie file is', newfilename)
     
     return newfilename
