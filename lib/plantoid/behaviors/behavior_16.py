@@ -1,7 +1,5 @@
-#import lib.plantoid.behaviors.behavior_library as behavior_library
 from lib.plantoid.behaviors import behavior_library
-#from plantoids.plantoid import Plantony
-import lib.plantoid.eden as eden
+
 import lib.plantoid.speech as PlantoidSpeech
 
 import os
@@ -19,66 +17,24 @@ PINATA_JWT = os.environ.get('PINATA_JWT')
 
 def ingurgitate_crypto(plantoid, network, tID, amount):
 
+    question = "What is the song that you're weaving into being through your life?"
+    user_speech = behavior_library.ask_transcript(plantoid, network, tID, question)
+
+
+    # Generate response  ..
+    plantoid.send_serial_message("thinking")
+    
     # calculate the credits for the response
     # one line every 0.01 ETH for mainnet, one line every 0.001 ETH for goerli
     credits = int(amount / network.min_amount)  
 
-    # do weaving : ask "what future are you dreaming of ?"
-    plantoid.weaving()
-        
-    # listen for audio and obtain the transcript
-    user_speech = plantoid.listen() or get_default_transcript(plantoid)
-
-    # if user_speech == "":
-    #    user_speech = behavior_library.get_default_song_transcript(plantoid.lang)
+    lines = behavior_library.get_song_prompts(plantoid, user_speech, credits)
     
-    print("I heard...: ", user_speech)
-
-    behavior_library.archive("text", "transcript", user_speech, tID, network)
-
-
-    
-    # Generate response  ..
-    plantoid.send_serial_message("thinking")
-
-    prompt = make_prompt(plantoid, user_speech, credits)
-
-    response_text = PlantoidSpeech.GPTmagic(prompt, model=plantoid.llm_model)
-    print('response text: ', response_text)
-
-    # Validate and fix line lengths for opera
-    lines = []
-    
-    # Split into individual lines and clean them
-    for line in response_text.split('\n'):
-            line = line.strip()
-            # Remove numbering like "(1)" or "1." from the start
-            line = re.sub(r'^\(\d+\)\s*', '', line)
-            line = re.sub(r'^\d+\.\s*', '', line)
-            # Remove quotes
-            line = line.strip('"\'')
-
-            if line and len(line) > 0:
-                # truncate if too long
-                if len(line) > 200:
-                    last_space = line[:200].rfind(' ')
-                    if last_space > 0:
-                        line = line[:last_space]
-                    else:
-                        line = line[:200]
-                    print(f"Warning: Truncated long line to {len(line)} chars")
-        
-                lines.append(line)
-    
-    lines = [l for l in lines if not re.match(r'^\*\*.*\*\*$', l)]
     response = '\n'.join(lines)
     print('fixed response text: ', response)
 
-
+    # archive the response
     behavior_library.archive("text", "response", response, tID, network)
-
-    # # generate the response ### NB: response is an array of lyrics
-    # response = behavior_library.generate_GPT_response("opera", plantoid, network, audiofile, tID, credits)
 
     # print response on the LP printer
     behavior_library.print_response(plantoid, network, tID, response)
@@ -150,7 +106,7 @@ def create_seed_metadata(plantoid, network, token_Id):
         from mutagen.mp3 import MP3
 
         glitchbox_server = "100.79.41.86" # GLITCHBOX on TAILSCALE
-        glitchbox_path = path + '/../lib/plantoid/behaviours/glitchbox/'
+        glitchbox_path = path + '/../lib/plantoid/behaviors/glitchbox/'
         movie_path = path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"
         audio_mp3 = path + "/audios/" + network.name + "/" + token_Id + "_audio.mp3"
         init_img = glitchbox_path + 'input2.jpg'

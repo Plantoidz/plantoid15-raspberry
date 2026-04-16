@@ -270,34 +270,10 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
 
 
-def glitchbox_video_journey(path, tID, network, init_img, init_strength):
+def glitchbox_video_journey(prompts, duration, fps, init_img, init_strength):
 
-    from mutagen.mp3 import MP3
-
-    # audio sermon
-    audio_file = path + "/audios/" + network.name + "/" + tID + "_audio.mp3"
-    
     # video output 
     output_file = "/tmp/generated_journey_video.mp4"
-
-    # text sermon
-    with open(path + "/responses/" + network.name + "/" + tID + "_response.txt", "r") as f:
-        sermon = f.read()
-    
-    # generate prompt from the response text 
-    duration = MP3(audio_file).info.length
-    fps = 20
-    n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
-    
-    prompt = get_video_prompts(sermon, n_prompt)
-
-    response = PlantoidSpeech.GPTmagic(prompt)
-
-    archive("text", "description", response, tID, network)
-
-    prompts = process_video_prompts(response)
-
-
 
     # calculate transition / hold frames to match audio duration
     total_frames = int(duration * fps)
@@ -306,7 +282,6 @@ def glitchbox_video_journey(path, tID, network, init_img, init_strength):
     # pick hold_frames = 15, solve for transition_frames
     hold_frames = 5
     transition_frames = max(1, (total_frames - n * hold_frames) // (n -1))
-
     
     run_journey(
         prompts = prompts,
@@ -327,27 +302,27 @@ def glitchbox_video_journey(path, tID, network, init_img, init_strength):
     return None
 
 
-def create_video_from_audio(path, tID, network_name, init_img, init_strength):
+# def create_video_from_audio(path, tID, network_name, init_img, init_strength):
 
-    # create empty output file
-    remote_output_file = None
-    video_file = None
+#     # create empty output file
+#     remote_output_file = None
+#     video_file = None
 
-    # prompts = PlantoidEden.create_prompts(tID)
+#     # prompts = PlantoidEden.create_prompts(tID)
 
-    # construct the API call to Eden (this includes the making of the prompts)
-    #eden_config = eden.build_API_request(path, tID, network_name)  
-    eden_config = eden.build_API_request(path, tID, network_name, path + "/audios/" + network_name + "/" + tID + "_audio.mp3", init_img, init_strength)
+#     # construct the API call to Eden (this includes the making of the prompts)
+#     #eden_config = eden.build_API_request(path, tID, network_name)  
+#     eden_config = eden.build_API_request(path, tID, network_name, path + "/audios/" + network_name + "/" + tID + "_audio.mp3", init_img, init_strength)
 
-    # get the output file from the eden call
-    remote_output_file = eden.make_eden_API_call(eden_config)           
+#     # get the output file from the eden call
+#     remote_output_file = eden.make_eden_API_call(eden_config)           
 
-    if remote_output_file is not None:
+#     if remote_output_file is not None:
 
-        print('Remote output file location:', remote_output_file)
-        video_file = get_remote_video(remote_output_file, path)
+#         print('Remote output file location:', remote_output_file)
+#         video_file = get_remote_video(remote_output_file, path)
 
-        return video_file
+#         return video_file
 
         # video_path = make_video(path, video_file, tID, network_name)
         # return video_path
@@ -544,10 +519,7 @@ def get_media_duration(file_path):
 
 
 
-
-def poem_generation(plantoid, network, tID, amount, question):
-
-    credits = int(amount / network.min_amount)
+def ask_transcript(plantoid, network, tID, question):
 
     # ask an initial question
     plantoid.weaving(question)
@@ -555,13 +527,34 @@ def poem_generation(plantoid, network, tID, amount, question):
     # listen for audio and obtain the transcript
     user_speech = plantoid.listen() or get_default_transcript(plantoid)
 
-    print("I heard ..", user_speech)
-
+    print("I heard.. ", user_speech)
     archive("text", "transcript", user_speech, tID, network)
+
+    return user_speech
+
+
+
+def poem_generation(plantoid, network, tID, amount, question):
+
+
+    # ask an initial question
+    # plantoid.weaving(question)
+
+    # listen for audio and obtain the transcript
+    #user_speech = plantoid.listen() or get_default_transcript(plantoid)
+
+    #print("I heard ..", user_speech)
+    #archive("text", "transcript", user_speech, tID, network)
+
+    user_speech = ask_transcript(plantoid, network, tID, question)
+    
+
 
     # Generate response
     plantoid.send_serial_message("thinking")
 
+    credits = int(amount / network.min_amount)
+    
     prompt = make_prompt(plantoid, user_speech, credits)
     response_text = PlantoidSpeech.GPTmagic(prompt, model=plantoid.llm_model)
     print("Response text: ", response_text)
@@ -585,36 +578,35 @@ def poem_generation(plantoid, network, tID, amount, question):
 
 
 
-
-def poem_metadata(plantoid, network, tID, description, image):
-
+def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video):
     movie_path = None
     animurl = None
 
-    # create the metadata information
-    db = dict()
-    db['name'] = tID
-    db['description'] = description
-    db['external_url'] = "http://plantoid.org"
-    db['image'] = image
-
     # check if movie exist for that particular token ID
     path = network.plantoid_path
-    if os.path.exists(path + "/videos/" + network.name + "/" + tID + "_movie.mp4"):
-        movie_path = path + "/videos/" + network.name + "/" + tID + "_movie.mp4"
+    video_file = path + "/videos/" + network.name + "/" + tID + "_movie.mp4"
+    audio_file = path + "/audios/" + network.name + "/" + tID + "_audio.mp3" 
+ 
+    if os.path.exists(video_file):
+        movie_path = video_file
 
-    # check if audio exists to create movie
-    elif os.path.isfile(path + "/audios/" + network.name + "/" + tID + "_audio.mp3"):
+    elif os.path.isfile(audio_file):
         plantoid.send_serial_message("thinking")
 
-        if(network.failsafe == 0):
-            print("Generative NEW video with Glitchbox")
-            init_img = path + "./init_img.jpg"
-            init_strength = 0.7
-            movie_path = glitchbox_video_journey(path, tID, network, init_img, init_strength)
+        # retrieve the generated text to include in the movie
+        with open(path + "/responses/" + network.name + "/" + tID + "_response.txt", "r") as f:
+            sermon = f.read() 
+
+
+        if(network.failsafe == 0): # IF NO FAILSAFE, CALL THE CALLBACK
+            prompts = callback_prompt(sermon, audio_file)
+            archive("text", "description", "\n".join(prompts), tID, network)
+
+            movie_path = callback_video(sermon, audio_file, prompts, path)
             save_video_fallback(path, movie_path)
 
-        elif(network.failsafe == 1 or movie_path == None):
+
+        elif(network.failsafe == 1 or movie_path == None):  # FAILSAFE
             print("Failsafe: using fallback video")
             movie_path = fallback_video(path, tID, network.name)
         
@@ -626,4 +618,74 @@ def poem_metadata(plantoid, network, tID, description, image):
     if(animurl):
         record_metadata(plantoid, network, tID, db, animurl)
 
-    plantoid.send_serial_message("awake")
+    plantoid.send_serial_message("awake") 
+
+
+
+
+
+def poem_make_prompts(sermon, audio_file):
+
+    from mutagen.mp3 import MP3
+    
+    # generate prompt from the response text 
+    duration = MP3(audio_file).info.length
+    fps = 20
+    n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
+
+    prompt = get_video_prompt(sermon, n_prompt)
+    response = PlantoidSpeech.GPTmagic(prompt)
+    prompts = process_video_prompts(response)
+    return prompts
+
+
+
+def poem_make_video(sermon, audio_file, prompts, path):
+    
+    from mutagen.mp3 import MP3
+
+    output_file = "/tmp/generated_journey_video.mp4"
+
+    print("Generative NEW video with Glitchbox")
+
+    duration = MP3(audio_file).info.length
+    init_img = path + "./init_img.jpg"
+    init_strength = 0.7
+    fps = 20
+    return glitchbox_video_journey(prompts, duration, fps, init_img, init_strength)
+
+
+# def poem_metadata(plantoid, network, tID, db, prompts):
+
+#     movie_path = None
+#     animurl = None
+
+#     # check if movie exist for that particular token ID
+#     path = network.plantoid_path
+#     if os.path.exists(path + "/videos/" + network.name + "/" + tID + "_movie.mp4"):
+#         movie_path = path + "/videos/" + network.name + "/" + tID + "_movie.mp4"
+
+#     # check if audio exists to create movie
+#     elif os.path.isfile(path + "/audios/" + network.name + "/" + tID + "_audio.mp3"):
+#         plantoid.send_serial_message("thinking")
+
+#         if(network.failsafe == 0):
+#             print("Generative NEW video with Glitchbox")
+#             init_img = path + "./init_img.jpg"
+#             init_strength = 0.7
+#             movie_path = glitchbox_video_journey(path, tID, network, init_img, init_strength)
+#             save_video_fallback(path, movie_path)
+
+#         elif(network.failsafe == 1 or movie_path == None):
+#             print("Failsafe: using fallback video")
+#             movie_path = fallback_video(path, tID, network.name)
+        
+#         # Add audio to the video
+#         movie_path = save_video_with_audio(path, movie_path, tID, network.name)
+
+#     # PIN movie to IPFS
+#     animurl = pin_movie(movie_path)
+#     if(animurl):
+#         record_metadata(plantoid, network, tID, db, animurl)
+
+#     plantoid.send_serial_message("awake")

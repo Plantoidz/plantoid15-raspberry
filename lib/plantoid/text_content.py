@@ -343,6 +343,44 @@ default_prompt = {
 }
 
 
+def get_song_prompts(plantoid, generated_transcript, credits):
+   
+    prompt = make_prompt(plantoid, generated_transcript, credits)
+
+    response_text = PlantoidSpeech.GPTmagic(prompt, model=plantoid.llm_model)
+    print('response text: ', response_text)
+
+    # Validate and fix line lengths for opera
+    lines = []
+    
+    # Split into individual lines and clean them
+    for line in response_text.split('\n'):
+            line = line.strip()
+            # Remove numbering like "(1)" or "1." from the start
+            line = re.sub(r'^\(\d+\)\s*', '', line)
+            line = re.sub(r'^\d+\.\s*', '', line)
+            # Remove quotes
+            line = line.strip('"\'')
+
+            if line and len(line) > 0:
+                # truncate if too long
+                if len(line) > 200:
+                    last_space = line[:200].rfind(' ')
+                    if last_space > 0:
+                        line = line[:last_space]
+                    else:
+                        line = line[:200]
+                    print(f"Warning: Truncated long line to {len(line)} chars")
+        
+                lines.append(line)
+
+    lines = [l for l in lines if not re.match(r'^\*\*.*\*\*$', l)]
+
+    return lines
+
+
+
+
 
 def make_prompt(plantoid, generated_transcript, credits):
 
@@ -378,7 +416,7 @@ def get_plantoid_sig(network, tID, lang):
 
 
 
-def get_video_prompts(sermon, n_prompt):
+def get_video_prompt(sermon, n_prompt):
 
     n = str(n_prompt)
 

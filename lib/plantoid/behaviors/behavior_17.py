@@ -10,11 +10,15 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
 
 def create_seed_metadata(plantoid, network, tID):
 
-    description = "Plantoid #17 - Seed #" + tID
-    image = "https://ipfs.io/ipfs/bafybeihkjh6s7ofaxb2nzjcwod3hs7qvubfftixwu35m35z5ijug25wwx4"
+    db = dict()
+    # standard information for the record_metadata() function
+    db['name'] = tID
+    db['description'] = "Plantoid #17 - Seed #" + tID
+    db['external_url'] = "http://plantoid.org"
+    db['image'] = "https://ipfs.io/ipfs/bafybeihkjh6s7ofaxb2nzjcwod3hs7qvubfftixwu35m35z5ijug25wwx4"
 
-
-    behaviors.poem_metadata(plantoid, network, tID, description, image)
+    # behaviors.poem_metadata(plantoid, network, tID, db)
+    behaviors.generic_metadata(plantoid, network, tID, db, behaviors.poem_make_prompts, behaviors.poem_make_video )
 
 
 

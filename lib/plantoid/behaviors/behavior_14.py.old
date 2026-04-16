@@ -32,7 +32,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     # Generate response
     plantoid.send_serial_message("thinking")
 
-    prompt = plantoid.make_prompt(user_speech, credits)
+    prompt = make_prompt(plantoid. user_speech, credits)
 
     response_text = PlantoidSpeech.GPTmagic(prompt, model=plantoid.llm_model)
     print('response text: ', response_text)
