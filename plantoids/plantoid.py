@@ -74,7 +74,7 @@ class Plantony:
         # Load the sounds
         self.introduction = self.path+"/samples/" + self.lang + "/intro.mp3"
         self.outroduction = self.path+"/samples/" + self.lang + "/outro.mp3"
-        # self.reflection = self.path+"/samples/" +   self.lang + "/initiation.mp3"
+        self.reflection = self.path+"/samples/" +   self.lang + "/initiation.mp3"
         self.cleanse = self.path+"/media/cleanse.mp3"
 
     # def ambient_background(self, music, stop_event):
@@ -384,11 +384,10 @@ class Plantony:
         
         self.send_serial_message("speaking")
 
-        msg = msg or self.reflection
-
-        PlantoidSpeech.stream_response(self, msg, self.voice_id)
-
-        #playsound(msg)
+        if(msg):
+            PlantoidSpeech.stream_response(self, msg, self.voice_id)
+        else:
+            playsound(self.reflection)
 
 
    
