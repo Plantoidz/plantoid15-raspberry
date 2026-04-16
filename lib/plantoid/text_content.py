@@ -1,4 +1,8 @@
+import re
+
+
 def get_text_content(lang):
+
 
     opening_lines = {
         "fr-FR": 
