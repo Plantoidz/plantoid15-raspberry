@@ -290,9 +290,12 @@ def glitchbox_video_journey(path, tID, network, init_img, init_strength):
     n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
     
     prompt = get_video_prompts(sermon, n_prompt)
-    archive("text", "description", prompt, tID, network)
 
-    prompts = process_video_prompts(prompt)
+    response = PlantoidSpeech.GPTmagic(prompt)
+
+    archive("text", "description", response, tID, network)
+
+    prompts = process_video_prompts(response)
 
 
 
@@ -510,7 +513,7 @@ def save_video_fallback(path, movie_path):
 
     if not os.path.exists(finalpath):
         os.makedirs(finalpath)
-        
+
     seconds = int(get_media_duration(movie_file))
     newfilename = finalpath + str(seconds) + "_" + md5sum + ".mp4"
     

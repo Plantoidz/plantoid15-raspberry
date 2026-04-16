@@ -304,8 +304,8 @@ default_prompt = {
             "fr-FR": "La question est la suivante: ",
         },
         "words": {
-            "en-EN": "Include the following words in your poem: ", 
-            "fr-FR": "Inclut les mots suivant dans ton poème: ",
+            "en-EN": "The poem can include words like ", 
+            "fr-FR": "Le poème peut inclure des mots tels que ",
         },
         "outro": {
            "en-EN": "Remember, the poem should be made of paragraphs that are 3 lines long, with the exactly number of paragraphs == ",
@@ -324,8 +324,8 @@ default_prompt = {
             "fr-FR": "Les paroles doivent refleter le sujet suivant: ",
         },
         "words": {
-            "en-EN": "Include the following words in your poem: ", 
-            "fr-FR": "Inclut les mots suivant dans ton poème: ",
+            "en-EN": "The lyrics can include words like ", 
+            "fr-FR": "Les paroles peuvent inclure des mots tels que ",
         },
         "outro": {
            "en-EN": "IMPORTANT: Lines must be less than 200 characters each! Make it as short as possible, not longer than 200 characters per line, and max lines == ",
@@ -369,8 +369,10 @@ def get_video_prompts(sermon, n_prompt):
 
     n = str(n_prompt)
 
-    prompt = "This is the poem i want to illustrate: ", sermon
+    prompt = "This is the poem i want to illustrate: " + sermon
     prompt += f"Can you generate {n} short sentences that illustrates the lyrics of the poem in a very graphical manner. Be highly descritive, ideally with a particular style that is reminescent of solar-punk vibes. Each sentence needs to be numbered (1., 2., etc.) in such a way as to follow the chronology of the poem. These descriptions will be used to generate a video illustrating the poem.  "
+
+    return prompt
 
     # prompt = "I need to illustrate this poem. "
     # prompt = prompt + "Can you generate " + str_n_prompts_n + " sentences (not more than " + str_n_prompts_n + " sentences) that illustrate the poem, presented chronologically based on the phrasing of the poem. "
