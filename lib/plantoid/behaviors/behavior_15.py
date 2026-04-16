@@ -82,7 +82,7 @@ def create_seed_metadata(plantoid, network, token_Id):
             movie_path = behavior_library.fallback_video(path, token_Id, network.name)
         
         
-        movie_path = behavior_library.make_video(path, movie_path, token_Id, network.name)
+        movie_path = behavior_library.save_video_with_audio(path, movie_path, token_Id, network.name)
 
 
     animurl = behavior_library.pin_movie(movie_path)

@@ -105,7 +105,9 @@ def create_seed_metadata(plantoid, network, token_Id):
             print('GENERATING NEW VIDEO with GLITCHBOX')
             init_img = path + "./init_img.jpg"
             init_strength = 0.7
-            movie_path = behavior_library.glitchbox_video_journey(path, token_Id, network.name, init_img, init_strength)
+            movie_path = behavior_library.glitchbox_video_journey(path, token_Id, network, init_img, init_strength)
+            behavior_library.save_video_fallback(path, movie_path) # save the video just created in the fallback folder
+
         
         elif(network.failsafe == 1 or movie_path == None):
             
@@ -113,8 +115,9 @@ def create_seed_metadata(plantoid, network, token_Id):
             #print("PlantoidEden.make_eden_API_call return Null -- going to use a fallback video !")
             movie_path = behavior_library.fallback_video(path, token_Id, network.name)
         
-        
-        movie_path = behavior_library.make_video(path, movie_path, token_Id, network.name)
+
+        # add the audio to the video
+        movie_path = behavior_library.save_video_with_audio(path, movie_path, token_Id, network.name)
 
 
     animurl = behavior_library.pin_movie(movie_path)

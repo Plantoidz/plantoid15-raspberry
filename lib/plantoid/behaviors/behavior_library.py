@@ -10,7 +10,6 @@ import subprocess
 from lib.plantoid.text_content import *
 import lib.plantoid.speech as PlantoidSpeech
 
-import lib.plantoid.eden as eden
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "glitchbox"))
 from grpc_prompt_journey_http import run_journey
 
@@ -61,264 +60,6 @@ def archive(type, folder, user_speech, tID, network):
 
     print(f"{folder} saved as ..... " + filename)
 
-
-
-# def save_response(response, tID, network):
-
-#     path = network.plantoid_path
-#     responses_path = path + "/responses/"
-#     responses_path_network = responses_path + str(network.name)
-
-#     if not os.path.exists(responses_path):
-#         os.makedirs(responses_path);
-
-#     if not os.path.exists(responses_path_network):
-#         os.makedirs(responses_path_network);
-    
-#     # save the generated response to a file with the seed name
-#     filename =  f"{responses_path_network}/{tID}_response.txt"
-
-#     with open(filename, "w") as f:
-#         f.write(response_text) 
-
-
-# def generate_GPT_response(craft, plantoid, network, audio, tID, credits):
-#     plantoid.send_serial_message("thinking")
-    
-#     # get the path of the network
-#     path = network.plantoid_path
-#     print("TRANSCRIBING... in PATH ==== ", path)
-    
-#     # get the path to the background music
-#     background_music_path = plantoid.path+"/media/ambient3.mp3"
-    
-#     # play the background music
-#     plantoid.play_background_music(background_music_path)
-    
-#     # get generated transcript
-#     generated_transcript = PlantoidSpeech.recognize_speech(audio, plantoid.lang)
-    
-#     # print the generated transcript
-#     print("I heard...: " + generated_transcript)
-    
-#     # if no generated transcript, use a default
-#     if not generated_transcript:  
-#             match craft:
-#                 case "opera":
-#                     generated_transcript = get_default_song_transcript(plantoid.lang)
-#                 case "oracle":
-#                     generated_transcript = get_default_sermon_transcript(plantoid.lang)
-        
-#     # save the generated transcript to a file with the seed name
-#     path_transcripts = path + "/transcripts/"
-#     path_transcripts_network = path_transcripts + str(network.name)
-    
-#     if not os.path.exists(path_transcripts):
-#         os.makedirs(path_transcripts)
-
-#     if not os.path.exists(path_transcripts_network):
-#         os.makedirs(path_transcripts_network)
-
-#     # save the generated response to a file with the seed name
-#     filename = f"{path_transcripts_network}/{tID}_transcript.txt"
-
-#     print("saving transcript as ...................................", filename)
-    
-#     with open(filename, "w") as f:
-#         f.write(generated_transcript)
-
-#     print("transcript saved as ..... " + filename)
-    
-#     ######## now generate the response ########
-    
-#     print("generating transcript with number of credits = " + str(credits))
-
-#     # retieve the response prompt
-#     prompt = None
-#     match craft:
-#                 case "opera":
-#                     prompt = get_song_prompt(
-#                         generated_transcript,
-#                         plantoid.selected_words_string,
-#                         credits,
-#                         plantoid.lang
-#                     )
-#                 case "oracle":
-#                     prompt = get_sermon_prompt(
-#                         generated_transcript,
-#                         plantoid.selected_words_string,
-#                         credits,
-#                         plantoid.lang
-#                     )
-    
-#     print("PROMPTING with ..............................................", prompt)
-
-#     # get GPT response
-#     response_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
-
-#     print('response text: ', response_text)
-
-
-#     # Validate and fix line lengths for opera
-#     if craft == "opera":
-        
-#         # Split into individual lines and clean them
-#         lines = []
-        
-#         for line in response_text.split('\n'):
-#             line = line.strip()
-#             # Remove numbering like "(1)" or "1." from the start
-#             line = re.sub(r'^\(\d+\)\s*', '', line)
-#             line = re.sub(r'^\d+\.\s*', '', line)
-#             # Remove quotes
-#             line = line.strip('"\'')
-
-#             if line and len(line) > 0:
-#                 # truncate is too long
-#                 if len(line) > 200:
-#                     last_space = line[:200].rfind(' ')
-#                     if last_space > 0:
-#                         line = line[:last_space]
-#                     else:
-#                         line = line[:200]
-#                     print(f"Warning: Truncated long line to {len(line)} chars")
-        
-#                 lines.append(line)
-    
-#         response_lines = lines
-#         response_text = '\n'.join(lines)
-#         print('fixed response text: ', response_text)
-
-  
-#     #--------
-
-#     responses_path = path + "/responses/"
-#     responses_path_network = responses_path + str(network.name)
-
-#     # save the generated response to a file with the seed name
-#     if not os.path.exists(responses_path):
-#         os.makedirs(responses_path);
-
-#     # save the generated response to a file with the seed name
-#     if not os.path.exists(responses_path_network):
-#         os.makedirs(responses_path_network);
-    
-#     # save the generated response to a file with the seed name
-#     filename =  f"{responses_path_network}/{tID}_response.txt"
-#     with open(filename, "w") as f:
-#         f.write(response_text)
-
-#     plantoid.send_serial_message("awake")
-
-#     if craft == "opera":
-#         return response_lines
-#     else:
-#         return response_text
-    
-
-# this could theoretically be commented out -- use generate_response() instead !  :)
-# def generate_oracle(plantoid, network, audio, tID, amount):
-
-#     plantoid.send_serial_message("thinking")
-#     plantoid.send_serial_message("asleep") ## REMOVE
-
-
-#     # get the path of the network
-#     path = network.plantoid_path
-#     print("TRANSCRIBING... in PATH ==== ", path)
-
-#     # get the path to the background music
-#     background_music_path = plantoid.path+"/media/ambient3.mp3"
-
-#     # play the background music
-#     plantoid.play_background_music(background_music_path)
-
-#     # get generated transcript
-#     generated_transcript = PlantoidSpeech.recognize_speech(audio, plantoid.lang)
-
-#     # print the generated transcript
-#     print("I heard... (oracle): " + generated_transcript)
-
-#     # if no generated transcript, use a default
-#     if not generated_transcript: 
-#         generated_transcript = get_default_sermon_transcript(plantoid.lang)
-
-#     # save the generated transcript to a file with the seed name
-#     path_transcripts = path + "/transcripts/"
-#     path_transcripts_network = path_transcripts + str(network.name)
-
-#     if not os.path.exists(path_transcripts):
-#         os.makedirs(path_transcripts)
-
-#     if not os.path.exists(path_transcripts_network):
-#         os.makedirs(path_transcripts_network)
-
-#     # save the generated response to a file with the seed name
-#     filename = f"{path_transcripts_network}/{tID}_transcript.txt"
-
-#     print("saving transcript as ...................................", filename)
-
-#     with open(filename, "w") as f:
-#         f.write(generated_transcript)
-
-#     print("transcript saved as ..... " + filename)
-
-#     # TODO: re-enable
-#     # calculate the length of the poem
-#     # one line every 0.01 ETH for mainnet, one line every 0.001 ETH for goerli
-#     n_lines = int(amount / network.min_amount)  
-
-#     n_lines = n_lines + 2
-    
-#     if n_lines > 6: 
-#         n_lines = 6
-
-#     # n_lines = 4
-
-#     print("generating transcript with number of lines = " + str(n_lines))
-
-#     # generate the sermon prompt
-#     prompt = get_sermon_prompt(
-#         generated_transcript,
-#         plantoid.selected_words_string,
-#         n_lines,
-#         plantoid.lang
-#     )
-#     print("PROMPTING with ..............................................", prompt)
-
-#     # get GPT response
-#     # response = PlantoidSpeech.GPTmagic(prompt, call_type='completion')
-#     # sermon_text = response.choices[0].text
-
-#     # print('sermon text 1:')
-#     # print(sermon_text)
-
-#     # get GPT response
-#     sermon_text = PlantoidSpeech.GPTmagic(prompt, model=self.llm_model)
-
-#     print('sermon text: ', sermon_text)
-  
-#     #--------
-
-#     responses_path = path + "/responses/"
-#     responses_path_network = responses_path + str(network.name)
-
-#     # save the generated response to a file with the seed name
-#     if not os.path.exists(responses_path):
-#         os.makedirs(responses_path);
-
-#     # save the generated response to a file with the seed name
-#     if not os.path.exists(responses_path_network):
-#         os.makedirs(responses_path_network);
-    
-#     # save the generated response to a file with the seed name
-#     filename =  f"{responses_path_network}/{tID}_response.txt"
-#     with open(filename, "w") as f:
-#         f.write(sermon_text)
-
-#     plantoid.send_serial_message("awake")
-
-#     return sermon_text
 
 
 def print_response(plantoid, network, tID, text):
@@ -465,30 +206,6 @@ def pin_movie(movie_path):
     ipfsQmp3 = None
   
 
-    # # check if the movie already exists
-    # if os.path.exists(path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"):
-
-    #     # the movie already exists, move directly to the metadata creation
-    #     print("skipping the production of the movie, as it already exists...");
-    #     movie_path = path + "/videos/" + network.name + "/" + token_Id +"_movie.mp4"
-
-    # else:
-
-    #     # the movie doesn't exist, create it
-    #     audio = path + "/sermons/" + network.name + "/" + token_Id + "_sermon.mp3"
-    #     print("creating movie for sermon file.. " + audio) 
-        
-    #     if not os.path.isfile(audio):
-    #         print("no Sermon audio file associated with seed: " + token_Id, 'skipping...')
-    #         return 
-
-    #     plantoid.send_serial_message("thinking")
-    #     plantoid.send_serial_message("asleep") ## REMOVE
-    #     plantoid.send_serial_message("fire") ## REMOVE
-            
-    #     movie_path = eden.create_video_from_audio(path, token_Id, network.failsafe, network.name)
-
-
     ### Pin the Video-Sermon on IPFS
     if movie_path is None:
         print("movie is null, skipping pinning to IPFS")
@@ -517,6 +234,7 @@ def pin_movie(movie_path):
             print(f"Something went wrong with Pinata: {e}")
 
     
+
 
 def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
@@ -552,29 +270,39 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
 
 
-def glitchbox_video_journey(path, tID, network_name, init_img, init_strength):
+def glitchbox_video_journey(path, tID, network, init_img, init_strength):
 
     from mutagen.mp3 import MP3
 
-    audio_file = path + "/audios/" + network_name + "/" + tID + "_audio.mp3"
+    # audio sermon
+    audio_file = path + "/audios/" + network.name + "/" + tID + "_audio.mp3"
+    
+    # video output 
     output_file = "/tmp/generated_journey_video.mp4"
 
-    # ensure video dir exists
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
-
-    # generate prompt fromm the response text (reuse eden.create_prompts
+    # text sermon
+    with open(path + "/responses/" + network.name + "/" + tID + "_response.txt", "r") as f:
+        sermon = f.read()
+    
+    # generate prompt from the response text 
     duration = MP3(audio_file).info.length
     fps = 20
     n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
-    prompts = eden.create_prompts(path, tID, n_prompt, network_name)
+    
+    prompt = get_video_prompts(sermon, n_prompt)
+    archive("text", "description", prompt, tID, network)
+
+    prompts = process_video_prompts(prompt)
+
+
 
     # calculate transition / hold frames to match audio duration
     total_frames = int(duration * fps)
     n = len(prompts)
     # total_frames = (n-1)*transition * n*hold
     # pick hold_frames = 15, solve for transition_frames
-    hold_frames = 15
-    transition_frames = max(1, total_frames - n * hold_frames) // (n -1)
+    hold_frames = 5
+    transition_frames = max(1, (total_frames - n * hold_frames) // (n -1))
 
     
     run_journey(
@@ -659,7 +387,7 @@ def fmpeg_interleave_av(video_file, audio_file, output_file):
     subprocess.run(cmd_combine)
 
 
-def make_video(path, video_file_path, seed, network_name): 
+def save_video_with_audio(path, video_file_path, seed, network_name): 
 
     if not video_file_path: return None
 
@@ -774,6 +502,22 @@ def get_remote_video(remote_output_file, path):
 
     return newfilename
 
+
+def save_video_fallback(path, movie_path):
+
+    md5sum = hashlib.md5(movie_path.encode('utf-8')).hexdigest() 
+    finalpath = path + "/fallback_videos/" 
+
+    if not os.path.exists(finalpath):
+        os.makedirs(finalpath)
+    
+   seconds = int(get_media_duration(movie_file))
+   newfilename = finalpath + str(seconds) + "_" + md5sum + ".mp4"
+
+   os.system("mv " + movie_file + " " + newfilename) 
+   print('fallback movie file is', newfilename)
+
+   return newfilename
 
 
 

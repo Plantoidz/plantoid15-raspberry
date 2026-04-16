@@ -66,8 +66,9 @@ def create_prompts(path, seed, n_prompt, network_name):
     descri1 = response1.choices[0].text
     descri = response.choices[0].text
 
-    print(descri1)
-    print(descri)
+    print("unfiltered prompts :::: \n")
+    print("----> general setting : : : : : :  : : : : ", descri1)
+    print("-----> list of individual prompts . . . . . . . . ", descri)
 
     # generate descriptions dir
     if not os.path.exists(path + "/descriptions"):

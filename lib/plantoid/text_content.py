@@ -292,22 +292,6 @@ def get_default_transcript(plantoid_n, language):
     return default_transcript[plantoid_n][language]
 
 
-# def get_default_song_transcript(lang):
-#     generated_transcript = {
-#         "en-EN": "A world where Plants collaborate with Humans and with Machines, in a symbiotic dance of co-creation.",
-#         "fr-FR": "Un monde où les Plantes collaborent avec les Humains et les Machines, dans une danse symbiotique de co-création."
-#     }
-#     return generated_transcript[lang]
-
-# def get_default_sermon_transcript(lang):
-
-#     generated_transcript = {
-#             "en-EN": "I don't know what the future looks like. Describe a solarkpunk utopia where Plantoids have taken over the world.",
-#             "fr-FR": "Le futur auquel j'aspire est une utopie solarpunk où les Plantoïdes ont envahit la planete."
-#             }
-#     return generated_transcript[lang]
-
-
 
 default_prompt = {
     14: {
@@ -369,42 +353,6 @@ def get_prompt(plantoid_n, generated_transcript, selected_words_string, credits,
 
 
 
-def get_sermon_prompt(
-    generated_transcript,
-    selected_words_string,
-    credits,
-    lang
-):
-    # define the length of the poem
-    n_lines = credits + 2
-    if n_lines > 6: n_lines = 6
-
-    prompt = {
-            "en-EN": f"You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem structured around {n_lines} short paragraph, each paragraph is composed of exactly 3 lines:\n\n{generated_transcript}\n\nInclude the following words in your poem: {selected_words_string}. Remember, the poem should be exactly {n_lines} paragraphs long, with {n_lines} lines per paragraph.",
-            "fr-FR": f"Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. A partir du texte suivant, écrit-moi un poème structuré en {n_lines} courts paragraphes, chaque paragraphe est composé de exactement 4 lignes:\n\n{generated_transcript}\n\nInclut les mots suivant dans ton poème: {selected_words_string}. Le poème doit être strictement en français, avec {n_lines} paragraphes de 4 lignes chacun."
-            }
-
-    return prompt[lang]
-
-def get_song_prompt(
-    generated_transcript,
-    selected_words_string,
-    credits,
-    lang
-):
-    # define the length of the lyrics
-    n_lines = credits + 2
-    if n_lines > 6: n_lines = 6
-    
-    prompt = {
-            "en-EN": f"You are Plantoid, an enlightened being from the future. Write the lyrics for an opera song that is made of {n_lines} lines with only a few words each, based on the following input:\n\n{generated_transcript}\n\nInclude the following words in the lyrics: {selected_words_string}. IMPORTANT: Lines must be less than 200 characters each! Make it as short as possible, not longer than 200 characters per line!",
-            "fr-FR": f"Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. Écrit-moi les paroles d'un chant d'opéra qui fait exactement {n_lines} phrases, à partir des éléments suivants:\n\n{generated_transcript}\n\nInclut les mots suivant dans les paroles: {selected_words_string}. Les paroles doivent être strictement en français."
- 
-    }
-    
-    return prompt[lang]
-
-
 def get_plantoid_sig(network, tID, lang):
     
     plantoid_sig = {
@@ -413,3 +361,70 @@ def get_plantoid_sig(network, tID, lang):
             }
 
     return plantoid_sig[lang]
+
+
+
+
+def get_video_prompts(sermon, n_prompt):
+
+    n = str(n_prompt)
+
+    prompt = "This is the poem i want to illustrate: ", sermon
+    prompt += f"Can you generate {n} short sentences that illustrates the lyrics of the poem in a very graphical manner. Be highly descritive, ideally with a particular style that is reminescent of solar-punk vibes. Each sentence needs to be numbered (1., 2., etc.) in such a way as to follow the chronology of the poem. These descriptions will be used to generate a video illustrating the poem.  "
+
+    # prompt = "I need to illustrate this poem. "
+    # prompt = prompt + "Can you generate " + str_n_prompts_n + " sentences (not more than " + str_n_prompts_n + " sentences) that illustrate the poem, presented chronologically based on the phrasing of the poem. "
+    # prompt = prompt + "I don't wont a summary of the plot, I want a graphical description that illustrates the statements of the poem. "
+    # prompt = prompt + "These descriptions will be used to generate a video illustrating the poem. "
+    # prompt = prompt + "Every sentence needs to be a self-contained descriptive illustration, that does not refer to the previous or following sentences. "
+    # prompt = prompt + "Be highly descritive, ideally with a particular style that is reminescent of solar-punk vibes. "
+    # prompt = prompt + "You can mention colors but only in one of these descriptions, and no reference to colors must be present in the first sentence. "
+    # prompt = prompt + "Draft your answer with each line starting with the number of the line, followed by a dot, a space, and then the actual description. "
+    # prompt = prompt + "Here's the poem which I'd like you to litterally illustrate: " + stri
+
+    # print("PROOOOOOOOOOOOOOOOMPT: ", prompt)
+
+    # response1 = openai.Completion.create(
+    #         engine=model_id,
+    #         prompt=prompt1,
+    #         max_tokens=max_tokens
+    # )
+
+    # response = openai.Completion.create(
+    #     engine=model_id,
+    #     prompt=prompt,
+    #     max_tokens=max_tokens
+    # )
+    
+    # descri1 = response1.choices[0].text
+    # descri = response.choices[0].text
+
+    # generate descriptions dir
+    # if not os.path.exists(path + "/descriptions"):
+    #     os.makedirs(path + "/descriptions");
+
+    # # write descriton to file
+    # with open(path + "/descriptions/" + seed + "_description.txt", "w") as outfile:
+    #     outfile.write(descri1)
+    #     outfile.write(descri)
+
+def process_video_prompts(descri):
+
+    lines = re.split("\d.", descri)
+
+    prompts = []
+
+    for ln in lines:
+        line = ln.strip()
+        line = line.replace("\n", "")
+        print("["+line+"]")
+
+        if (line):
+            # line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line + ". Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration"
+            line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line
+            line = line + " Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined."
+            prompts.append(line)
+
+    print("PROMPTS: ----> ", prompts)
+
+    return prompts
