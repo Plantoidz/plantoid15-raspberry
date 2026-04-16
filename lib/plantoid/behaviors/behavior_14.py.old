@@ -23,7 +23,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     plantoid.weaving()
         
     # listen for audio and obtain the transcript
-    user_speech = plantoid.listen() or plantoid.get_default_transcript()
+    user_speech = plantoid.listen() or get_default_transcript(plantoid)
 
     print("I heard ..", user_speech)  
     

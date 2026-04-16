@@ -553,7 +553,7 @@ def poem_generation(plantoid, network, tID, amount, question):
     plantoid.weaving(question)
 
     # listen for audio and obtain the transcript
-    user_speech = plantoid.listen() or plantoid.get_default_transcript()
+    user_speech = plantoid.listen() or get_default_transcript(plantoid)
 
     print("I heard ..", user_speech)
 
@@ -562,7 +562,7 @@ def poem_generation(plantoid, network, tID, amount, question):
     # Generate response
     plantoid.send_serial_message("thinking")
 
-    prompt = plantoid.make_prompt(user_speech, credits)
+    prompt = make_prompt(plantoid, user_speech, credits)
     response_text = PlantoidSpeech.GPTmagic(prompt, model=plantoid.llm_model)
     print("Response text: ", response_text)
 

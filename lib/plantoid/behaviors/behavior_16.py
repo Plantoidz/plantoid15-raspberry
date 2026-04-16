@@ -27,7 +27,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     plantoid.weaving()
         
     # listen for audio and obtain the transcript
-    user_speech = plantoid.listen() or plantoid.get_default_transcript()
+    user_speech = plantoid.listen() or get_default_transcript(plantoid)
 
     # if user_speech == "":
     #    user_speech = behavior_library.get_default_song_transcript(plantoid.lang)
@@ -41,7 +41,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     # Generate response  ..
     plantoid.send_serial_message("thinking")
 
-    prompt = plantoid.make_prompt(user_speech, credits)
+    prompt = make_prompt(plantoid, user_speech, credits)
 
     response_text = PlantoidSpeech.GPTmagic(prompt, model=plantoid.llm_model)
     print('response text: ', response_text)
