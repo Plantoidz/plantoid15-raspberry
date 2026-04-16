@@ -508,7 +508,7 @@ def get_remote_video(remote_output_file, path):
 
 def save_video_fallback(path, movie_file):
 
-    md5sum = hashlib.md5(movie_path.encode('utf-8')).hexdigest() 
+    md5sum = hashlib.md5(movie_file.encode('utf-8')).hexdigest() 
     finalpath = path + "/fallback_videos/" 
 
     if not os.path.exists(finalpath):
