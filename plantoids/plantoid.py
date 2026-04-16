@@ -386,7 +386,9 @@ class Plantony:
 
         msg = msg or self.reflection
 
-        playsound(msg)
+        PlantoidSpeech.stream_response(self, msg, self.voice_id)
+
+        #playsound(msg)
 
 
    
