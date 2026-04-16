@@ -541,3 +541,89 @@ def get_media_duration(file_path):
             return total_seconds
         
     raise ValueError(f"Could not determine duration of {file_path}.")
+
+
+
+
+def poem_generation(plantoid, network, tID, amount, question):
+
+    credits = int(amount / network.min_amount)
+
+    # ask an initial question
+    plantoid.weaving(question)
+
+    # listen for audio and obtain the transcript
+    user_speech = plantoid.listen() or plantoid.get_default_transcript()
+
+    print("I heard ..", user_speech)
+
+    archive("text", "transcript", user_speech, tID, network)
+
+    # Generate response
+    plantoid.send_serial_message("thinking")
+
+    prompt = plantoid.make_prompt(user_speech, credits)
+    response_text = PlantoidSpeech.GPTmagic(prompt, model=plantoid.llm_model)
+    print("Response text: ", response_text)
+
+    archive("text", "response", response_text, tID, network)
+
+    # print oracle on the LP printer
+    print_response(plantoid, network, tID, response_text)
+
+    # generate audio file
+    audiofile = PlantoidSpeech.stream_response(plantoid, response_text, plantoid.voice_id, save_to_file=f"/tmp/output_oracle{plantoid.plantoid_number}.wav")
+    # convert to MP#
+    mp3_file = f"/tmp/output_oracle{plantoid.plantoid_number}.mp3"
+    subprocess.run(["ffmpeg", "-y", "-i", audiofile, mp3_file])
+    audiofile = mp3_file
+    # save and play the oracle
+    save_and_play_audio(plantoid, network, tID, audiofile)
+
+    plantoid.send_serial_message("awake")
+
+
+
+
+
+def poem_metadata(plantoid, network, tID, description, image):
+
+    movie_path = None
+    animurl = None
+
+    # create the metadata information
+    db = dict()
+    db['name'] = tID
+    db['description'] = description
+    db['external_url'] = "http://plantoid.org"
+    db['image'] = image
+
+    # check if movie exist for that particular token ID
+    path = network.plantoid_path
+    if os.path.exists(path + "/videos/" + network.name + "/" + tID + "_movie.mp4"):
+        movie_path = path + "/videos/" + network.name + "/" + tID + "_movie.mp4"
+
+    # check if audio exists to create movie
+    elif os.path.isfile(path + "/audios/" + network.name + "/" + tID + "_audio.mp3"):
+        plantoid.send_serial_message("thinking")
+
+        if(network.failsafe == 0):
+            print("Generative NEW video with Glitchbox")
+            init_img = path + "./init_img.jpg"
+            init_strength = 0.7
+            movie_path = glitchbox_video_journey(path, tID, network, init_img, init_strength)
+            save_video_fallback(path, movie_path)
+
+        elif(network.failsafe == 1 or movie_path == None):
+            print("Failsafe: using fallback video")
+            movie_path = fallback_video(path, tID, network.name)
+        
+        # Add audio to the video
+        movie_path = save_video_with_audio(path, movie_path, tID, network.name)
+
+    # PIN movie to IPFS
+    animurl = pin_movie(movie_path)
+    if(animurl):
+        record_metadata(plantoid, network, tID, db, animurl)
+
+    plantoid.send_serial_message("awake")

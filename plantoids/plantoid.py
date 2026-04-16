@@ -74,7 +74,7 @@ class Plantony:
         # Load the sounds
         self.introduction = self.path+"/samples/" + self.lang + "/intro.mp3"
         self.outroduction = self.path+"/samples/" + self.lang + "/outro.mp3"
-        self.reflection = self.path+"/samples/" +   self.lang + "/initiation.mp3"
+        # self.reflection = self.path+"/samples/" +   self.lang + "/initiation.mp3"
         self.cleanse = self.path+"/media/cleanse.mp3"
 
     # def ambient_background(self, music, stop_event):
@@ -161,6 +161,13 @@ class Plantony:
        # playsound(audiofile)
 
         PlantoidSpeech.stream_response(self, self.opening, self.voice_id)
+
+
+    def say(self):
+
+        self.send_serial_message("speaking")
+        PlantoidSpee.stream_response(self, "stream_response", self.voice_id)
+        self.send_serial_message("awake")
 
 
     def terminate(self):
@@ -373,11 +380,13 @@ class Plantony:
         self.prompt_text = open(self.path+self.personality).read().strip()
 
         
-    def weaving(self):
+    def weaving(self, msg=None):
         
         self.send_serial_message("speaking")
 
-        playsound(self.reflection)
+        msg = msg or self.reflection
+
+        playsound(msg)
 
 
    

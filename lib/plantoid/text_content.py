@@ -291,7 +291,10 @@ default_transcript = {
   }
 
 
-def get_default_transcript(plantoid_n, language):
+def get_default_transcript(plantoid):
+
+    plantoid_n = plantoid.plantoid_number
+    language = plantoid.lang
 
     return default_transcript[plantoid_n][language]
 
@@ -341,7 +344,13 @@ default_prompt = {
 
 
 
-def get_prompt(plantoid_n, generated_transcript, selected_words_string, credits, lang):
+def make_prompt(plantoid, generated_transcript, credits):
+
+    plantoid_n = plantoid.plantoid_number
+    lang = plantoid.lang
+    selected_words_string = plantoid.selected_words_string
+
+    
 
     n_lines = credits + 2
     if n_lines > 5: n_lines = 5
