@@ -510,14 +510,14 @@ def save_video_fallback(path, movie_path):
 
     if not os.path.exists(finalpath):
         os.makedirs(finalpath)
+        
+    seconds = int(get_media_duration(movie_file))
+    newfilename = finalpath + str(seconds) + "_" + md5sum + ".mp4"
     
-   seconds = int(get_media_duration(movie_file))
-   newfilename = finalpath + str(seconds) + "_" + md5sum + ".mp4"
-
-   os.system("mv " + movie_file + " " + newfilename) 
-   print('fallback movie file is', newfilename)
-
-   return newfilename
+    os.system("mv " + movie_file + " " + newfilename) 
+    print('fallback movie file is', newfilename)
+    
+    return newfilename
 
 
 
