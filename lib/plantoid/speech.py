@@ -934,8 +934,8 @@ def listen_smartASR(plantoid):
     ]    
 
     # P17 has a broken mic, skip local servers and go straight to deepgram.
-    if plantoid.plantoid_number == 17:
-        SERVERS = []
+    # if plantoid.plantoid_number == 17:
+    #     SERVERS = []
 
 
 
@@ -944,7 +944,7 @@ def listen_smartASR(plantoid):
             with ignoreStderr():
                 audio = pyaudio.PyAudio()
 
-            mic = audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=512)
+            mic = audio.open(format=pyaudio.paInt16, channels=2, rate=16000, input=True, frames_per_buffer=512)
 
             print(f"Smart ASR - streaming to {name} ...")
 
@@ -952,7 +952,13 @@ def listen_smartASR(plantoid):
 
                 while True:
                     data = mic.read(512, exception_on_overflow=False)
-                    await ws.send(data)
+                    
+                    # for P17 --> extract left channel only (every other sample in stereo interleaved data)
+                    import struct
+                    samples = struct.unpack('<' + 'hh' * 512, data)
+                    left_only = struct.pack('<' + 'h' * 512, *samples[0::2])
+
+                    await ws.send(left_only)
 
                     try:
                         msg = await asyncio.wait_for(ws.recv(), timeout=0.001)
@@ -1051,12 +1057,17 @@ def listen_smartASR(plantoid):
 
         with ignoreStderr():
             audio = pyaudio.PyAudio()
-        mic = audio.open(format=pyaudio.paInt32, channels=1, rate=44100, input=True, frames_per_buffer=1024)
+        mic = audio.open(format=pyaudio.paInt32, channels=2, rate=44100, input=True, frames_per_buffer=1024)
         print("Mic opened -- streaming to Deepgram")
 
         while result[0] is None:
             data = mic.read(1024, exception_on_overflow=False)
+            
             samples32 = np.frombuffer(data, dtype=np.int32)
+            
+            # for P17 --> extract left channel only (every other sample from stereo)
+            samples32 = samples32[0::2]
+
             samples16 = (samples32 >> 15).clip(-32768, 32767).astype(np.int16)
             rms = np.sqrt(np.mean(samples16.astype(np.float64)**2))
             print(f"\r Audio level: {rms: 0f}", end='', flush=True)
