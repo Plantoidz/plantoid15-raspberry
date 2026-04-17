@@ -344,6 +344,7 @@ default_prompt = {
            "en-EN": "Remember, the poem should be made of paragraphs that are 3 lines long, with the exactly number of paragraphs == ",
            "fr-FR": "Rappèle-toi que le poème doit être composé de paragraphes de 3 lignes chacun, avec le nombre exact de paragraphes == ", 
         }
+    },
 
     16: {
         "intro": {
