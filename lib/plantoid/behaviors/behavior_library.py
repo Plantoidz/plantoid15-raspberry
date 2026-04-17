@@ -11,7 +11,7 @@ from lib.plantoid.text_content import *
 import lib.plantoid.speech as PlantoidSpeech
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "glitchbox"))
-from grpc_prompt_journey_http import run_journey
+from grpc_prompt_journey_http import run_journey, run_scheduler
 
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play
