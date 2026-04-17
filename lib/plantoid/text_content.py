@@ -1,5 +1,7 @@
 import re
 
+import lib.plantoid.speech as PlantoidSpeech
+
 
 def get_text_content(lang):
 
