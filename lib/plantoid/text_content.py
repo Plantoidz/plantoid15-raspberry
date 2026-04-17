@@ -290,6 +290,10 @@ default_transcript = {
           "en-EN": "A world where Plants collaborate with Humans and with Machines, in a symbiotic dance of co-creation.",
           "fr-FR": "Un monde où les Plantes collaborent avec les Humains et les Machines, dans une danse symbiotique de co-création.",
       },
+      17: {
+          "en-EN": "A recursive world where Plants collaborate with Humans and with Machines, looping into each other as symbiotic beings.",
+          "fr-FR": "Un monde recursif où les Plantes collaborent avec les Humains et les Machines, dans une danse qui les rend toujours plus symbiotique les uns avec les autres.",
+      },
   }
 
 
@@ -303,6 +307,7 @@ def get_default_transcript(plantoid):
 
 
 default_prompt = {
+
     14: {
         "intro": {
             "en-EN": "You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem, with the following structure: each paragraph is composed of exactly 3 lines; with number of paragraphs == ",
@@ -320,8 +325,25 @@ default_prompt = {
            "en-EN": "Remember, the poem should be made of paragraphs that are 3 lines long, with the exactly number of paragraphs == ",
            "fr-FR": "Rappèle-toi que le poème doit être composé de paragraphes de 3 lignes chacun, avec le nombre exact de paragraphes == ", 
         }
-
     },
+    
+    17: {
+        "intro": {
+            "en-EN": "You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem, with the following structure: each paragraph is composed of exactly 3 lines; with number of paragraphs == ",
+            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. A partir du texte suivant, écrit-moi un poème structuré ainsi: chaque paragraphe est composé exactement de 3 lignes; avec nombre de paragraphes == ",
+        },
+        "question": {
+            "en-EN": "The question is the following: ",
+            "fr-FR": "La question est la suivante: ",
+        },
+        "words": {
+            "en-EN": "The poem can include words like ", 
+            "fr-FR": "Le poème peut inclure des mots tels que ",
+        },
+        "outro": {
+           "en-EN": "Remember, the poem should be made of paragraphs that are 3 lines long, with the exactly number of paragraphs == ",
+           "fr-FR": "Rappèle-toi que le poème doit être composé de paragraphes de 3 lignes chacun, avec le nombre exact de paragraphes == ", 
+        }
 
     16: {
         "intro": {

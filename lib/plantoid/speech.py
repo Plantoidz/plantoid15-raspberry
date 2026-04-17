@@ -976,11 +976,14 @@ def listen_smartASR():
         try:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            result = asyncio.get_event_loop().run_until_complete(_stream(name, uri))
+            # result = asyncio.get_event_loop().run_until_complete(_stream(name, uri))
+            result = loop.run_until_complete(_stream(name, uri))
             if result is not None: 
                 return result
         except Exception as e:
             print(f"Smart ASR - {name} failed: {e}")
+        finally:
+            loop.close()
     
     ## Fallback to local recording and remote ASR transcription
     # print("Smart ASR - falling back to local")
