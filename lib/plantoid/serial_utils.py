@@ -144,3 +144,31 @@ def reset_arduino_software(ser):
     ser.write(b'<RESET>\n')
     time.sleep(2)
     ser.flushInput()
+
+
+
+
+def check_if_talk(ser, pattern):
+
+    if ser.in_waiting > 0:
+
+        try:
+
+
+            # line = ser.readline().decode('utf-8').strip()
+
+            # Drain buffer, keep last line
+            raw = ser.read(ser.in_waiting).decode('utf-8', errors='ignore')
+            lines = raw.strip().split('\n')
+            line = lines[-1].strip()
+
+            print("line ==== ", line, " with pattern ============= ", pattern)
+
+            # Clear the buffer after reading to ensure no old "button_pressed" events are processed.
+            ser.reset_input_buffer()
+                        
+            condition = bool(re.fullmatch(pattern, line))
+            return condition
+
+        except UnicodeDecodeError:  
+            print("Received a line that couldn't be decoded!")
