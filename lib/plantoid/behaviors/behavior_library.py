@@ -270,7 +270,7 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
 
 
-def glitchbox_video_journey(prompts, duration, fps, init_img, init_strength):
+def glitchbox_video_journey(prompts, duration, fps, init_img, init_strength, loras):
 
     # video output 
     output_file = "/tmp/generated_journey_video.mp4"
@@ -293,7 +293,7 @@ def glitchbox_video_journey(prompts, duration, fps, init_img, init_strength):
         output = output_file,
         loop = False,
         init_image = init_img,
-        curation_index = 28, # NO LORA
+        curation_index = loras,
         strength = init_strength
     )
 
@@ -301,6 +301,27 @@ def glitchbox_video_journey(prompts, duration, fps, init_img, init_strength):
         return output_file
     return None
 
+
+def glitchbox_video_scheduler(audio_file, duration, fps, init_img, init_strength, loras):
+   # video output 
+    output_file = "/tmp/generated_journey_video.mp4"
+
+    run_scheduler(
+        server_ip = "100.79.41.86", # GLITCHBOX ON TAILSCALE
+        port = 7860, ## HTTP PORT
+        fps = fps,
+        output = output_file,
+        init_image = init_img,
+        audio_file = audio_file,
+        duration_seconds = duration,
+        curation_index = loras,
+        strength = init_strength
+    )
+
+    if os.path.exists(output_file):
+        return output_file
+    return None
+  
 
 # def create_video_from_audio(path, tID, network_name, init_img, init_strength):
 
@@ -599,10 +620,14 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
 
 
         if(network.failsafe == 0): # IF NO FAILSAFE, CALL THE CALLBACK
-            prompts = callback_prompt(sermon, audio_file)
-            archive("text", "description", "\n".join(prompts), tID, network)
+            
+            prompts = None
 
-            movie_path = callback_video(sermon, audio_file, prompts, path)
+            if(callback_prompt):
+                prompts = callback_prompt(sermon, audio_file)
+                archive("text", "description", "\n".join(prompts), tID, network)
+
+            movie_path = callback_video(path, sermon, audio_file, prompts)
             save_video_fallback(path, movie_path)
 
 
@@ -640,19 +665,34 @@ def poem_make_prompts(sermon, audio_file):
 
 
 
-def poem_make_video(sermon, audio_file, prompts, path):
+def poem_make_video(path, sermon, audio_file, prompts):
     
     from mutagen.mp3 import MP3
-
-    output_file = "/tmp/generated_journey_video.mp4"
-
-    print("Generative NEW video with Glitchbox")
-
     duration = MP3(audio_file).info.length
+
+    print("Generative NEW video with Glitchbox for --> POEM")
+
     init_img = path + "./init_img.jpg"
     init_strength = 0.7
     fps = 20
-    return glitchbox_video_journey(prompts, duration, fps, init_img, init_strength)
+    loras = 28 # NO LORA
+    return glitchbox_video_journey(prompts, duration, fps, init_img, init_strength, loras)
+
+
+def opera_make_video(path, sermon, audio_file, prompts):
+
+    from mutagen.mp3 import MP3
+    duration = MP3(audio_file).info.length
+
+    print("Generative NEW video with Glitchbox for --> OPERA")
+
+    init_img = path + '/../lib/plantoid/behaviors/glitchbox/' + 'input2.jpg'
+    init_strength = 0.9
+    fps = "15"
+    loras = "21" # twisted bodies & water
+
+    return glitchbox_video_scheduler(audio_file, duration, fps, init_img, init_strength, loras)
+    # os.system('python3.10 ' + glitchbox_path + f"grpc_prompt_journey.py --server {glitchbox_server} --scheduler --fps {fps} --init-image {init_img} --audio {audio_mp3} --duration {duration} --curation {loras} --output {movie_path}" )
 
 
 # def poem_metadata(plantoid, network, tID, db, prompts):
