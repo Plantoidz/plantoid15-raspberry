@@ -920,7 +920,7 @@ def recognize_speech_old(filename, lang=None):
 
 
 
-def listen_smartASR():
+def listen_smartASR(plantoid):
 
     # Stream audio to 1. MacBookPro or 2. GLITCHBOX for VAD + Smart Turn + ASR
     # Fall back to local recording + standard ASR failsafe system if servers are unavaible
@@ -932,6 +932,12 @@ def listen_smartASR():
         ("MackBook",  "ws://100.67.155.96:8200/v1/listen"),
         ("Glitchbox", "ws://100.79.41.86:8200/v1/listen"),
     ]    
+
+    # P17 has a broken mic, skip local servers and go straight to deepgram.
+    if plantoid.plantoid_number == 17:
+        SERVERS = []
+
+
 
     async def _stream(name, uri):
         async with websockets.connect(uri, open_timeout=2) as ws:

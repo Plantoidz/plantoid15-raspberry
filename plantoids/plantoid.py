@@ -199,7 +199,7 @@ class Plantony:
 
         self.send_serial_message("listening")
         self.play_background_music(self.cleanse, loops=0)
-        user_message = PlantoidSpeech.listen_smartASR() or ""
+        user_message = PlantoidSpeech.listen_smartASR(self) or ""
         playsound(self.acknowledge())
         print("Plantony has heard -----> ", user_message)
         return user_message
