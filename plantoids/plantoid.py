@@ -12,7 +12,6 @@ from lib.plantoid.text_content import *
 from lib.plantoid.behaviors import behavior_selector
 import lib.plantoid.speech as PlantoidSpeech
 import lib.plantoid.serial_utils as PlantoidSerial
-import lib.plantoid.gpio_utils as PlantoidGPIO
 import lib.plantoid.web3_utils as web3_utils
 
 class Plantony:
@@ -24,6 +23,7 @@ class Plantony:
             self.use_serial = 1
             self.serial_connector = io
         else:
+            import lib.plantoid.gpio_utils as PlantoidGPIO
             self.use_serial = 0
             self.use_gpio = 1
             self.gpio = PlantoidGPIO.GPIOLEDController(io['led'])
@@ -146,6 +146,7 @@ class Plantony:
             PlantoidSerial.send_to_arduino(self.serial_connector, message)
 
         elif self.use_gpio:
+            import lib.plantoid.gpio_utils as PlantoidGPIO
             PlantoidGPIO.LEDs_control(self.gpio, message)
 
 
