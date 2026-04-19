@@ -21,6 +21,7 @@ class Plantony:
         # instantaite i/o communication: serial vs gpio
         if isinstance(io, serial.Serial):
             self.use_serial = 1
+            self.use_gpio = 0
             self.serial_connector = io
         else:
             import lib.plantoid.gpio_utils as PlantoidGPIO

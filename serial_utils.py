@@ -4,7 +4,7 @@ import time
 import os, signal
 import random
 import regex_spm
-
+import re
 
 def setup_serial(PORT="/dev/ttyUSB0", baud_rate=9600):
 
