@@ -196,7 +196,7 @@ def main():
     plantoid_cfg = config[plantoid_number]
 
     use_serial = str_to_bool(plantoid_cfg['USE_SERIAL'])
-    use_gpio = isinstance(plantoid_cfg['USE_GPIO'], dict)
+    use_gpio = isinstance(plantoid_cfg.get('USE_GPIO'), dict)
     if(use_serial and use_gpio): 
         raise ValueError("Error: cannot have both USE_SERIAL and USE_GPIO")
 
