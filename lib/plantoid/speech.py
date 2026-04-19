@@ -119,9 +119,9 @@ def GPTmagic(prompt, model="gpt-4"):
         if resp.status_code == 200:
             print("LLM - using MacBook LM Studio ({model})")
             content = resp.json()["choices"][0]["message"]["content"]
-            # print("Content ==> ", content)
+            print("Content ==> ", content)
             trimmed = clean_trim_to_sentence(content)
-            # print("Trimmed content ==> ", trimmed)
+            print("Trimmed content ==> ", trimmed)
             return trimmed
 
     except Exception as e:
