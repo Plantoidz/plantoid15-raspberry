@@ -2,7 +2,7 @@ import time
 import os
 import sys
 import re
-import lib.plantoid.gpio_utils as gpio_utils
+# import lib.plantoid.gpio_utils as gpio_utils
 import lib.plantoid.serial_utils as serial_utils
 import lib.plantoid.web3_utils as web3_utils
 from plantoids.plantoid import Plantony
@@ -240,7 +240,9 @@ def main():
         io = serial_utils.setup_serial(PORT=PORT, baud_rate = 9600 if plantoid_number == "14" else 115200) # ugly - this should go into configuration.toml
         serial_utils.wait_for_arduino(io)
         serial_utils.send_to_arduino(io, "awake")
+    
     if use_gpio:
+        import lib.plantoid.gpio_utils as gpio_utils
         io = { 'touch' : plantoid_cfg['USE_GPIO']['touch'],  
                'led'  : plantoid_cfg['USE_GPIO']['led']
         }
