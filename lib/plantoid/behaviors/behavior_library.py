@@ -401,8 +401,11 @@ def save_video_with_audio(path, video_file_path, seed, network_name):
         # If it doesn't exist, create it
         os.makedirs(video_network_path)
 
+    plantoid_num = os.path.basename(os.path.normpath(path))
+    movie_name = f"{plantoid_num}_{network_name}_{seed}_movie.mp4"
+
     audio_file_path = path +"/audios/" + network_name + "/" + seed + "_audio.mp3"
-    output_file_path = path +"/videos/" + network_name + "/" + seed + "_movie.mp4"
+    output_file_path = path +"/videos/" + network_name + "/" + movie_name
 
     print(audio_file_path, video_file_path)
 
@@ -605,7 +608,8 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
 
     # check if movie exist for that particular token ID
     path = network.plantoid_path
-    video_file = path + "/videos/" + network.name + "/" + tID + "_movie.mp4"
+    plantoid_num = os.path.basename(os.path.normpath(path))
+    video_file = path + "/videos/" + network.name + "/" + f"{plantoid_num}_{network_name}_{tID}_movie.mp4"
     audio_file = path + "/audios/" + network.name + "/" + tID + "_audio.mp3" 
  
     if os.path.exists(video_file):

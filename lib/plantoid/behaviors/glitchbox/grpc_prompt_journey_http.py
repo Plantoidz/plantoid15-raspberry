@@ -65,13 +65,68 @@ def upload_file(server_ip, port, local_path):
     return server_path
 
 
-def download_file(server_ip, port, server_path, local_path):
-    """Download a file from the server."""
+def _wait_for_server_file(server_ip, port, server_path, timeout=120):
+      """Poll server until the file exists and its size is stable."""
+      #url = f"http://{server_ip}:{port}/api/file_info?path={server_path}"
+      last_size = -1
+      stable_count = 0
+      deadline = time.time() + timeout
+      while time.time() < deadline:
+          try:
+              info = _get(server_ip, port, f"/api/file_info?path={server_path}")
+              size = info.get("size", 0)
+              if size > 0 and size == last_size:
+                  stable_count += 1
+                  if stable_count >= 2:  # stable for ~2s
+                      return size
+              else:
+                  stable_count = 0
+              last_size = size
+          except Exception:
+              pass
+          time.sleep(1)
+      return last_size  # best effort
+
+
+def download_file(server_ip, port, server_path, local_path, timeout=30):
+    """Download a file from the server, with progress + timeout."""
     print(f"\nDownloading {server_path}...")
+
+    # Give the server a moment to finish writing the mp4
+    expected = _wait_for_server_file(server_ip, port, server_path, timeout=120)
+    if expected and expected > 0:
+        print(f"Server file size: {expected/1024/1024:.1f} MB")
+
     url = f"http://{server_ip}:{port}/api/download?path={server_path}"
+    
     try:
-        urllib.request.urlretrieve(url, local_path)
-        print(f"Downloaded: {local_path}")
+        # urllib.request.urlretrieve(url, local_path)
+        with urllib.request.urlopen(url, timeout=timeout) as resp:
+            total = int(resp.headers.get("Content-Length", expected or 0))
+            downloaded = 0
+
+            chunk = 64 * 1024
+            t0 = time.time()
+
+            with open(local_path, "wb") as f:
+
+                while True:
+                    buf = resp.read(chunk)
+                    if not buf: break
+                    f.write(buf)
+                    downloaded += len(buf)
+
+                    if total:
+                        pct = 100 * downloaded / total
+                        mb = downloaded / 1024 / 1024
+                        mbps = mb / max(time.time() - t0, 0.001)
+                        print(f"   {pct:5.1f}% {mb:6.1f} MB {mbps:5.2f} MB/s", end="\r", flush=True)
+                    else:
+                        mb = downloaded / 1024 / 1024
+                        print(f"   {mb:6.1f} MB", end="\r", flush=True)
+        
+        
+        print(f"Downloaded: {local_path}\n")
         return True
     except Exception as e:
         print(f"Download failed: {e}")
