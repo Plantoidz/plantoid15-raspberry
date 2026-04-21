@@ -609,7 +609,7 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
     # check if movie exist for that particular token ID
     path = network.plantoid_path
     plantoid_num = os.path.basename(os.path.normpath(path))
-    video_file = path + "/videos/" + network.name + "/" + f"{plantoid_num}_{network_name}_{tID}_movie.mp4"
+    video_file = path + "/videos/" + network.name + "/" + f"{plantoid_num}_{network.name}_{tID}_movie.mp4"
     audio_file = path + "/audios/" + network.name + "/" + tID + "_audio.mp3" 
  
     if os.path.exists(video_file):
