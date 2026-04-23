@@ -376,7 +376,7 @@ default_video_prompt = {
         "post":  "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
         },
     17: {
-        "pre":  "mrnabrmv style, ethereal figure dissolving into smoke particles representing: ",
+        "pre":  "Ethereal figure dissolving into smoke particles representing: ",
         "post": "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
     },
 }
