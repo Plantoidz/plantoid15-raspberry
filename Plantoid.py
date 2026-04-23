@@ -75,13 +75,13 @@ def plantoid_event_listen(
         
             if(plantony.use_serial):  # only check for button pressed if there is a serial communication with Arduino
                 
-                print('checking if button pressed... with serial', io)
+                # print('checking if button pressed... with serial', io)
                 talk = serial_utils.check_if_talk(io, plantony.pattern)
 
 
             elif(plantony.use_gpio):
 
-                print('checking if button pressed... with GPIO')
+                # print('checking if button pressed... with GPIO')
                 talk = gpio_utils.check_if_talk(io)
 
             

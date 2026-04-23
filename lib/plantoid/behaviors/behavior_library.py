@@ -680,7 +680,7 @@ def poem_make_video(path, sermon, audio_file, prompts):
     print("Generative NEW video with Glitchbox for --> POEM")
 
     init_img = path + "./init_img.jpg"
-    init_strength = 0.7
+    init_strength = 0.75
     fps = 20
     loras = 28 # NO LORA
     return glitchbox_video_journey(prompts, duration, fps, init_img, init_strength, loras)
