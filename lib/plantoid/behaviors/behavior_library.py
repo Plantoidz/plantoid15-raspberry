@@ -280,7 +280,7 @@ def glitchbox_video_journey(prompts, duration, fps, init_img, init_strength, lor
     n = len(prompts)
     # total_frames = (n-1)*transition * n*hold
     # pick hold_frames = 15, solve for transition_frames
-    hold_frames = 5
+    hold_frames = 15
     if n > 1:
         transition_frames = max(1, (total_frames - n * hold_frames) // (n -1))
     else:

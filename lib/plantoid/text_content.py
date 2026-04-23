@@ -430,7 +430,7 @@ def make_prompt(plantoid, generated_transcript, credits):
 
     
 
-    n_lines = credits + 2
+    n_lines = credits + 1
     if n_lines > 5: n_lines = 5
 
     prompt = (default_prompt[plantoid_n]["intro"][lang] + str(n_lines) + ".\n" +
