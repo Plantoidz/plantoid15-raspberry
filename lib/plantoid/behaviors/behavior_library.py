@@ -666,7 +666,7 @@ def poem_make_prompts(plantoid, sermon, audio_file):
     n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
 
     prompt = get_video_prompt(sermon, n_prompt)
-    response = PlantoidSpeech.GPTmagic(prompt)
+    response = PlantoidSpeech.GPTmagic(prompt, trim=False)
     prompts = process_video_prompts(plantoid, response)
     return prompts
 

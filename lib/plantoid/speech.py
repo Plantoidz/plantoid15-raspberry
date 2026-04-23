@@ -100,7 +100,7 @@ def play_background_music_INTERNAL(filename, loops=-1):
 
 
 
-def GPTmagic(prompt, model="gpt-4"):
+def GPTmagic(prompt, model="gpt-4", trim=True):
 
     import requests as req
     
@@ -120,9 +120,10 @@ def GPTmagic(prompt, model="gpt-4"):
             print("LLM - using MacBook LM Studio ({model})")
             content = resp.json()["choices"][0]["message"]["content"]
             print("Content ==> ", content)
-            trimmed = clean_trim_to_sentence(content)
-            print("Trimmed content ==> ", trimmed)
-            return trimmed
+            if trim:
+                content = clean_trim_to_sentence(content)
+                print("Trimmed content ==> ", content)
+            return content
 
     except Exception as e:
         print(f"MackBook LLM failed {e}")
@@ -147,9 +148,10 @@ def GPTmagic(prompt, model="gpt-4"):
             print("LLM - using GLITCHBOX LM Studio (LIQUID IS HARDCODED)")
             content = resp.json()["choices"][0]["message"]["content"]
             print("Content ==> ", content)
-            trimmed = clean_trim_to_sentence(content)
-            print("Trimmed content ==> ", trimmed)
-            return trimmed
+            if trim:
+                content = clean_trim_to_sentence(content)
+                print("Trimmed content ==> ", content)
+            return content
 
     except Exception as e:
         print(f"GLITCHBOX LLM failed {e}")
@@ -164,9 +166,10 @@ def GPTmagic(prompt, model="gpt-4"):
             messages=[{"role": "user", "content": prompt}], **config
             )
             content = response.choices[0].message.content
-            trimmed = clean_trim_to_sentence(content)
-            print("Trimmed content ==> ", trimmed)
-            return trimmed
+            if trim:
+                content = clean_trim_to_sentence(content)
+                print("Trimmed content ==> ", content)
+            return content
     except Exception as e:
         print(f"GPT-llm failed {e}")
 
