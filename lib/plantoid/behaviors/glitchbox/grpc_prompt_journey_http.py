@@ -222,7 +222,7 @@ def poll_until_done(server_ip, port, stuck_timeout=30):
                       print(f"\n[Client] Stuck at {current}/{total} for "
                             f"{stuck_timeout}s — assuming done and proceeding.")
                       return current, status.get("output_file", "")
-              else:
+            else:
                   stuck_since = None
 
         except Exception as e:
@@ -271,7 +271,6 @@ def run_journey(prompts, server_ip, port, fps, output, transition_frames,
     if server_audio_path:
         journey_data["audio_file"] = server_audio_path
 
-    force = setup_kwargs.get("force", False)
     if force:
         print("[HTTP] --force: stopping any existing journey..")
         try:
