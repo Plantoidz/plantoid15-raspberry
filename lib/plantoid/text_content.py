@@ -374,7 +374,7 @@ default_video_prompt = {
     14: {
         "pre": "Drawing by M. C. Escher with a strong solar-punk flavor representing: ",
         "post":  "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
-        }
+        },
     17: {
         "pre":  "mrnabrmv style, ethereal figure dissolving into smoke particles representing: ",
         "post": "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
