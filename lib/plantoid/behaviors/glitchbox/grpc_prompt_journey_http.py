@@ -16,6 +16,7 @@ import time
 import urllib.request
 import urllib.error
 import uuid
+import time
 
 
 SERVER_IP = "192.168.10.130"
@@ -189,19 +190,41 @@ def set_params(server_ip, port, **params):
         _post(server_ip, port, "/api/params/generation", params)
 
 
-def poll_until_done(server_ip, port):
+def poll_until_done(server_ip, port, stuck_timeout=30):
     """Poll journey status until completed. Returns (frame_count, output_file)."""
+    
+    """NB: If current_frame stays at total_frames for `stuck_timeout` seconds without
+      `completed` flipping True, assume the server finished but failed to flip the
+      flag, and return anyway so the caller can try to download the file.
+      """
+    stuck_since = None
+
     signal.signal(signal.SIGINT, lambda *_: sys.exit(0))
+
 
     while True:
         time.sleep(2)
         try:
             status = _get(server_ip, port, "/api/journey/status")
             total = status["total_frames"] if status["total_frames"] > 0 else "?"
-            print(f"  Frame {status['current_frame']}/{total} generated...", end="\r")
+            current = status["current_frame"]
+            print(f"  Frame {current}/{total} generated...", end="\r")
+            
             if status["completed"]:
                 print(f"\n\n[Server] Generation complete: {status['current_frame']} frames")
-                return status["current_frame"], status.get("output_file", "")
+                return current, status.get("output_file", "")
+        
+            # Server bug workaround: if we've been at 100% for too long, bail out
+            if isinstance(total, int) and total > 0 and current >= total:
+                  if stuck_since is None:
+                      stuck_since = time.time()
+                  elif time.time() - stuck_since > stuck_timeout:
+                      print(f"\n[Client] Stuck at {current}/{total} for "
+                            f"{stuck_timeout}s — assuming done and proceeding.")
+                      return current, status.get("output_file", "")
+              else:
+                  stuck_since = None
+
         except Exception as e:
             print(f"\n[HTTP] Connection lost: {e}")
             return 0, ""
@@ -210,7 +233,7 @@ def poll_until_done(server_ip, port):
 def run_journey(prompts, server_ip, port, fps, output, transition_frames,
                 hold_frames, loop, input_video=None, init_image=None,
                 audio_file=None, curation_index=None, strength=None,
-                temporal_coherence=None, pipe_index=None, controlnet_scale=None):
+                temporal_coherence=None, pipe_index=None, controlnet_scale=None, force=False):
     # Setup
     if curation_index is not None:
         switch_curation(server_ip, port, curation_index)
@@ -248,10 +271,24 @@ def run_journey(prompts, server_ip, port, fps, output, transition_frames,
     if server_audio_path:
         journey_data["audio_file"] = server_audio_path
 
+    force = setup_kwargs.get("force", False)
+    if force:
+        print("[HTTP] --force: stopping any existing journey..")
+        try:
+            _post(server_ip, port, "/api/journey/stop")
+        except Exception as e:
+            print(f"[HTTP] Stop failed (continuing anyway): {e}")
+
+        time.sleep(0.2)
+
+
     result = _post(server_ip, port, "/api/journey/start", journey_data)
-    if result.get("status") != "success":
+    if result.get("status") == "error":
         print(f"[HTTP] Server rejected: {result.get('message')}")
+        if not force and "already active" in (result.get("message") or ""):
+            print("[HTTP] Tip: re-run with --force to stop the existing journey first")
         sys.exit(1)
+
     print(f"[HTTP] {result['message']}")
 
     print(f"\nServer generating video to: {server_output}")
@@ -369,6 +406,7 @@ def main():
     parser.add_argument("--strength", type=float, default=None, help="Denoising strength 0.0-1.0")
     parser.add_argument("--scheduler", action="store_true", help="Use server's prompt travel scheduler")
     parser.add_argument("--duration", type=float, default=30, help="Duration in seconds (--scheduler mode)")
+    parser.add_argument("--force", action="store_true", help="If a journey is already running on the server, stop it before starting the new one")
 
     args = parser.parse_args()
 
@@ -399,6 +437,7 @@ def main():
             curation_index=args.curation, strength=args.strength,
             temporal_coherence=args.temporal_coherence,
             pipe_index=args.pipe_index, controlnet_scale=args.controlnet_scale,
+            force=args.force,
         )
 
 
