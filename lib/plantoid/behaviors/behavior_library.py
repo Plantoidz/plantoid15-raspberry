@@ -281,8 +281,11 @@ def glitchbox_video_journey(prompts, duration, fps, init_img, init_strength, lor
     # total_frames = (n-1)*transition * n*hold
     # pick hold_frames = 15, solve for transition_frames
     hold_frames = 5
-    transition_frames = max(1, (total_frames - n * hold_frames) // (n -1))
-    
+    if n > 1:
+        transition_frames = max(1, (total_frames - n * hold_frames) // (n -1))
+    else:
+        transition_frames = max(1, total_frames - hold_frames)
+
     run_journey(
         prompts = prompts,
         server_ip = "100.79.41.86", # GLITCHBOX ON TAILSCALE
