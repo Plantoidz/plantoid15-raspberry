@@ -628,7 +628,7 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
             prompts = None
 
             if(callback_prompt):
-                prompts = callback_prompt(sermon, audio_file)
+                prompts = callback_prompt(plantoid, sermon, audio_file)
                 archive("text", "description", "\n".join(prompts), tID, network)
 
             movie_path = callback_video(path, sermon, audio_file, prompts)
@@ -653,7 +653,7 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
 
 
 
-def poem_make_prompts(sermon, audio_file):
+def poem_make_prompts(plantoid, sermon, audio_file):
 
     from mutagen.mp3 import MP3
     
@@ -664,7 +664,7 @@ def poem_make_prompts(sermon, audio_file):
 
     prompt = get_video_prompt(sermon, n_prompt)
     response = PlantoidSpeech.GPTmagic(prompt)
-    prompts = process_video_prompts(response)
+    prompts = process_video_prompts(plantoid, response)
     return prompts
 
 

@@ -306,6 +306,7 @@ def get_default_transcript(plantoid):
 
 
 
+
 default_prompt = {
 
     14: {
@@ -366,6 +367,20 @@ default_prompt = {
     }
 
 }
+
+
+default_video_prompt = {
+
+    14: {
+        "pre": "Drawing by M. C. Escher with a strong solar-punk flavor representing: ",
+        "post":  "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
+        }
+    17: {
+        "pre":  "mrnabrmv style, ethereal figure dissolving into smoke particles representing: ",
+        "post": "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
+    },
+}
+
 
 
 def get_song_prompts(plantoid, generated_transcript, credits):
@@ -486,7 +501,7 @@ def get_video_prompt(sermon, n_prompt):
     #     outfile.write(descri1)
     #     outfile.write(descri)
 
-def process_video_prompts(descri):
+def process_video_prompts(plantoid, descri):
 
     lines = re.split("\d.", descri)
 
@@ -498,9 +513,11 @@ def process_video_prompts(descri):
         print("["+line+"]")
 
         if (line):
+
+            line = default_video_prompt[plantoid.plantoid_number]["pre"] + line + default_video_prompt[plantoid.plantoid_number]["post"] 
             # line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line + ". Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration"
-            line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line
-            line = line + " Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined."
+            # line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line
+            # line = line + " Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined."
             prompts.append(line)
 
     print("PROMPTS: ----> ", prompts)
