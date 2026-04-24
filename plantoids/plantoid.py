@@ -169,7 +169,7 @@ class Plantony:
         self.send_serial_message("speaking")
 
 
-        playsound(self.introduction)
+        safe_playsound(self.introduction)
         
 
        # audiofile = PlantoidSpeech.get_text_to_speech_response(self.opening, self.voice_id)
@@ -193,7 +193,7 @@ class Plantony:
         # playsound(self.outroduction)
 
         PlantoidSpeech.stream_response(self, self.closing, self.voice_id)
-        playsound(self.outroduction)
+        safe_playsound(self.outroduction)
 
         self.send_serial_message("asleep") ## REMOVE
 
@@ -203,7 +203,7 @@ class Plantony:
         self.send_serial_message("listening")
         self.play_background_music(self.cleanse, loops=0)
         user_message = PlantoidSpeech.listen_smartASR(self) or ""
-        playsound(self.acknowledge())
+        safe_playsound(self.acknowledge())
         print("Plantony has heard -----> ", user_message)
         return user_message
 
@@ -218,7 +218,7 @@ class Plantony:
 
         audiofile = PlantoidSpeech.listen_for_speech(path=self.path)
 
-        playsound(self.acknowledge())
+        safe_playsound(self.acknowledge())
 
         print("Plantony listen is returning the audiofile as:  " + audiofile)
 
@@ -403,7 +403,7 @@ class Plantony:
         if(msg):
             PlantoidSpeech.stream_response(self, msg, self.voice_id)
         else:
-            playsound(self.reflection)
+            safe_playsound(self.reflection)
 
 
    
@@ -621,3 +621,12 @@ class Plantony:
             return 0
 
 
+
+def safe_playsound(path):
+    if not path or not os.path.exists(path):
+          print(f"[audio] missing, skipping: {path}")
+          return
+      try:
+          safe_playsound(path)
+      except Exception as e:
+          print(f"[audio] playback failed for {path}: {e}")
