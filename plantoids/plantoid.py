@@ -627,6 +627,6 @@ def safe_playsound(path):
         print(f"[audio] missing, skipping: {path}")
         return
     try:
-        safe_playsound(path)
+        playsound(path)
     except Exception as e:
         print(f"[audio] playback failed for {path}: {e}")
