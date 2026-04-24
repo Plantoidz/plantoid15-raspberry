@@ -180,9 +180,12 @@ def clean_trim_to_sentence(text):
     if match:
         text = match.group(1)
 
+    # unwrap markdwown **bold** first so the stage-direction regex doesnt fuck up
+    text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text) 
+
     # remove parenthical stage directions:
     text = re.sub(r'\([^)]*?\)', '', text)
-    text = re.sub(r'\*[^*]*\s[^*]*\*', '', text) # multi-words stage direction
+    text = re.sub(r'(?<!\*)\*[^*\n]+?\*(?!\*)', '', text) # multi-words stage direction
 
     # remove markdown from the response
     # text = re.sub(r'\*\*[^*]+?\*\*', '', text) # bold
