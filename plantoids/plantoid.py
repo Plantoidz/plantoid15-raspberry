@@ -74,8 +74,8 @@ class Plantony:
 
         # Load the sounds
         self.acknowledgements = [
-            self.path+"/media/hmm1.mp3",
-            self.path+"/media/hmm2.mp3",
+            self.path+"/media/" + plantoid_number + "/hmm1.mp3",
+            self.path+"/media/" + plantoid_number + "/hmm2.mp3",
         ]
 
         self.beep_start = self.path+"/media/beep_start.wav"
