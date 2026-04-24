@@ -624,9 +624,9 @@ class Plantony:
 
 def safe_playsound(path):
     if not path or not os.path.exists(path):
-          print(f"[audio] missing, skipping: {path}")
-          return
-      try:
-          safe_playsound(path)
-      except Exception as e:
-          print(f"[audio] playback failed for {path}: {e}")
+        print(f"[audio] missing, skipping: {path}")
+        return
+    try:
+        safe_playsound(path)
+    except Exception as e:
+        print(f"[audio] playback failed for {path}: {e}")
