@@ -176,7 +176,8 @@ def GPTmagic(prompt, model="gpt-4", trim=True):
 def clean_trim_to_sentence(text):
 
     # get the first instance of Plantoid:
-    match = re.search(r'Plantoid\s*:\s*(.*?)(?:\n\n|Human|H:|$)', text, flags=re.DOTALL)
+    #match = re.search(r'Plantoid\s*:\s*(.*?)(?:\n\n|Human|H:|$)', text, flags=re.DOTALL)
+    match = re.search(r'(?:^|\n)\s*Plantoid\s*:\s*(.*?)(?:\n\n|Human|H:|$)', text, flags=re.DOTALL)
     if match:
         text = match.group(1)
 
@@ -192,6 +193,9 @@ def clean_trim_to_sentence(text):
     # text = re.sub(r'\*[^*]*?\*', '', text) # italic, non-greedy
     # text = re.sub(r'#+\s*[^*]+', '', text) # headers
     # text = re.sub(r'\**(Human|Plantoid|User|Assistant)\**:\s*', '', text)
+
+    # strip any orphaned markdown markers / stray whitespaces
+    text = text.strip(' *\n\t')
 
     # find the last sentence-ending punctuation
     for i in range(len(text) - 1, -1, -1):
