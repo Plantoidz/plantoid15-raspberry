@@ -939,7 +939,7 @@ def listen_smartASR(plantoid):
     import websockets
 
     SERVERS = [
-        ("MackBook",  "ws://100.67.155.96:8200/v1/listen"),
+       # ("MackBook",  "ws://100.67.155.96:8200/v1/listen"),
         ("Glitchbox", "ws://100.79.41.86:8200/v1/listen"),
     ]    
 
@@ -987,6 +987,11 @@ def listen_smartASR(plantoid):
                 
                     except asyncio.TimeoutError:
                         pass
+            except websockets.exceptions.ConnectionClosedOK:
+                # server closed cleanly without a transcription --> no speech detected
+                # return "" (not None) so the outer loop short-circuits and doesn't fall to Deepgram
+                print(f"Smart ASR - {name}: no speech detected, returning empty")
+                return ""
 
             finally:
                 mic.stop_stream()

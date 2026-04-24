@@ -60,7 +60,8 @@ def create_seed_metadata(plantoid, network, tID):
     db['name'] = tID
     db['description'] = "Plantoid #16 - Seed #" + tID
     db['external_url'] = "http://plantoid.org"
-    db['image'] = "https://ipfs.io/ipfs/bafybeihkwbsoy6rbkduezgqefddivk54pqgdbttz5r3gib64v5ysme4naa" # @@@ CHANGEEE
+    db['image'] = "https://ipfs.io/ipfs/QmeUwpiFa9fuV2C5zG9bCBue9KtZYNyTwUSX3WHAzomafF"
+    # "https://ipfs.io/ipfs/bafybeihkwbsoy6rbkduezgqefddivk54pqgdbttz5r3gib64v5ysme4naa" # @@@ CHANGEEE
 
     behaviors.generic_metadata(plantoid, network, tID, db, None, behaviors.opera_make_video)
 
