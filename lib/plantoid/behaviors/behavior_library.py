@@ -218,7 +218,7 @@ def pin_movie(movie_path):
         try:
             response = pinata.pin_file(movie_path)
             print('pinata response:', response)
-
+            
             # TODO: this should probably check for a response code
             if(response and response.get('data')):
                 ipfsQmp3 = response['data']['IpfsHash']

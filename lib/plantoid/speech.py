@@ -90,6 +90,7 @@ voice_ids["plantony"] = "o7lPjDgzlF8ZloHzVPeK"
 voice_ids["trevor"] = "KRzS7KO2TLlh1BRPgHnB"
 voice_ids["primavera"] = "txtf1EDouKke753vN8SL"
 voice_ids["iannis"] = "ejJ1ETWS2ohLMMeCu1H3"
+voice_ids["sofi"] = "RILOU7YmBhvwJGDGjNmP"
 
 
 
@@ -440,29 +441,29 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
         os.close(stderr_fd)
 
     # 1. try MacBookPro
-    try:
-        ref_audio = f"/Users/ya/Desktop/PLANTOID 22/WHISPER/QwenTTS/voice-samples/{voiceid}.mp3"
-        ref_text = "Hello my name is Plantoid, I am a blockchain-based lifeform. I feed off cryptocurrency in order to replicate myself."
+    # try:
+    #     ref_audio = f"/Users/ya/Desktop/PLANTOID 22/WHISPER/QwenTTS/voice-samples/{voiceid}.mp3"
+    #     ref_text = "Hello my name is Plantoid, I am a blockchain-based lifeform. I feed off cryptocurrency in order to replicate myself."
 
-        resp = req.post("http://100.67.155.96:8000/v1/audio/speech", json = {
-            "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
-            "input": agent_message,
-            "ref_audio": ref_audio, "ref_text": ref_text,
-            "response_format": "wav",
-            "stream": True, "streaming_interval": 2.0,
-          }, timeout=(2, 30), stream=True)
+    #     resp = req.post("http://100.67.155.96:8000/v1/audio/speech", json = {
+    #         "model": "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+    #         "input": agent_message,
+    #         "ref_audio": ref_audio, "ref_text": ref_text,
+    #         "response_format": "wav",
+    #         "stream": True, "streaming_interval": 2.0,
+    #       }, timeout=(2, 30), stream=True)
 
-        if resp.status_code == 200:
-            print(f"TTS - using MacBookPro ({voiceid})")
+    #     if resp.status_code == 200:
+    #         print(f"TTS - using MacBookPro ({voiceid})")
 
-            if save_to_file:
-                return save_stream(resp)
+    #         if save_to_file:
+    #             return save_stream(resp)
 
-            play_streaming_tts(resp, default_sr=24000)
-            return
+    #         play_streaming_tts(resp, default_sr=24000)
+    #         return
 
-    except Exception as e:
-        print(f"MacBookPro TTS failed: {e}")
+    # except Exception as e:
+    #     print(f"MacBookPro TTS failed: {e}")
         
 
     # 2. try Glitchbox
