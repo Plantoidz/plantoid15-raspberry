@@ -37,7 +37,7 @@ METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 [16]
 # ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
-VOICE_ID="logina"
+VOICE_ID="sofi"
 max_rounds=4
 USE_SERIAL = "True"
 SERIAL_PORT = "/dev/ttyACM0"
