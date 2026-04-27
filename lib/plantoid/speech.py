@@ -176,18 +176,21 @@ def GPTmagic(prompt, model="gpt-4", trim=True):
 
 def clean_trim_to_sentence(text):
 
+    # unwrap markdwown **bold** first so the stage-direction regex doesnt fuck up
+    text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text) 
+    
     # get the first instance of Plantoid:
     #match = re.search(r'Plantoid\s*:\s*(.*?)(?:\n\n|Human|H:|$)', text, flags=re.DOTALL)
     match = re.search(r'(?:^|\n)\s*Plantoid\s*:\s*(.*?)(?:\n\n|Human|H:|$)', text, flags=re.DOTALL)
     if match:
         text = match.group(1)
 
-    # unwrap markdwown **bold** first so the stage-direction regex doesnt fuck up
-    text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text) 
 
     # remove parenthical stage directions:
     text = re.sub(r'\([^)]*?\)', '', text)
-    text = re.sub(r'(?<!\*)\*[^*\n]+?\*(?!\*)', '', text) # multi-words stage direction
+
+    text = re.sub(r'(?<!\*)\*[^*\n]+?\s[^*\n]*?\*(?!\*)', '', text) # multi-words stage direction, remove
+    text = re.sub(r'(?<!\*)\*([^*\s\n]+)\*(?!\*)', r'\1', text) # single-word italics, keep the word, drop astericks
 
     # remove markdown from the response
     # text = re.sub(r'\*\*[^*]+?\*\*', '', text) # bold
