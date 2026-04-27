@@ -225,6 +225,8 @@ def main():
         'use_metadata_address': plantoid_mainnet_cfg['METADATA_ADDRESS'],
         'goerli_failsafe': plantoid_goerli_cfg['FAILSAFE'],
         'mainnet_failsafe': plantoid_mainnet_cfg['FAILSAFE'],
+        'goerli_start_block': int(plantoid_goerli_cfg.get('START_BLOCK'), 1)
+        'mainnet_start_block': int(plantoid_mainnet_cfg.get('START_BLOCK'))
         'path': path,
         'plantoid_path': path + "/" + plantoid_number + "/",
         'plantoid_number': plantoid_number,

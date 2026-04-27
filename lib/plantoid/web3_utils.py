@@ -58,6 +58,7 @@ def setup_web3_provider_goerli(config):
             feeding_amount=1000000000000000,  # one line every 0.001 ETH
             reclaim_url="http://" + config['plantoid_number'] + ".plantoid.org",
             failsafe=config['goerli_failsafe'], # this set failsafe = 1 (meaning we should recycle movies)
+            start_block=config.get('goerli_start_block', 1),
         ) 
         return goerli
 
@@ -74,6 +75,7 @@ def setup_web3_provider_mainnet(config):
             feeding_amount=10000000000000000,  # one line every 0.01 ETH)
             reclaim_url="http://" + config['plantoid_number'] + ".plantoid.org",
             failsafe=config['mainnet_failsafe'], # this set failsafe = 0 (meaning we should generate a new movie)
+            start_block=config.get('mainnet_start_block', 1),
         ) 
         return mainnet
 
@@ -90,6 +92,7 @@ def setup(
     feeding_amount=0,
     reclaim_url=None,
     failsafe=0,
+    start_block=1,
 ):
    
     print('trying to connect to name ==== ', name)
@@ -146,7 +149,7 @@ def setup(
     print('plantoid contract === ', network.plantoid_contract)
 
     # instantiate the event filter
-    network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=1)
+    network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=start_block)
     print('event filter:', network.event_filter)
     
     # set the path
