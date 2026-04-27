@@ -244,6 +244,7 @@ def main():
         serial_utils.send_to_arduino(io, "awake")
     
     if use_gpio:
+        global gpio_utils
         import lib.plantoid.gpio_utils as gpio_utils
         io = { 'touch' : plantoid_cfg['USE_GPIO']['touch'],  
                'led'  : plantoid_cfg['USE_GPIO']['led']
