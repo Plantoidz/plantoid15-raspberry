@@ -34,6 +34,7 @@ def create_seed_metadata(plantoid, network, tID):
             controlnet=True,
             mode="img2img",
         ),
+        audio_merge=False,
     )
 
 

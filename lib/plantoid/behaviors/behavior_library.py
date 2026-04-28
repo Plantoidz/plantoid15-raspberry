@@ -395,6 +395,34 @@ def save_video_with_audio(path, video_file_path, seed, network_name):
     return output_file_path
 
 
+def save_video(path, video_file_path, seed, network_name):
+    if not video_file_path: return None
+
+    video_path = path + "/videos"
+    video_network_path = path + "/videos/" + network_name
+
+    if not os.path.exists(video_path):
+        # If it doesn't exist, create it
+        os.makedirs(video_path)
+
+    if not os.path.exists(video_network_path):
+        # If it doesn't exist, create it
+        os.makedirs(video_network_path)
+
+    plantoid_num = os.path.basename(os.path.normpath(path))
+    movie_name = f"{plantoid_num}_{network_name}_{seed}_movie.mp4" 
+    output_file_path = path +"/videos/" + network_name + "/" + movie_name
+
+    print(video_file_path, "->", output_file_path)
+    if not os.path.isfile(video_file_path): raise Exception('Video file not found!')
+
+    import shutil
+    shutil.copy2(video_file_path, output_file_path)
+
+    return output_file_path
+
+
+
 
 def fallback_video(path, tID, network_name):
 
@@ -580,7 +608,7 @@ def poem_generation(plantoid, network, tID, amount, question):
 
 
 
-def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video):
+def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video, audio_merge=True):
     movie_path = None
     animurl = None
 
@@ -618,7 +646,10 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
             movie_path = fallback_video(path, tID, network.name)
         
         # Add audio to the video
-        movie_path = save_video_with_audio(path, movie_path, tID, network.name)
+        if(merge_video):
+            movie_path = save_video_with_audio(path, movie_path, tID, network.name)
+        else:
+            movie_path = save_video(path, movie_path, tID, network.name)
 
     # PIN movie to IPFS
     animurl = pin_movie(movie_path)
