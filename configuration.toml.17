@@ -1,9 +1,6 @@
 [general]
 PLANTOID=17
 
-MAINNET_START_BLOCK = 22000000
-TESTNET_START_BLOCK = 10741539
-
 
 # Rachel 21m00Tcm4TlvDq8ikWAM 
 # Tony o7lPjDgzlF8ZloHzVPeK
@@ -39,7 +36,7 @@ METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 [16]
 # ELEVEN_VOICE_ID="o7lPjDgzlF8ZloHzVPeK"
-VOICE_ID="sofi"
+VOICE_ID="iannis"
 max_rounds=4
 USE_SERIAL = "True"
 SERIAL_PORT = "/dev/ttyACM0"
@@ -47,7 +44,7 @@ SERIAL_PORT = "/dev/ttyACM0"
 LANG="en-EN"
 PATTERN = "<Touched>"
 #PERSONALITY="./prompt_context/plantony_context-fr.txt"
-PERSONALITY="./prompt_context/plantony_context-16.txt"
+PERSONALITY="./prompt_context/plantony_context.txt"
 LLM_MODEL="liquid/lfm2.5-1.2b" ## other choices include: "gtp-4", "qwen/qwen3.5-35b-a3b", "qwen/qwen3.5-27b"
     
 
@@ -103,8 +100,9 @@ USE_SERIAL = "True"
 SERIAL_PORT = "/dev/ttyUSB0"
 LANG="en-EN"
 PATTERN = '<Touched>'
-PERSONALITY="./prompt_context/plantony_context-14.txt"
+PERSONALITY="./prompt_context/plantony_context.txt"
 LLM_MODEL="liquid/lfm2.5-1.2b" ## other choices include: "gtp-4", "qwen/qwen3.5-35b-a3b", "qwen/qwen3.5-27b"
+
 
 [14.mainnet]
 ACTIVE = "True"
@@ -118,6 +116,7 @@ FAILSAFE = 0
 #BLOCKCHAIN_ADDRESS = "0x9809D9C367fA49297c4b1F8E57A13a310b00cDc1" ### This is the goerli address
 BLOCKCHAIN_ADDRESS = "0x3c6570206bb6b3bcbec27643cbc89003a25cac8c" ### This is the sepolia address
 METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
+
 
 
 # USE_GOERLI = "True"
