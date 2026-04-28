@@ -47,7 +47,7 @@ SERIAL_PORT = "/dev/ttyACM0"
 LANG="en-EN"
 PATTERN = "<Touched>"
 #PERSONALITY="./prompt_context/plantony_context-fr.txt"
-PERSONALITY="./prompt_context/plantony_context.txt"
+PERSONALITY="./prompt_context/plantony_context-16.txt"
 LLM_MODEL="liquid/lfm2.5-1.2b" ## other choices include: "gtp-4", "qwen/qwen3.5-35b-a3b", "qwen/qwen3.5-27b"
     
 
@@ -103,7 +103,7 @@ USE_SERIAL = "True"
 SERIAL_PORT = "/dev/ttyUSB0"
 LANG="en-EN"
 PATTERN = '<Touched>'
-PERSONALITY="./prompt_context/plantony_context.txt"
+PERSONALITY="./prompt_context/plantony_context-14.txt"
 LLM_MODEL="liquid/lfm2.5-1.2b" ## other choices include: "gtp-4", "qwen/qwen3.5-35b-a3b", "qwen/qwen3.5-27b"
 
 [14.mainnet]
