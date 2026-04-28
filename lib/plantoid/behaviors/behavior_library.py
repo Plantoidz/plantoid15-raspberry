@@ -646,7 +646,7 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
             movie_path = fallback_video(path, tID, network.name)
         
         # Add audio to the video
-        if(merge_video):
+        if(audio_merge):
             movie_path = save_video_with_audio(path, movie_path, tID, network.name)
         else:
             movie_path = save_video(path, movie_path, tID, network.name)
