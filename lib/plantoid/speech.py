@@ -101,7 +101,7 @@ def play_background_music_INTERNAL(filename, loops=-1):
 
 
 
-def GPTmagic(prompt, model="gpt-4", trim=True):
+def GPTmagic(prompt, model="gpt-4", trim=True, max_tokens=92):
 
     import requests as req
     
@@ -112,7 +112,7 @@ def GPTmagic(prompt, model="gpt-4", trim=True):
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
-            "max_tokens": 92,
+            "max_tokens": max_tokens,
         }
         resp = req.post(url, json=payload, timeout=10)
         print("trying LLM MacBook with resp.status_code = ", resp.status_code) 
@@ -138,7 +138,7 @@ def GPTmagic(prompt, model="gpt-4", trim=True):
             "model": "LFM2.5-VL-1.6B-Q8_0.gguf",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
-            "max_tokens": 92,
+            "max_tokens": max_tokens,
             "chat_template_kwargs": {"enable_thinking": False }
         } 
         resp = req.post(url, json=payload, timeout=30)

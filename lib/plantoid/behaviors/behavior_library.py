@@ -648,9 +648,10 @@ def poem_make_SDXLprompts(plantoid, sermon, audio_file):
         f"Write exactly {n_prompt} prompts. For each prompt, pick one idea, line, or image from the poem and render it as a concrete visual scene — NOT a paraphrase of the line. The viewer should see the image, not read the poem. Return only the prompts, one per line, no numbering, no commentary."
     )
 
-    response = PlantoidSpeech.GPTmagic(prompt, trim=False)
+    response = PlantoidSpeech.GPTmagic(prompt, trim=False, max_tokens=1024)
     prompts = [
-        re.sub(r"^[\s\-\*\d\.\)]+", "", p).strip()
+        # re.sub(r"^[\s\-\*\d\.\)]+", "", p).strip()
+        re.sub(r"^(?:SDXL prompt:|prompt:)\s*", "", p, flags=re.IGNORECASE).strip()
         for p in response.splitlines()
         if p.strip()
     ]
