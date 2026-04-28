@@ -270,7 +270,7 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
 
 
-def glitchbox_build_video_journey(plantoid_id, init_img, **defaults)
+def glitchbox_build_video_journey(plantoid_id, init_img, **defaults):
 
     def _video(path, sermon, audiofile, prompts):
         
@@ -649,7 +649,11 @@ def poem_make_SDXLprompts(plantoid, sermon, audio_file):
     )
 
     response = PlantoidSpeech.GPTmagic(prompt, trim=False)
-    prompts = re.split("\n", response)
+    prompts = [
+        re.sub(r"^[\s\-\*\d\.\)]+", "", p).strip()
+        for p in response.splitlines()
+        if p.strip()
+    ]
     return prompts
 
 
