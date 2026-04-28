@@ -953,7 +953,7 @@ def listen_smartASR(plantoid):
 
 
 
-    async def _stream(name, uri):
+    async def _stream(name, uri, listen_timeout=15):
         async with websockets.connect(uri, open_timeout=2) as ws:
             with ignoreStderr():
                 audio = pyaudio.PyAudio()
@@ -962,9 +962,17 @@ def listen_smartASR(plantoid):
 
             print(f"Smart ASR - streaming to {name} ...")
 
+            deadline = asyncio.get_event_loop().time() + listen_timeout
+
             try:
 
                 while True:
+
+                    ## add a listening timeout
+                    if asyncio.get_event_loop().time() > deadline:
+                        print(f"Smart ASR - {name}: listen timeout ({listen_timeout}s), no speech")
+                        return ""
+
                     data = mic.read(512, exception_on_overflow=False)
                     
                     # for P17 --> extract left channel only (every other sample in stereo interleaved data)
