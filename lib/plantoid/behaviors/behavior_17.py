@@ -22,7 +22,21 @@ def create_seed_metadata(plantoid, network, tID):
     behaviors.generic_metadata(plantoid, network, tID, db, behaviors.poem_make_prompts, behaviors.poem_make_video )
 
 
-
+    behaviors.generic_metadata(plantoid, network, tID, db,
+        behaviors.poem_make_SDXLprompts,
+        behaviors.glitchbox_build_video_journey(
+            17,
+            network.plantoid_path + "/init_img.jpg",
+            # **defaults
+            style_prompts_file="prompts_twisted_bodies_XL.txt",
+            target_frames=350,
+            lora="twisted-bodies-xl, robwood-xl",
+            cn_scale=0.55,
+            controlnet=True,
+            mode="img2img",
+        ),
+        audio_merge=False,
+    )
 
 
 
