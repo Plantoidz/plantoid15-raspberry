@@ -12,6 +12,7 @@ import lib.plantoid.speech as PlantoidSpeech
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "glitchbox"))
 from grpc_prompt_journey_http import run_journey, run_scheduler
+from plantoid_wrapper import plantoid_video_journey
 
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play
@@ -269,6 +270,23 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
 
 
 
+def glitchbox_build_video_journey(plantoid_id, init_img, **defaults)
+
+    def _video(path, sermon, audiofile, prompts):
+        
+        return plantoid_video_journey(
+            plantoid_id = plantoid_id,
+            prompts=prompts,
+            audio_path=audiofile,
+            init_image=init_img,
+            **defaults,
+    )
+
+    return _video
+    
+
+
+
 
 def glitchbox_video_journey(prompts, duration, fps, init_img, init_strength, loras):
 
@@ -325,49 +343,6 @@ def glitchbox_video_scheduler(audio_file, duration, fps, init_img, init_strength
         return output_file
     return None
   
-
-# def create_video_from_audio(path, tID, network_name, init_img, init_strength):
-
-#     # create empty output file
-#     remote_output_file = None
-#     video_file = None
-
-#     # prompts = PlantoidEden.create_prompts(tID)
-
-#     # construct the API call to Eden (this includes the making of the prompts)
-#     #eden_config = eden.build_API_request(path, tID, network_name)  
-#     eden_config = eden.build_API_request(path, tID, network_name, path + "/audios/" + network_name + "/" + tID + "_audio.mp3", init_img, init_strength)
-
-#     # get the output file from the eden call
-#     remote_output_file = eden.make_eden_API_call(eden_config)           
-
-#     if remote_output_file is not None:
-
-#         print('Remote output file location:', remote_output_file)
-#         video_file = get_remote_video(remote_output_file, path)
-
-#         return video_file
-
-        # video_path = make_video(path, video_file, tID, network_name)
-        # return video_path
-
-        # else:
-        #     raise Exception('Provided eden output file does not exist:', remote_output_file)
-
-
-    # FAILSAFE
-    # run this if failsafe == 1, or if the remote_output_file is None (see above)
-    # if failsafe == 1:
-
-    # print('using failsafe, using fallback')
-    #  #print("PlantoidEden.make_eden_API_call return Null -- going to use a fallback video !")
-    # video_file = fallback_video(path, tID, network_name)
-
-    # video_path = make_video(path, video_file, tID, network_name)
-    # return video_path
-
-
-
 
 
 
@@ -654,6 +629,28 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
 
 
 
+
+def poem_make_SDXLprompts(plantoid, sermon, audio_file):
+
+    from mutagen.mp3 import MP3
+    
+    # generate prompt from the response text 
+    duration = MP3(audio_file).info.length
+    fps = 20
+    n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
+
+
+    prompt = ("You write image-generation prompts for SDXL diffusion models."
+        "Each prompt is a single line: terse, concrete, sensory, packed with visual nouns and material detail (objects, postures, textures, light, color, framing)." 
+        "Avoid abstractions, metaphors, and adjectives without a visual anchor."
+        "Poem to illustrate:\n"
+        f"---\n{sermon}\n---\n\n"
+        f"Write exactly {n_prompt} prompts. For each prompt, pick one idea, line, or image from the poem and render it as a concrete visual scene — NOT a paraphrase of the line. The viewer should see the image, not read the poem. Return only the prompts, one per line, no numbering, no commentary."
+    )
+
+    response = PlantoidSpeech.GPTmagic(prompt, trim=False)
+    prompts = re.split("\n", response)
+    return prompts
 
 
 def poem_make_prompts(plantoid, sermon, audio_file):

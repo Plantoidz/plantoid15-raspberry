@@ -1,0 +1,79 @@
+# Static index of valid LoRA presets + shorthands.
+# Synced from /api/installations/lora_index (regenerate via
+# plantoid/refresh_lora_index.sh when glitchbox lora_config changes).
+#
+# Plantoid clients (caller.py and the actual installation runtime)
+# read this file directly — no codebase dependency, no network call
+# at submit time, validation is local.
+
+shorthands:
+- angels-xl
+- dwellers-input
+- dwellers-input-merge
+- dwellers-output
+- dwellers-output-merge
+- glitch-xl
+- mannequin-0-xl
+- mannequin-anime-xl
+- mannequin-xl
+- melies-bw-xl
+- melies-col-xl
+- papercut-xl
+- pixel-art-xl
+- pixel-xl
+- queepybeep-anime-xl
+- queepybeep-xl
+- robwood-xl
+- san-xl
+- shaman-xl
+- smoke-xl
+- twisted-bodies-xl
+- water-xl
+presets:
+  '12':
+  - pixel-art-xl
+  - papercut-xl
+  '13':
+  - mannequin-0-xl
+  - mannequin-xl
+  '14':
+  - mannequin-xl
+  - mannequin-anime-xl
+  '15':
+  - queepybeep-xl
+  - queepybeep-anime-xl
+  '16':
+  - mannequin-xl
+  - queepybeep-xl
+  '17':
+  - mannequin-anime-xl
+  - queepybeep-anime-xl
+  '18':
+  - melies-col-xl
+  - melies-bw-xl
+  '19':
+  - robwood-xl
+  - smoke-xl
+  '20':
+  - glitch-xl
+  - pixel-xl
+  '21':
+  - twisted-bodies-xl
+  - water-xl
+  '22':
+  - san-xl
+  - angels-xl
+  '23':
+  - angels-xl
+  - glitch-xl
+  '24':
+  - dwellers-input
+  '25':
+  - dwellers-output
+  '26':
+  - dwellers-input-merge
+  - dwellers-output-merge
+  '27':
+  - shaman-xl
+  - angels-xl
+  '28': []

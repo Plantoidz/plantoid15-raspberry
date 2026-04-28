@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en" class="bg-zinc-900 text-zinc-100">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sdxl-travel-ablation viewer</title>
+    <script type="module" crossorigin src="/assets/index-ClHZPviA.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D0UzXbs1.css">
+  </head>
+  <body class="min-h-screen">
+    <div id="root"></div>
+  </body>
+</html>
