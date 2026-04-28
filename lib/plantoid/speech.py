@@ -953,7 +953,7 @@ def listen_smartASR(plantoid):
 
 
 
-    async def _stream(name, uri, listen_timeout=15):
+    async def _stream(name, uri, listen_timeout=30):
         async with websockets.connect(uri, open_timeout=2) as ws:
             with ignoreStderr():
                 audio = pyaudio.PyAudio()
