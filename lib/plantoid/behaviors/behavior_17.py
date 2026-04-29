@@ -28,10 +28,10 @@ def create_seed_metadata(plantoid, network, tID):
             14, # prompt travelling
             network.plantoid_path + "/init_img.jpg",
             # **defaults
-            lora="smoke-xl",
+            lora="18", # melies
             target_frames=150,
-            trigger="smoke: An ethereal figure representing",
-            strength=0.3,
+            # trigger="smoke: An ethereal figure representing",
+            strength=0.2,
             cn_scale=0.15,
             controlnet=True,
             mode="img2img",
