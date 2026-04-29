@@ -275,8 +275,8 @@ def glitchbox_build_video_journey(plantoid_id, init_img, **defaults):
     def _video(path, sermon, audiofile, prompts):
         
         return plantoid_video_journey(
-            plantoid_id = plantoid_id,
-            prompts=prompts,
+            plantoid_id,
+            prompts,
             audio_path=audiofile,
             init_image=init_img,
             **defaults,

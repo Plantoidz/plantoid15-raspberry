@@ -365,16 +365,17 @@ def _download_video(server: str, run_id: str, output_dir: Path) -> Path:
 # ---------------------------------------------------------------------------
 
 def plantoid_video_journey(
+    plantoid_id,
+    prompts: list[str],
+    *, 
+    lora: str = "28",
     poem_path=None,
     audio_path=None,
     init_image=None,
-    *,
-    prompts: Optional[list[str]] = None,
-    style_prompts_file: str = "prompts_twisted_bodies_XL.txt",
-    n: int = 6,
+    trigger: str = None,
+    n: int = 2,
     fps: Optional[int] = None,
     target_frames: int = 300,
-    lora: str = "21",
     lora_weights: Optional[str] = None,
     controlnet: bool = True,
     cn_scale: float = 0.55,
@@ -384,7 +385,6 @@ def plantoid_video_journey(
     audio_reaction_output_gain: float = 1.0,
     seed: Optional[int] = None,
     server: str = DEFAULT_SERVER,
-    plantoid_id: int = 14,
     output_dir = "/tmp",
     poll_interval: float = 2.0,
     llm_model: str = "gpt-4o",
@@ -402,11 +402,10 @@ def plantoid_video_journey(
         (detected from ``style_prompts_file``) is prepended to any prompt that
         doesn't already start with it. Skips the LLM step entirely. Mutually
         exclusive with ``poem_path``.
+    trigger : lora trigger words
     audio_path : path to the audio file (drives video length, muxed into output).
     init_image : path to the visual anchor image.
-    style_prompts_file : filename under ./prompts/ — used as STYLE EXAMPLES for
-        the LLM (poem path), and as the source for trigger detection in BOTH paths.
-    n : number of prompts to generate (≥ 2). More prompts = more transitions.
+       n : number of prompts to generate (≥ 2). More prompts = more transitions.
     fps : output frame rate.
     lora : preset index ("21"), single shorthand ("twisted-bodies-xl"), or
         comma-list. "none" / "" disables LoRA.
@@ -466,21 +465,24 @@ def plantoid_video_journey(
         lora_weights = ",".join(str(w) for w in weights)
 
     # Style file is consulted in BOTH paths — for trigger detection.
-    style_path = PROMPTS_DIR / style_prompts_file
-    examples = _load_style_examples(style_path, max(n, 2))
-    trigger = _detect_trigger(examples)
-    if trigger:
-        print(f"[plantoid{plantoid_id}] detected LoRA trigger: {trigger!r}")
+    # style_path = PROMPTS_DIR / style_prompts_file
+    # examples = _load_style_examples(style_path, max(n, 2))
+    # trigger = _detect_trigger(examples)
+    # if trigger:
+    #     print(f"[plantoid{plantoid_id}] detected LoRA trigger: {trigger!r}")
 
-    if prompts is not None:
-        # User-supplied prompts: just enforce the trigger; no LLM call.
+    if prompts is  None:
+        raise ValueError("You need to provide a list of prompts !")
+
+    if trigger:
         prompts = _apply_trigger(prompts, trigger)
-        print(f"[plantoid{plantoid_id}] using {len(prompts)} provided prompts:")
-    else:
-        # Poem-driven: LLM generates n prompts in the style of the examples.
-        print(f"[plantoid{plantoid_id}] {n} style examples from {style_path.name}; "
-              f"generating poem-inspired prompts from {poem_path.name}")
-        prompts = prompts_from_poem(examples, poem_path, n, model=llm_model)
+    
+    print(f"[plantoid{plantoid_id}] using {len(prompts)} provided prompts:")
+    # else:
+    #     # Poem-driven: LLM generates n prompts in the style of the examples.
+    #     print(f"[plantoid{plantoid_id}] {n} style examples from {style_path.name}; "
+    #           f"generating poem-inspired prompts from {poem_path.name}")
+    #     prompts = prompts_from_poem(examples, poem_path, n, model=llm_model)
 
     for i, p in enumerate(prompts):
         print(f"  {i}: {p[:80]}{'…' if len(p) > 80 else ''}")

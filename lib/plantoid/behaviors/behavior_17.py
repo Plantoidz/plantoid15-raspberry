@@ -28,9 +28,9 @@ def create_seed_metadata(plantoid, network, tID):
             17,
             network.plantoid_path + "/init_img.jpg",
             # **defaults
-            style_prompts_file="prompts_twisted_bodies_XL.txt",
+            lora="twisted-bodies-xl,robwood-xl",
             target_frames=350,
-            lora="twisted-bodies-xl, robwood-xl",
+            trigger="twisted bodies - robwood:",
             cn_scale=0.55,
             controlnet=True,
             mode="img2img",
