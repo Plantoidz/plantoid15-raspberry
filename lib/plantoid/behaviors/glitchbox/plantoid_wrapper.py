@@ -301,7 +301,7 @@ def _submit_job(
         ("audio_reaction_output_gain", str(audio_reaction_output_gain)),
         ("mode", mode),
         ("h_smoothing", "true" if h_smoothing else "false"),
-    ] + [("prompts", p) for p in prompts]
+    ] + [("prompts_a", p) for p in prompts]
     if lora_weights:
         data.append(("lora_weights", lora_weights))
     if seed is not None:
@@ -493,7 +493,7 @@ def plantoid_video_journey(
         plantoid_id=plantoid_id,
         init_image=init_image,
         audio_file=audio_path,
-        prompts_a=prompts,
+        prompts=prompts,
         lora=lora,
         fps=fps,
         controlnet=controlnet,
