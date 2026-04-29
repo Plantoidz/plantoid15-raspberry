@@ -29,10 +29,10 @@ def create_seed_metadata(plantoid, network, tID):
             network.plantoid_path + "/init_img.jpg",
             # **defaults
             lora="smoke-xl",
-            target_frames=250,
+            target_frames=150,
             trigger="smoke: An ethereal figure representing",
-            strength=0.5,
-            cn_scale=0.35,
+            strength=0.3,
+            cn_scale=0.15,
             controlnet=True,
             mode="img2img",
         ),
