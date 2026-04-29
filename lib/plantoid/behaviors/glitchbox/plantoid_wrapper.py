@@ -493,7 +493,7 @@ def plantoid_video_journey(
         plantoid_id=plantoid_id,
         init_image=init_image,
         audio_file=audio_path,
-        prompts=prompts,
+        prompts_a=prompts,
         lora=lora,
         fps=fps,
         controlnet=controlnet,
