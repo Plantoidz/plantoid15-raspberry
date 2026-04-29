@@ -32,7 +32,7 @@ def create_seed_metadata(plantoid, network, tID):
             # **defaults
             lora="21",
             trigger="twisted bodies:",
-            target_frames=350,
+            target_frames=200,
             strength=0.7,
             cn_scale=0.55,
             controlnet=True,
