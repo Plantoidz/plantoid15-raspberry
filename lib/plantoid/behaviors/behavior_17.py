@@ -25,7 +25,7 @@ def create_seed_metadata(plantoid, network, tID):
     behaviors.generic_metadata(plantoid, network, tID, db,
         behaviors.poem_make_SDXLprompts,
         behaviors.glitchbox_build_video_journey(
-            17,
+            14, # prompt travelling
             network.plantoid_path + "/init_img.jpg",
             # **defaults
             lora="twisted-bodies-xl,robwood-xl",
