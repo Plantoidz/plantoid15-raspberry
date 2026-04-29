@@ -31,8 +31,8 @@ def create_seed_metadata(plantoid, network, tID):
             lora="18", # melies
             target_frames=150,
             # trigger="smoke: An ethereal figure representing",
-            strength=0.2,
-            cn_scale=0.15,
+            strength=0.05,
+            cn_scale=0.25,
             controlnet=True,
             mode="img2img",
         ),
