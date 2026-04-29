@@ -28,10 +28,11 @@ def create_seed_metadata(plantoid, network, tID):
             14, # prompt travelling
             network.plantoid_path + "/init_img.jpg",
             # **defaults
-            lora="twisted-bodies-xl,robwood-xl",
+            lora="twisted-bodies-xl,smoke-xl",
             target_frames=350,
-            trigger="twisted bodies - robwood:",
-            cn_scale=0.55,
+            trigger="twisted bodies - smoke:",
+            strength=0.5,
+            cn_scale=0.35,
             controlnet=True,
             mode="img2img",
         ),
