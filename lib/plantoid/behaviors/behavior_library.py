@@ -5,6 +5,7 @@ from pathlib import Path
 import json
 from dotenv import load_dotenv
 import subprocess
+import requests
 
 #from plantoids.plantoid import Plantony
 from lib.plantoid.text_content import *
@@ -121,6 +122,52 @@ def generate_song(text, credits): ### NB: text is an array of lyrics
     audio_file_path = "/tmp/output_music.mp3"
     return audio_file_path
     
+
+def generate_song_suno(text, credits): ### NB: text is an array of lyrics
+
+    print("generating a SONG with SUNO, credits = ", credits)
+
+    api_key = os.getenv("SUNO_API")
+    base = "https://api.suno.com/v0/audio"
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+
+    lyrics = "\n".join(text) if isinstance(text, list) else text
+
+    r = requests.post(base, headers=headers, json={
+        "lyrics": lyrics,
+        "style": (
+            "bel canto, early 19th-century Italian opera, classical aria, "
+            "lyrical female soprano, long lyrical vocal lines, delicate woodwinds, "
+            "no music, only voice. No electronic beats, no heavy percussion, "
+            "no modern synth, no rock, no heavy brass."
+        ),
+        "title": "Opera",
+    })
+    r.raise_for_status()
+    job_id = r.json()["id"]
+    print(f"suno submitted: {job_id}")
+
+    while True:
+        r = requests.get(f"{base}/{job_id}", headers=headers)
+        r.raise_for_status()
+        data = r.json()
+        status = data["status"]
+        print(f"suno status: {status}")
+        
+        if status == "complete":
+            url = data["audio_url"]
+            out_path = "/tmp/output_music.mp3"
+            with requests.get(url, stream=True) as audio:
+                audio.raise_for_status()
+                with open(out_path, "wb") as f:
+                    for chunk in audio.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+            return out_path
+        if status == "error":
+            raise RuntimeError(f"suno error: {data.get('error')}")
+        time.sleep(3)
+
 
 
 

@@ -40,7 +40,8 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     behaviors.print_response(plantoid, network, tID, response)
     
     # create a song
-    audiofile = behaviors.generate_song(lines, credits)
+    # audiofile = behaviors.generate_song(lines, credits)
+    audiofile = behaviors.generate_song_suno(lines, credits)
 
 
     plantoid.send_serial_message("awake")
