@@ -125,6 +125,18 @@ def load_prompts(prompts_file: Path, n: int) -> list[str]:
     return lines[:n]
 
 
+def apply_trigger(prompts: list[str], trigger: str) -> list[str]:
+    """Idempotently prepend ``trigger`` (+ space) to any prompt that doesn't
+    already start with it. Returns prompts unchanged if ``trigger`` is empty."""
+    if not trigger:
+        return list(prompts)
+    prefix = trigger + " "
+    return [
+        p if p.lower().startswith(trigger.lower()) else prefix + p
+        for p in prompts
+    ]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -139,6 +151,14 @@ def main() -> None:
                         help="Filename under ./prompts/ to draw from")
     parser.add_argument("--n", type=int, default=6,
                         help="Number of prompts to send (first N lines)")
+    parser.add_argument("--trigger", type=str, default="",
+                        help="LoRA trigger phrase to prepend to any prompt "
+                             "that doesn't already start with it (case-"
+                             "insensitive match). Idempotent — safe on "
+                             "already-prefixed prompt files. Empty (default) "
+                             "leaves prompts untouched, matching the historic "
+                             "caller.py behaviour where prompt files ship "
+                             "pre-prefixed.")
     parser.add_argument("--lora", type=str, default="21",
                         help="Preset index (e.g. '21'), single shorthand "
                              "(e.g. 'twisted-bodies-xl'), or comma-list "
@@ -151,6 +171,12 @@ def main() -> None:
                              "caller sends an explicit equal-split (so the "
                              "field stays visible in the curl reproduce).")
     parser.add_argument("--fps", type=int, default=20)
+    parser.add_argument("--strength", type=float, default=0.7,
+                        help="img2img denoising strength in (0, 1]. "
+                             "Higher = more transformation away from the "
+                             "init image; lower = stays closer to it. "
+                             "Default 0.7 matches the runtime's "
+                             "behavior_14.py value.")
     parser.add_argument("--no-controlnet", dest="controlnet",
                         action="store_false", default=True)
     parser.add_argument("--cn-scale", type=float, default=0.55,
@@ -236,13 +262,16 @@ def main() -> None:
 
     prompts_path = PROMPTS_DIR / args.prompts_file
     prompts = load_prompts(prompts_path, args.n)
+    if args.trigger:
+        prompts = apply_trigger(prompts, args.trigger)
+        print(f"[plantoid14] applied trigger {args.trigger!r}")
     print(f"[plantoid14] {args.n} prompts from {prompts_path.name}:")
     for i, p in enumerate(prompts):
         print(f"  {i}: {p[:80]}{'…' if len(p) > 80 else ''}")
     cn_str = f"on@{args.cn_scale}" if args.controlnet else "off"
     print(f"[plantoid14] lora={args.lora!r} → {describe_lora(args.lora, idx)}  "
           f"weights={args.lora_weights or '(default)'}  "
-          f"fps={args.fps}  cn={cn_str}  "
+          f"fps={args.fps}  strength={args.strength}  cn={cn_str}  "
           f"audio_mode={args.audio_mode}  "
           f"seed={args.seed if args.seed is not None else 'random'}")
 
@@ -256,6 +285,7 @@ def main() -> None:
     data = [
         ("lora", args.lora),
         ("fps", str(args.fps)),
+        ("strength", str(args.strength)),
         ("controlnet", "true" if args.controlnet else "false"),
         ("cn_scale", str(args.cn_scale)),
         ("audio_mode", args.audio_mode),
@@ -265,7 +295,7 @@ def main() -> None:
         ("preset", args.preset),
         ("mode", args.mode),
         ("h_smoothing", "true" if args.h_smoothing else "false"),
-    ] + [("prompts", p) for p in prompts]
+    ] + [("prompts_a", p) for p in prompts]
     if args.lora_weights:
         data.append(("lora_weights", args.lora_weights))
     # Only send seed when explicitly provided — empty/missing field tells
