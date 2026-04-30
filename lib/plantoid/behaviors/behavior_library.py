@@ -798,7 +798,9 @@ def opera_make_video(path, sermon, audio_file, prompts):
 
     init_img = path + '/../lib/plantoid/behaviors/glitchbox/' + 'input2.jpg'
     init_strength = 0.9
-    fps = "15"
+    # fps = "15" # calculate it based on the length of the song, otherwise it might be too many
+    target_frames = 300
+    fps = str(max(1, min(15, int(target_frames / duration ))))
     loras = "21" # twisted bodies & water
 
     return glitchbox_video_scheduler(audio_file, duration, fps, init_img, init_strength, loras)
