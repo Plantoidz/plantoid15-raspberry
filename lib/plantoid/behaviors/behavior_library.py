@@ -156,14 +156,37 @@ def generate_song_suno(text, credits): ### NB: text is an array of lyrics
         
         if status == "complete":
             url = data["audio_url"]
+
+            # probe actual format
+            head = requests.head(url, allow_redirects=True, timeout=10)
+            ctype = head.headers.get("Content-Type", "").split(";")[0].strip()
+            ext_map = {
+                "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/x-m4a": "m4a",
+                "audio/aac": "aac", "audio/wav": "wav", "audio/ogg": "ogg",
+            }
+            src_ext = ext_map.get(ctype, "m4a")
+            src_path = f"/tmp/suno_raw.{src_ext}"
             out_path = "/tmp/output_music.mp3"
+
             with requests.get(url, stream=True) as audio:
                 audio.raise_for_status()
                 with open(out_path, "wb") as f:
                     for chunk in audio.iter_content(chunk_size=8192):
                         if chunk:
                             f.write(chunk)
+            
+            # transcode to mp3 so pygame/mpg123 can play it
+            if src_ext == "mp3":
+                subprocess.run(["cp", src_path, out_path], check=True)
+            else:
+                subprocess.run([
+                    "ffmpeg", "-y", "-loglevel", "error",
+                    "-i", src_path, "-codec:a", "libmp3lame", "-qscale:a", "2",
+                    out_path
+                    ], check=True)
+
             return out_path
+
         if status == "error":
             raise RuntimeError(f"suno error: {data.get('error')}")
         time.sleep(3)
