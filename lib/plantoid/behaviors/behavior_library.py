@@ -170,7 +170,7 @@ def generate_song_suno(text, credits): ### NB: text is an array of lyrics
 
             with requests.get(url, stream=True) as audio:
                 audio.raise_for_status()
-                with open(out_path, "wb") as f:
+                with open(src_path, "wb") as f:
                     for chunk in audio.iter_content(chunk_size=8192):
                         if chunk:
                             f.write(chunk)
