@@ -28,11 +28,11 @@ def create_seed_metadata(plantoid, network, tID):
             14, # prompt travelling
             network.plantoid_path + "/init_img.jpg",
             # **defaults
-            lora="smoke-xl", # melies
-            target_frames=150,
-            trigger="smoke: An ethereal figure.",
-            strength=0.05,
-            cn_scale=0.15,
+            lora="18", # melies
+            target_frames=200,
+            trigger="Vintage collage art featuring",
+            strength=0.7,
+            cn_scale=0.55,
             controlnet=True,
             mode="img2img",
         ),
