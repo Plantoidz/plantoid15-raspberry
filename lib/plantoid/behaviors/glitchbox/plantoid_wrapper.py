@@ -53,7 +53,9 @@ import yaml
 HERE = Path(__file__).resolve().parent
 PROMPTS_DIR = HERE / "prompts"
 LORA_INDEX_YAML = HERE / "lora_index.yaml"
-DEFAULT_SERVER = os.environ.get("PLANTOID_SERVER", "http://100.74.77.125:8000")
+
+# DEFAULT_SERVER = os.environ.get("PLANTOID_SERVER", "http://100.74.77.125:8000")
+DEFAULT_SERVER = os.environ.get("PLANTOID_SERVER", "http://100.79.41.86:8002")
 
 
 # ---------------------------------------------------------------------------
