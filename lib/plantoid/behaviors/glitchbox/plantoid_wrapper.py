@@ -298,6 +298,7 @@ def _submit_job(
     data = [
         ("lora", lora),
         ("fps", str(fps)),
+        ("strength", str(strength)),
         ("controlnet", "true" if controlnet else "false"),
         ("cn_scale", str(cn_scale)),
         ("audio_mode", audio_mode),
