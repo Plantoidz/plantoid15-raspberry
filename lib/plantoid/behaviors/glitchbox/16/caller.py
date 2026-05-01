@@ -1,38 +1,40 @@
 """Plantoid 16 simulator — pretends to be the external installation client.
 
 In production this is the actual plantoid runtime, which:
-  1. has N keyframe images on hand (artistic curation upstream),
-  2. picks a LoRA spec + final prompts (LLM in prod; raw caption files here),
-  3. POSTs everything as multipart/form-data to
-     ``/api/installations/plantoid16``.
+  1. picks a LoRA spec + final prompts (LLM in prod; raw caption files here),
+  2. provides the audio file driving timeline + reactivity,
+  3. POSTs to ``/api/installations/plantoid16/library`` (default), letting
+     the server pick an init_video at random from
+     ``<repo_root>/server_assets/ltx_videos/``. Server infers fps from the
+     picked clip (so SDXL stage matches), and auto-enables ping-pong
+     looping when the clip is shorter than the audio. The plantoid can
+     optionally pin a specific clip via ``--clip-num N`` (1-indexed).
 
-Two upload shapes, mutually exclusive:
+Four sources for the SDXL final stage, selected via ``--source`` (default
+``library``):
 
-  * keyframes mode (default): N keyframe images + N init_image_prompts.
-    Server runs Stage A (build init video) + Stage 1 (pregen prompt-
-    travel) + Stage 2 (final pass).
-  * init_video mode (``--init-video PATH``): a pre-built mp4. Server
-    skips Stage A + Stage 1 and feeds the upload straight into the
-    final pass. fps is inferred from the file when ``--fps`` is omitted.
+  * library    (default): no upload; server picks from server_assets/ltx_videos/.
+                          Pin a specific clip with ``--clip-name``.
+  * keyframes:            N keyframe images + N init_image_prompts. Server
+                          runs LTX (or legacy diffusion) pregen + final.
+  * init_video:           upload a pre-built mp4. Server skips pregen.
+  * text2video:           no spatial input. LTX runs as text2video using
+                          ``--ltx-prompt``.
 
-Defaults match the cell_pregen_* reference runs:
-  * keyframes:    plantoid/16/assets/keyframes/keyframe_*.png  (3 b&w shots)
-  * audio:        plantoid/16/assets/audio.wav  (10s opera clip)
-  * init prompts: plantoid/16/init_image_prompts.txt
-                  (the 3 b&w compositional prompts that produced the
-                   keyframes; drive the prompt-travel between them)
-  * lora:         preset 21 (twisted-bodies-xl + water-xl)
-  * final A:      first N lines of prompts_twisted_bodies_XL.txt
-  * final B:      first N lines of prompts_water_XL.txt
+Defaults for ``library`` mode (the reproducible canonical run):
+  * audio:    plantoid/16/assets/audio_5s.wav
+  * lora:     preset 21 (twisted-bodies-xl + water-xl)
+  * final A:  first 2 lines of prompts_twisted_bodies_XL.txt
+  * final B:  first 2 lines of prompts_water_XL.txt
 
 Usage::
 
-    uv run python plantoid/16/caller.py
-    uv run python plantoid/16/caller.py --lora twisted-bodies-xl  # single
-    uv run python plantoid/16/caller.py --no-wait                  # submit & exit
-    # init_video mode (skip pregen, fps inferred from file)
-    uv run python plantoid/16/caller.py \\
-        --init-video plantoid/16/assets/wan_ballerina_lossless_768x1024.mp4
+    uv run python plantoid/16/caller.py                              # library, random clip
+    uv run python plantoid/16/caller.py --clip-name 04_bourree_jete  # library, pinned
+    uv run python plantoid/16/caller.py --source keyframes           # legacy keyframes
+    uv run python plantoid/16/caller.py --source init_video --init-video <path>
+    uv run python plantoid/16/caller.py --source text2video --ltx-prompt "..."
+    uv run python plantoid/16/caller.py --no-wait                    # submit & exit
 """
 from __future__ import annotations
 
@@ -144,28 +146,56 @@ def main() -> None:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--server", default=DEFAULT_SERVER)
+    parser.add_argument("--source", default="library",
+                        choices=["library", "keyframes", "init_video",
+                                 "text2video"],
+                        help="Where the SDXL final stage's spatial input "
+                             "comes from. ``library`` (default): server "
+                             "picks at random from server_assets/ltx_videos/. "
+                             "``keyframes``: legacy upload mode (LTX or "
+                             "diffusion pregen). ``init_video``: upload a "
+                             "pre-built mp4. ``text2video``: no spatial "
+                             "input (LTX text2video via --ltx-prompt).")
+    parser.add_argument("--clip-num", type=int, default=None,
+                        help="Library-mode only: pin to a specific clip "
+                             "by 1-indexed ordinal in the alphabetical "
+                             "listing (the production knob — the remote "
+                             "plantoid doesn't naturally know filename "
+                             "slugs). Mutually exclusive with --clip-name. "
+                             "Default: server picks random.")
+    parser.add_argument("--clip-name", type=str, default=None,
+                        help="Library-mode only: pin to a specific clip "
+                             "by filename stem (e.g. 04_bourree_jete). "
+                             "Convenience for human-driven curls + the "
+                             "dev caller. Mutually exclusive with "
+                             "--clip-num. Default: server picks random.")
     parser.add_argument("--keyframes-dir", type=Path,
-                        default=HERE / "assets" / "keyframes",
-                        help="Keyframes-mode source dir. Ignored when "
-                             "--init-video is set.")
+                        default=HERE / "assets" / "keyframes_ballerina",
+                        help="--source=keyframes only: directory of keyframe "
+                             "PNG/JPG files. Default = the 3 ballerina "
+                             "frames.")
     parser.add_argument("--init-video", type=Path, default=None,
-                        help="Direct-stage-2 mode: a pre-built mp4 fed "
-                             "straight into the final pass. Mutually "
-                             "exclusive with --keyframes-dir / "
-                             "--init-prompts-file.")
+                        help="--source=init_video only: path to a pre-built "
+                             "mp4 to upload as the init_video.")
     parser.add_argument("--audio", type=Path,
-                        default=HERE / "assets" / "audio.wav")
+                        default=HERE / "assets" / "audio_5s.wav",
+                        help="Audio file driving output length + reactivity. "
+                             "Default = audio_5s.wav (5s, matches the "
+                             "ballerina-keyframes default). Pass --audio "
+                             "plantoid/16/assets/audio.wav for the 10s opera clip.")
     parser.add_argument("--init-prompts-file", type=Path,
-                        default=HERE / "assets" / "init_image_prompts.txt",
+                        default=HERE / "assets" / "init_image_prompts_ballerina.txt",
                         help="Keyframes-mode source. Lines = prompts "
                              "driving the prompt-travel between the "
-                             "keyframes (one per keyframe). Ignored when "
+                             "keyframes (one per keyframe). Default matches "
+                             "--keyframes-dir's ballerina set. Ignored when "
                              "--init-video is set.")
     parser.add_argument("--lora", type=str, default="21",
                         help="Preset index, single shorthand, or comma-list.")
-    parser.add_argument("--n-final", type=int, default=6,
+    parser.add_argument("--n-final", type=int, default=2,
                         help="How many final-pass prompts to send "
-                             "(taken as the first N of the relevant XL file).")
+                             "(taken as the first N of the relevant XL file). "
+                             "Default 2 — minimum for paired-LoRA prompt blend.")
     parser.add_argument("--final-prompts-a", type=Path, default=None,
                         help="Override default final_prompts_a source file.")
     parser.add_argument("--final-prompts-b", type=Path, default=None,
@@ -200,6 +230,15 @@ def main() -> None:
     parser.add_argument("--cn-scale", type=float, default=0.55,
                         help="Final-stage ControlNet strength in (0, 2]. "
                              "Only meaningful when controlnet is on.")
+    parser.add_argument("--strength", type=float, default=None,
+                        help="Final-stage diffusion denoising strength in "
+                             "(0, 1]. Higher = more denoising work per "
+                             "frame (further from the pregen / init_video "
+                             "anchor), lower = closer to it. Internally "
+                             "maps to t_index_list = [int((1 - strength) "
+                             "* num_inference_steps)]. Pregen stage is "
+                             "untouched (its own dynamics drive that). "
+                             "Omit to inherit the server default (0.7).")
     parser.add_argument("--audio-reaction-output-gain", type=float,
                         default=1.0,
                         help="Post-smoother expander gain on the α(t) "
@@ -221,6 +260,41 @@ def main() -> None:
                         default="medium",
                         help="libx264 preset. Default medium "
                              "(libx264 default — good speed/size balance).")
+    parser.add_argument("--pregen-method", choices=["ltx", "diffusion"],
+                        default="ltx",
+                        help="How keyframes get smoothed into an init_video "
+                             "for the final stage. Default 'ltx' "
+                             "(LTX-Video learned interpolation, single "
+                             "forward pass). 'diffusion' = legacy "
+                             "build_init_video + prompt-travel diffusion. "
+                             "Ignored when --init-video is set.")
+    parser.add_argument("--ltx-prompt", type=str,
+                        default=(
+                            "A black silhouette of a graceful ballerina "
+                            "dancing against a pure white background, slow "
+                            "elegant motion through a series of poses, "
+                            "smooth seamless video"
+                        ),
+                        help="Single text condition for the LTX pregen "
+                             "(T5 cross-attention, no per-frame schedule). "
+                             "Ignored when --pregen-method=diffusion (which "
+                             "uses --init-prompts-file as a per-keyframe "
+                             "SLERP). Default canonical form: "
+                             "'a black silhouette of <subject> against a "
+                             "pure white background' — clean two-tone "
+                             "framing that LTX synthesises cleanly without "
+                             "caption / signage hallucinations.")
+    parser.add_argument("--pregen-cfg", type=float, default=3.0,
+                        help="LTX pregen guidance_scale. Default 3.0 "
+                             "activates the negative_prompt and suppresses "
+                             "LTX's caption / signage hallucinations. Set "
+                             "1.0 to skip CFG (faster — ~3× — but no "
+                             "negative prompt). Ignored when "
+                             "--pregen-method=diffusion.")
+    parser.add_argument("--pregen-steps", type=int, default=12,
+                        help="LTX pregen num_inference_steps. Default 12 "
+                             "is the minimum that's clean with CFG=3. Ignored "
+                             "when --pregen-method=diffusion.")
     parser.add_argument("--seed", type=int, default=None,
                         help="Omit for pipeline-random.")
     parser.add_argument("--poll-interval", type=float, default=2.0)
@@ -231,14 +305,27 @@ def main() -> None:
     idx = load_lora_index()
     validate_lora(args.lora, idx)
 
-    use_init_video = args.init_video is not None
-    if use_init_video and not args.init_video.is_file():
-        sys.exit(f"--init-video file not found: {args.init_video}")
+    use_library = args.source == "library"
+    use_init_video = args.source == "init_video"
+    use_text2video = args.source == "text2video"
+    use_keyframes = args.source == "keyframes"
+    if (args.clip_name is not None or args.clip_num is not None) and not use_library:
+        sys.exit("--clip-num / --clip-name only valid with --source=library")
+    if args.clip_num is not None and args.clip_name is not None:
+        sys.exit("--clip-num and --clip-name are mutually exclusive")
+    if use_init_video and (args.init_video is None
+                           or not args.init_video.is_file()):
+        sys.exit(f"--source=init_video requires --init-video <existing path>")
+    if use_text2video and args.pregen_method != "ltx":
+        sys.exit(
+            "--source=text2video requires --pregen-method=ltx; "
+            f"got {args.pregen_method!r}"
+        )
 
-    # ---- Keyframes-mode discovery (skipped in init_video mode) ------
+    # ---- Keyframes-mode discovery (skipped for init_video / text2video) ----
     keyframe_files: list[Path] = []
     init_image_prompts: list[str] = []
-    if not use_init_video:
+    if use_keyframes:
         keyframe_files = sorted(args.keyframes_dir.glob("*.png")) + \
                          sorted(args.keyframes_dir.glob("*.jpg"))
         keyframe_files = [p for p in keyframe_files if p.is_file()]
@@ -279,6 +366,10 @@ def main() -> None:
 
     if use_init_video:
         print(f"[plantoid16] init_video: {args.init_video}")
+    elif use_text2video:
+        print(f"[plantoid16] text2video (no keyframes, no init_video) "
+              f"— ltx_prompt: {args.ltx_prompt[:90]}"
+              f"{'…' if len(args.ltx_prompt) > 90 else ''}")
     else:
         print(f"[plantoid16] keyframes: {len(keyframe_files)} from {args.keyframes_dir}")
         for kf, prm in zip(keyframe_files, init_image_prompts):
@@ -297,9 +388,10 @@ def main() -> None:
           f"seed={args.seed if args.seed is not None else 'random'}")
 
     # ---- Build multipart payload ------------------------------------
-    # Two upload shapes:
-    #   keyframes mode: repeated `init_images=@...` (one per keyframe)
-    #   init_video mode: a single `init_video=@...` upload
+    # Three upload shapes:
+    #   keyframes mode  : repeated `init_images=@...` (one per keyframe)
+    #   init_video mode : a single `init_video=@...` upload
+    #   text2video mode : neither — only the audio file + form fields
     # Audio is always required; form fields are list-as-repeated.
     files = []
     open_handles = []
@@ -308,15 +400,19 @@ def main() -> None:
         open_handles.append(iv_fh)
         files.append(("init_video",
                       (args.init_video.name, iv_fh, "video/mp4")))
-    else:
+    elif use_keyframes:
         for kf in keyframe_files:
             fh = kf.open("rb")
             open_handles.append(fh)
             files.append(("init_images", (kf.name, fh, "image/png")))
+    # text2video + library: no spatial-input upload at all.
     audio_fh = args.audio.open("rb")
     open_handles.append(audio_fh)
     files.append(("audio_file", (args.audio.name, audio_fh, "audio/wav")))
 
+    # Library mode hits a different endpoint with a smaller form
+    # surface (no pregen knobs — those don't apply when the init_video
+    # is pre-baked). All other modes share the legacy endpoint.
     data = [
         ("lora", args.lora),
         ("audio_band", args.audio_band),
@@ -329,10 +425,25 @@ def main() -> None:
         ("controlnet", "true" if args.controlnet else "false"),
         ("cn_scale", str(args.cn_scale)),
     ]
+    if not use_library:
+        data += [
+            ("pregen_method", args.pregen_method),
+            ("ltx_prompt", args.ltx_prompt),
+            ("pregen_cfg", str(args.pregen_cfg)),
+            ("pregen_steps", str(args.pregen_steps)),
+        ]
     if args.fps is not None:
-        # Omit when None — server infers from init_video, or falls
-        # back to DEFAULT_FPS in keyframes mode.
+        # Omit when None — server infers from init_video / library
+        # clip, or falls back to DEFAULT_FPS in keyframes mode.
         data.append(("fps", str(args.fps)))
+    if args.strength is not None:
+        # Omit when None — server uses its default (0.7).
+        data.append(("strength", str(args.strength)))
+    if use_library:
+        if args.clip_num is not None:
+            data.append(("clip_num", str(args.clip_num)))
+        elif args.clip_name is not None:
+            data.append(("clip_name", args.clip_name))
     for p in init_image_prompts:
         data.append(("init_image_prompts", p))
     for p in final_prompts_a:
@@ -342,8 +453,11 @@ def main() -> None:
     if args.seed is not None:
         data.append(("seed", str(args.seed)))
 
-    url = args.server.rstrip("/") + "/api/installations/plantoid16"
-    print(f"[plantoid16] POST {url}")
+    if use_library:
+        url = args.server.rstrip("/") + "/api/installations/plantoid16/library"
+    else:
+        url = args.server.rstrip("/") + "/api/installations/plantoid16"
+    print(f"[plantoid16] POST {url}  source={args.source}")
     try:
         r = requests.post(url, files=files, data=data, timeout=120)
     finally:
@@ -353,16 +467,36 @@ def main() -> None:
         sys.exit(f"server returned {r.status_code}: {r.text}")
     job = r.json()
     summary = job.get("summary", {})
-    src = (
-        f"init_video={summary.get('init_video_filename')!r} "
-        f"@ {summary.get('init_video_fps')}fps "
-        f"({summary.get('init_video_frames')} frames)"
-        if summary.get("mode") == "init_video"
-        else f"keyframes={summary.get('n_keyframes')}"
-    )
+    mode = summary.get("mode")
+    if mode == "library":
+        pin_method = summary.get("library_pin_method")
+        if summary.get("library_random"):
+            how = "random"
+        elif pin_method == "num":
+            how = f"pinned by num"
+        elif pin_method == "name":
+            how = f"pinned by name"
+        else:
+            how = "pinned"
+        src = (
+            f"library #{summary.get('library_num')} "
+            f"= {summary.get('library_clip')!r} ({how}) "
+            f"@ {summary.get('init_video_fps')}fps "
+            f"({summary.get('init_video_frames')} frames, "
+            f"{summary.get('init_video_duration_s')}s)"
+            f"{'  ping-pong=on' if summary.get('will_pingpong') else ''}"
+        )
+    elif mode == "init_video":
+        src = (
+            f"init_video={summary.get('init_video_filename')!r} "
+            f"@ {summary.get('init_video_fps')}fps "
+            f"({summary.get('init_video_frames')} frames)"
+        )
+    else:
+        src = f"keyframes={summary.get('n_keyframes')}"
     print(f"[plantoid16] enqueued job {job['job_id'][:8]}  "
-          f"mode={summary.get('mode')}  {src}  "
-          f"final_prompts={summary.get('n_final_prompts')}  "
+          f"mode={mode}  {src}  "
+          f"final_prompts={summary.get('n_final_prompts', len(final_prompts_a))}  "
           f"is_pair={summary.get('is_pair')}  "
           f"audio_mode={summary.get('audio_mode')}  "
           f"fps={summary.get('fps')}  "

@@ -13,7 +13,7 @@ import lib.plantoid.speech as PlantoidSpeech
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "glitchbox"))
 from grpc_prompt_journey_http import run_journey, run_scheduler
-from plantoid_wrapper import plantoid_video_journey
+from plantoid_wrapper import plantoid_video_journey, plantoid_video_scheduler
 
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play
@@ -354,6 +354,21 @@ def glitchbox_build_video_journey(plantoid_id, init_img, **defaults):
 
     return _video
     
+
+def glitchbox_build_video_scheduler(**defaults):
+
+    def _video(path, sermon, audiofile, prompts):
+
+        kwargs = dict(defaults)
+        if prompts and "final_prompts_a" not in kwargs:
+            kwargs["final_prompts_a"] = prompts
+
+        return plantoid_video_scheduler(
+            audio_path=audiofile,
+            **kwargs,
+        )
+
+    return _video
 
 
 

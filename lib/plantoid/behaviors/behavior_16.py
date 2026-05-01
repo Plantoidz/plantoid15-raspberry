@@ -64,8 +64,17 @@ def create_seed_metadata(plantoid, network, tID):
     db['image'] = "https://ipfs.io/ipfs/QmeUwpiFa9fuV2C5zG9bCBue9KtZYNyTwUSX3WHAzomafF"
     # "https://ipfs.io/ipfs/bafybeihkwbsoy6rbkduezgqefddivk54pqgdbttz5r3gib64v5ysme4naa" # @@@ CHANGEEE
 
-    behaviors.generic_metadata(plantoid, network, tID, db, None, behaviors.opera_make_video)
+    # behaviors.generic_metadata(plantoid, network, tID, db, None, behaviors.opera_make_video)
 
+    behaviors.generic_metadata(plantoid, network, tID, db, None,
+        behaviors.glitchbox_build_video_scheduler(
+            lora="21",
+            # fps=10,
+            strength=0.7,
+            cn_scale=0.55,
+        ),
+        audio_merge=False,
+    )
 
 
 

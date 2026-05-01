@@ -189,84 +189,6 @@ def _load_style_examples(prompts_file: Path, n: int) -> list[str]:
     return lines[:n]
 
 
-def prompts_from_poem(
-    examples: list[str],
-    poem_path: Path,
-    n: int,
-    model: str = "gpt-4o",
-    temperature: float = 0.9,
-) -> list[str]:
-    """Generate ``n`` image-prompts that illustrate the poem at ``poem_path``,
-    written in the style of ``examples``.
-
-    ``examples`` are style references (raw glitchbox XL captions). The poem
-    is the *content*: each generated prompt picks one image/idea/line from
-    the poem and renders it as a concrete visual scene.
-
-    Requires ``OPENAI_API_KEY`` in the environment.
-    """
-    poem_path = Path(poem_path)
-    if not poem_path.is_file():
-        raise FileNotFoundError(f"poem file missing: {poem_path}")
-    poem = poem_path.read_text().strip()
-    if not poem:
-        raise ValueError(f"poem file is empty: {poem_path}")
-
-    examples_block = "\n".join(f"- {ex}" for ex in examples)
-    trigger = _detect_trigger(examples)
-
-    trigger_rule = (
-        f"\n\nEVERY prompt MUST start with the exact phrase "
-        f"\"{trigger}\" (lowercase, verbatim). This is a LoRA trigger token, "
-        f"not optional. Prompts without it are invalid."
-        if trigger else ""
-    )
-
-    system = (
-        "You write image-generation prompts for SDXL diffusion models in "
-        "the style of glitchbox-XL captions. Each prompt is a single line: "
-        "terse, concrete, sensory, packed with visual nouns and material "
-        "detail (objects, postures, textures, light, color, framing). "
-        "Avoid abstractions, metaphors, and adjectives without a visual "
-        "anchor."
-        + trigger_rule
-    )
-    user = (
-        f"Style references — match the form, vocabulary, and density of these:\n"
-        f"{examples_block}\n\n"
-        f"Poem to illustrate:\n"
-        f"---\n{poem}\n---\n\n"
-        f"Write exactly {n} prompts. For each prompt, pick one idea, line, "
-        f"or image from the poem and render it as a concrete visual scene — "
-        f"NOT a paraphrase of the line. The viewer should see the image, "
-        f"not read the poem. Return only the prompts, one per line, no "
-        f"numbering, no commentary."
-        + trigger_rule
-    )
-
-    import openai
-    resp = openai.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user",   "content": user},
-        ],
-        temperature=temperature,
-    )
-    raw = resp.choices[0].message.content.strip()
-
-    lines = [
-        re.sub(r"^[\s\-\*\d\.\)]+", "", ln).strip()
-        for ln in raw.splitlines()
-        if ln.strip()
-    ]
-    if len(lines) < n:
-        raise RuntimeError(
-            f"LLM returned {len(lines)} prompts, asked for {n}:\n---\n{raw}\n---"
-        )
-    return _apply_trigger(lines[:n], trigger)
-
-
 # ---------------------------------------------------------------------------
 # HTTP submit / poll / download.
 # ---------------------------------------------------------------------------
@@ -517,6 +439,158 @@ def plantoid_video_journey(
 
     run_id = _poll_job(server, job["job_id"], poll_interval)
     return str(_download_video(server, run_id, output_dir))
+
+
+
+# ----------------------------------------------------------------------
+# VIDEO SCHEDULER
+# -----------------------------------------------------------------------
+
+def _lora_resolved_shorthands(spec: str, idx: dict) -> list[str]:
+    """Resolve a LoRA spec to its ordered shorthand list. Used to pick
+    the default per-LoRA prompt files for the final pass."""
+    s = spec.strip()
+    if not s or s.lower() == "none":
+        return []
+    if s.lstrip("-").isdigit():
+        return list(idx["presets"].get(s, []))
+    return [c.strip() for c in s.split(",") if c.strip()]
+
+
+def _lora_prompts_filename(shorthand: str) -> str:
+    """``twisted-bodies-xl`` → ``prompts_twisted_bodies_XL.txt``. Best-effort
+    name normalisation; override via the ``final_prompts_*`` args when a
+    shorthand maps to an outlier filename."""
+    base = shorthand.replace("-xl", "").replace("-", "_")
+    return f"prompts_{base}_XL.txt"
+
+
+def _load_first_n_prompts(path: Path, n: int) -> list[str]:
+    if not path.is_file():
+        raise FileNotFoundError(f"prompts file missing: {path}")
+    lines = [ln.strip() for ln in path.read_text().splitlines() if ln.strip()]
+    if len(lines) < n:
+        raise ValueError(f"only {len(lines)} prompts in {path.name}, asked for {n}")
+    return lines[:n]
+
+
+# ---- actual main function
+
+def plantoid_video_scheduler(
+    *,
+    audio_path,
+    final_prompts_a: Optional[list[str]] = None,
+    final_prompts_b: Optional[list[str]] = None,
+    n_final: int = 6,
+    lora: str = "21",
+    fps: Optional[int] = None,
+    cn_scale: float = 0.55,
+    controlnet: bool = True,
+    strength: Optional[float] = None,
+    mode: str = "img2img",
+    h_smoothing: bool = False,
+    audio_band: str = "treble",
+    audio_reaction_output_gain: float = 1.0,
+    n_rungs: int = 2,
+    crf: int = 23,
+    preset: str = "medium",
+    seed: Optional[int] = None,
+    server: str = DEFAULT_SERVER,
+    output_dir="/tmp",
+    poll_interval: float = 2.0,
+) -> str:
+    """POST a plantoid16 job and download the resulting mp4.
+
+    Init-video / keyframe selection happens server-side; this wrapper
+    only supplies the audio file and the SDXL / audio-reaction knobs.
+
+    ``final_prompts_a`` / ``final_prompts_b`` drive the final pass.
+    When omitted, the wrapper auto-resolves them from the LoRA
+    shorthand(s): first ``n_final`` lines of the matching
+    ``prompts_<shorthand>_XL.txt`` under ``PROMPTS_DIR``. For a pair
+    LoRA, both A and B are loaded.
+
+    Returns the local mp4 path. Same contract as plantoid_video_journey.
+    """
+    audio_path = Path(audio_path)
+    if not audio_path.is_file():
+        raise FileNotFoundError(f"audio_path missing: {audio_path}")
+
+    # LoRA validation + pair detection.
+    idx = _load_lora_index()
+    _validate_lora(lora, idx)
+    shorts = _lora_resolved_shorthands(lora, idx)
+    is_pair = len(shorts) >= 2
+
+    # Auto-resolve final prompts when caller didn't supply them.
+    if final_prompts_a is None:
+        if not shorts:
+            raise ValueError(
+                "no LoRA selected — can't pick a default final_prompts_a file"
+            )
+        final_prompts_a = _load_first_n_prompts(
+            PROMPTS_DIR / _lora_prompts_filename(shorts[0]), n_final,
+        )
+    if final_prompts_b is None and is_pair:
+        final_prompts_b = _load_first_n_prompts(
+            PROMPTS_DIR / _lora_prompts_filename(shorts[1]), n_final,
+        )
+    if not is_pair:
+        final_prompts_b = []
+
+    output_dir = Path(output_dir)
+
+    # Multipart payload — audio is the only file upload now.
+    audio_fh = audio_path.open("rb")
+    try:
+        files = {"audio_file": (audio_path.name, audio_fh, "audio/wav")}
+
+        data = [
+            ("lora", lora),
+            ("audio_band", audio_band),
+            ("audio_reaction_output_gain", str(audio_reaction_output_gain)),
+            ("n_rungs", str(n_rungs)),
+            ("crf", str(crf)),
+            ("preset", preset),
+            ("mode", mode),
+            ("h_smoothing", "true" if h_smoothing else "false"),
+            ("controlnet", "true" if controlnet else "false"),
+            ("cn_scale", str(cn_scale)),
+        ]
+        if fps is not None:
+            data.append(("fps", str(fps)))
+        if strength is not None:
+            data.append(("strength", str(strength)))
+        for p in final_prompts_a:
+            data.append(("final_prompts_a", p))
+        for p in final_prompts_b:
+            data.append(("final_prompts_b", p))
+        if seed is not None:
+            data.append(("seed", str(seed)))
+
+        url = f"{server.rstrip('/')}/api/installations/plantoid16"
+        print(f"[plantoid16] POST {url}")
+        r = requests.post(url, files=files, data=data, timeout=120)
+    finally:
+        audio_fh.close()
+
+    if r.status_code != 200:
+        raise RuntimeError(f"server returned {r.status_code}: {r.text}")
+    job = r.json()
+    summary = job.get("summary", {})
+    print(f"[plantoid16] enqueued job {job['job_id'][:8]}  "
+        f"mode={summary.get('mode')}  "
+        f"final_prompts={summary.get('n_final_prompts')}  "
+        f"is_pair={summary.get('is_pair')}  "
+        f"fps={summary.get('fps')}  "
+        f"target_frames={summary.get('target_frames')}")
+    for w in summary.get("warnings", []) or []:
+        print(f"[plantoid16] warn: {w}")
+
+    run_id = _poll_job(server, job["job_id"], poll_interval)
+    return str(_download_video(server, run_id, output_dir))
+
+
 
 
 # ---------------------------------------------------------------------------
