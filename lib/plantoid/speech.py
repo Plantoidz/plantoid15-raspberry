@@ -134,7 +134,7 @@ def GPTmagic(prompt, model="gpt-4", trim=True, max_tokens=92):
     try:
         url = "http://100.79.41.86:1235/v1/chat/completions"
         payload =  {
-            "model": "qwen3.5-2b",
+            # "model": "qwen3.5-2b",
             "model": "Qwen3.6-35B-A3B",
             # "model": "LFM2.5-VL-1.6B-Q8_0.gguf",
             "messages": [{"role": "user", "content": prompt}],
