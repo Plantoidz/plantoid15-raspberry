@@ -49,7 +49,7 @@ import yaml
 HERE = Path(__file__).resolve().parent
 PROMPTS_DIR = HERE.parent / "prompts"
 LORA_INDEX_YAML = HERE.parent / "lora_index.yaml"
-DEFAULT_SERVER = "http://127.0.0.1:8000"
+DEFAULT_SERVER = "http://100.79.41.86:8002"
 
 
 # ---------------------------------------------------------------------------
