@@ -192,7 +192,7 @@ def clean_trim_to_sentence(text):
     # remove parenthical stage directions:
     text = re.sub(r'\([^)]*?\)', '', text)
 
-    text = re.sub(r'(?<!\*)\*[^*\n]+?[ \t][^*\n]*?\*(?!\*)', '', text) # multi-words stage direction, remove
+    # text = re.sub(r'(?<!\*)\*[^*\n]+?[ \t][^*\n]*?\*(?!\*)', '', text) # multi-words stage direction, remove
 
     # remove markdown from the response
     # text = re.sub(r'\*\*[^*]+?\*\*', '', text) # bold
