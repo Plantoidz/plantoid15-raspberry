@@ -190,7 +190,7 @@ def clean_trim_to_sentence(text):
     # remove parenthical stage directions:
     text = re.sub(r'\([^)]*?\)', '', text)
 
-    text = re.sub(r'(?<!\*)\*[^*\n]+?\s[^*\n]*?\*(?!\*)', '', text) # multi-words stage direction, remove
+    text = re.sub(r'(?<!\*)\*[^*\n]+?[ \t][^*\n]*?\*(?!\*)', '', text) # multi-words stage direction, remove
     text = re.sub(r'(?<!\*)\*([^*\s\n]+)\*(?!\*)', r'\1', text) # single-word italics, keep the word, drop astericks
 
     # remove markdown from the response
