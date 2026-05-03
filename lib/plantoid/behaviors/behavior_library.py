@@ -770,7 +770,7 @@ def poem_make_SDXLprompts(plantoid, sermon, audio_file):
         re.sub(r"^(?:SDXL prompt:|prompt:)\s*", "", p, flags=re.IGNORECASE).strip()
         for p in response.splitlines()
         if p.strip()
-    ][:n_prompts] ## cap it to max n_prompts in case LLM disobbey
+    ][:n_prompt] ## cap it to max n_prompts in case LLM disobbey
     return prompts
 
 
