@@ -132,7 +132,7 @@ def GPTmagic(prompt, model="gpt-4", trim=True, max_tokens=92):
 
     #2. Try GLITCHBOX LLM Studio (hard-coded model: liquid)
     try:
-        url = "http://100.79.41.86:1235/v1/chat/completions"
+        url = "http://100.79.41.86:1234/v1/chat/completions"
         payload =  {
             # "model": "qwen3.5-2b",
             "model": "Qwen3.6-35B-A3B",
@@ -140,6 +140,8 @@ def GPTmagic(prompt, model="gpt-4", trim=True, max_tokens=92):
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
             "max_tokens": max_tokens,
+            "repetition_penalty": 1.15,
+            "frequency_penalty": 0.5,
             "chat_template_kwargs": {"enable_thinking": False }
         } 
         resp = req.post(url, json=payload, timeout=30)
