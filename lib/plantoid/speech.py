@@ -179,6 +179,8 @@ def clean_trim_to_sentence(text):
 
     # unwrap markdwown **bold** first so the stage-direction regex doesnt fuck up
     text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text) 
+    # unwrap markdown *italic* second, so the stage-direction regex doesnt fuck up
+    text = re.sub(r'(?<!\*)\*([^*\s\n]+)\*(?!\*)', r'\1', text) # single-word italics, keep the word, drop astericks
     
     # get the first instance of Plantoid:
     #match = re.search(r'Plantoid\s*:\s*(.*?)(?:\n\n|Human|H:|$)', text, flags=re.DOTALL)
@@ -191,7 +193,6 @@ def clean_trim_to_sentence(text):
     text = re.sub(r'\([^)]*?\)', '', text)
 
     text = re.sub(r'(?<!\*)\*[^*\n]+?[ \t][^*\n]*?\*(?!\*)', '', text) # multi-words stage direction, remove
-    text = re.sub(r'(?<!\*)\*([^*\s\n]+)\*(?!\*)', r'\1', text) # single-word italics, keep the word, drop astericks
 
     # remove markdown from the response
     # text = re.sub(r'\*\*[^*]+?\*\*', '', text) # bold
