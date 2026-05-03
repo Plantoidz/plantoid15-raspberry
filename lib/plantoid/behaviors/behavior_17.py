@@ -29,7 +29,7 @@ def create_seed_metadata(plantoid, network, tID):
             network.plantoid_path + "/init_img.jpg",
             # **defaults
             lora="18", # melies
-            target_frames=200,
+            target_frames=150,
             trigger="Vintage collage art featuring",
             strength=0.72,
             cn_scale=0.55,
