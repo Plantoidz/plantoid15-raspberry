@@ -65,7 +65,7 @@ def print_thermal_txt(textual):
             p.close()
         except Exception as e:
             result["err"] = e
-        
+    
     t = threading.Thread(target=_work, daemon=True)
     t.start()
     t.join(timeout)
@@ -101,9 +101,9 @@ def print_thermal_img(image_file, timeout=10):
         except Exception as e:
             result["err"] = e
     
-   t = threading.Thread(target=_work, daemon=True)
-   t.start()
-   t.join(timeout)
+    t = threading.Thread(target=_work, daemon=True)
+    t.start()
+    t.join(timeout)
 
     if t.is_alive():
         print(f"[thermal] print hung for >{timeout}s, abandoning — printer offline?")
