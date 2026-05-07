@@ -171,6 +171,7 @@ def setup(
         network.indexer = IndexerClient(
             url = INDEXER_URL,
             plantoid_address = addr,
+            minted_db_path = minted_db_path,
         )
     # prime the cursor from minted.db
     minted_path = plantoid_path + '/minted_' + name + '.db'
@@ -260,11 +261,11 @@ def check_for_deposits(web3obj):
 
         try:
 
-            deposit = indexer.fetch_oldest_new_deposit()
+            deposit = indexer.fetch_oldest_unprocessed_deposit()
             if deposit is None:
                 return None
 
-            indexer.max_processed_token_id = max(indexer.max_processed_token_id, int(deposit['tokenId']))
+            indexer.advance_cursor(deposit['tokenId'])
             print(f"[indexer] new deposit: token={deposit['tokenId']} amount={deposit['amount']} tx={deposit['txHash']}")
             return (deposit['tokenId'], deposit['amount'])
 

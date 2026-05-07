@@ -12,13 +12,36 @@ class IndexerClient:
     One instance per network (mainnet / sepolia) 
     """
 
-    def __init__(self, url, plantoid_address, request_timeout=5.0):
+    def __init__(self, url, plantoid_address, minted_db_path, request_timeout=5.0):
         self.url = url.rstrip("/") + "/graphql"
         self.plantoid_address = plantoid_address.lower()
+        self.minted_db_path = minted_db_path
         self.request_timeout = request_timeout
-        self.max_processed_token_id = 0 # bumped at boot from minted.db, then in-memory
+        self.max_processed_token_id = None # bumped at boot from minted.db, then in-memory
 
   
+    def _ensure_initialized(self):
+            if self.max_processed_token_id is not None:
+                return
+            max_id = 0
+            if os.path.exists(self.minted_db_path):
+                with open(self.minted_db_path, 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            n = int(line)
+                            if n > max_id:
+                                max_id = n
+                        except ValueError:
+                            pass
+            self.max_processed_token_id = max_id
+            print(f"[indexer] cursor initialized to tokenId={max_id} from {self.minted_db_path}")
+
+
+    def advance_cursor(self, token_id):
+            self.max_processed_token_id = max(self.max_processed_token_id or 0, int(token_id))
 
     # --- queries ---
 
@@ -37,6 +60,8 @@ class IndexerClient:
         if "errors" in body:
             raise IndexerUnavailable(f"graphql errors: {body['errors']}")
         return body["data"]
+
+
 
 
     def fetch_oldest_unprocessed_deposit(self):
