@@ -255,7 +255,7 @@ def process_previous_tx(plantoid, network):
 def check_for_deposits(web3obj):
 
     # try indexer first
-    indexer = getattr(webobj, 'indexer', None)
+    indexer = getattr(web3obj, 'indexer', None)
     if indexer is not None:
 
         try:
