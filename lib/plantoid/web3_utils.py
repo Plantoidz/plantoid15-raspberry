@@ -173,7 +173,7 @@ def setup(
         network.indexer = IndexerClient(
             url = INDEXER_URL,
             plantoid_address = addr,
-            minted_db_path = minted_db_path,
+            minted_db_path = minted_path,
         )
     # prime the cursor from minted.db
     if os.path.exists(minted_path):
