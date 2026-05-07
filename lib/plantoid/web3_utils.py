@@ -225,6 +225,7 @@ def process_previous_tx(plantoid, network):
         except IndexerUnavailable as e:
             print(f"[indexer] unavailable, falling back to RPC: {e}")
 
+    # 2. try the event filter if indexer has failed
     if event_token_ids is None:
         try:
             event_list = event_filter.get_all_entries()
@@ -233,6 +234,8 @@ def process_previous_tx(plantoid, network):
             print(f"process previous tx - Unexpected {err=}, {type(err)=}")
             return
     
+
+
     for token_Id in event_token_ids:
 
         print("looping through ---: " +token_Id)
@@ -252,7 +255,7 @@ def process_previous_tx(plantoid, network):
 def check_for_deposits(web3obj):
 
     # try indexer first
-    indexer = gettattr(webobj, 'indexer', None)
+    indexer = getattr(webobj, 'indexer', None)
     if indexer is not None:
 
         try:
