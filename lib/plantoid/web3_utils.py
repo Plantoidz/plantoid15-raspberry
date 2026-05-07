@@ -167,14 +167,15 @@ def setup(
 
     # INDEXER 
     network.indexer = None
+
     if INDEXER_URL:
+        minted_path = plantoid_path + '/minted_' + name + '.db'
         network.indexer = IndexerClient(
             url = INDEXER_URL,
             plantoid_address = addr,
             minted_db_path = minted_db_path,
         )
     # prime the cursor from minted.db
-    minted_path = plantoid_path + '/minted_' + name + '.db'
     if os.path.exists(minted_path):
         with open(minted_path, 'r') as f:
             ids = [int(line.strip()) for line in f if line.strip()]
