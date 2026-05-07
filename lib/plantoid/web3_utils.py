@@ -8,13 +8,35 @@ import sys
 from pathlib import Path
 import json
 from dotenv import load_dotenv
-from pinata import Pinata
+
 
 from escpos.printer import Usb
 import qrcode
 from PIL import Image
 
 from lib.plantoid.indexer_client import IndexerClient, IndexerUnavailable
+
+
+from pinata import Pinata
+import requests as _pinata_requests
+
+def _pinata_pin_file_safe(self, file):
+    """Replaces Pinata.pin_file to close the file handle (upstream leak)."""
+    if not isinstance(file, str):
+        raise NotImplementedError("only path strings are supported")
+    if not os.path.exists(file):
+        return {'status': 'error', 'message': 'File does not exist'}
+    with open(file, 'rb') as fh:
+        raw = _pinata_requests.post(
+            self.base_url + 'pinning/pinFileToIPFS',
+            headers=self.headers,
+            files={'file': fh},
+        ).json()
+    if 'error' in raw:
+        return {'status': 'error', 'message': raw['error']['details']}
+    return {'status': 'success', 'data': raw}
+
+Pinata.pin_file = _pinata_pin_file_safe
 
 
 class Web3Object:
