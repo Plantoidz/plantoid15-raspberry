@@ -127,8 +127,7 @@ def setup(
     # get the balance of the address
     # eth_balance_wei = network.w3.eth.get_balance(address)
     # eth_balance = network.w3.from_wei(eth_balance_wei, 'ether')
-
-    print('eth balance:', eth_balance)
+    # print('eth balance:', eth_balance)
     
     abifile = open(path + '/abi', 'r')
     o = abifile.read()
