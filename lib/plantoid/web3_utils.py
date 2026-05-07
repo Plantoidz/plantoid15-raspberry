@@ -14,8 +14,8 @@ from escpos.printer import Usb
 import qrcode
 from PIL import Image
 
+from lib.plantoid.indexer_client import IndexerClient, IndexerUnavailable
 
-#from lib.plantoid.behaviors import behavior_selector
 
 class Web3Object:
     infura_websock = None
@@ -37,6 +37,7 @@ PINATA_JWT = os.environ.get('PINATA_JWT')
 SIGNER_PRIVATE_KEY = os.environ.get("SIGNER_PRIVATE_KEY")
 INFURA_API_KEY_MAINNET = os.environ.get("INFURA_MAINNET")
 INFURA_API_KEY_GOERLI = os.environ.get("INFURA_GOERLI")
+INDEXER_URL = os.environ.get("INDEXER_URL",  "https://plantoidz-brainz.tail98279f.ts.net")  # e.g. http://plantoidz-brainz.local:42069
 
 print(INFURA_API_KEY_MAINNET)
 
@@ -124,8 +125,8 @@ def setup(
     print('address is', address)
 
     # get the balance of the address
-    eth_balance_wei = network.w3.eth.get_balance(address)
-    eth_balance = network.w3.from_wei(eth_balance_wei, 'ether')
+    # eth_balance_wei = network.w3.eth.get_balance(address)
+    # eth_balance = network.w3.from_wei(eth_balance_wei, 'ether')
 
     print('eth balance:', eth_balance)
     
@@ -165,18 +166,23 @@ def setup(
     # set the failsafe
     network.failsafe = failsafe
 
+    # INDEXER 
+    network.indexer = None
+    if INDEXER_URL:
+        network.indexer = IndexerClient(
+            url = INDEXER_URL,
+            plantoid_address = addr,
+        )
+    # prime the cursor from minted.db
+    minted_path = plantoid_path + '/minted_' + name + '.db'
+    if os.path.exits(minted_path):
+        with open(minted_path, 'r') as f:
+            ids = [int(line.strip()) for line in f if line.strip()]
+            if ids:
+                network.indexer.max_processed_token_id = max(ids)
+
     return network  
     
-    # except TimeoutError:
-
-    #     print('Connection unsuccessful or timed out!')
-    #     return None
-
-    # except Exception as e:
-    #     print('Generic exception caught: ', e)
-    # #    import pdb; pdb.set_trace()
-    #     return None
-
 
 
 def process_previous_tx(plantoid, network):
@@ -209,33 +215,33 @@ def process_previous_tx(plantoid, network):
 
     # loop over all entries to process unprocessed Deposits
 
-    try:
-        event_list = event_filter.get_all_entries()
-    
-    except Exception as err:
-        print(f"process previous tx - Unexpected {err=}, {type(err)=}")
-        return
 
-    
-    for event in event_list:
+    # 1. try indexer first
+    event_token_ids = None
+    indexer = getattr(network, 'indexer', None)
+    if indexer is not None:
+        try:
+            event_token_ids = indexer.fetch_all_token_ids()
+            print(f"[indexer] fetched {len(event_token_ids)} historical token ids")
+        except IndexerUnavailable as e:
+            print(f"[indexer] unavailable, falling back to RPC: {e}")
 
-        token_Id = str(event.args.tokenId)
+    if event_token_ids is None:
+        try:
+            event_list = event_filter.get_all_entries()
+            event_token_ids = [str(e.args.tokenId) for e in event_list]
+        except Exception as err:
+            print(f"process previous tx - Unexpected {err=}, {type(err)=}")
+            return
+    
+    for token_Id in event_token_ids:
 
         print("looping through ---: " +token_Id)
 
         if token_Id not in minted_db_token_ids:
 
-            print('processing metadata for token id:', token_Id)
-
-            # create_seed_metadata = behavior_selector.get_plantoid_function(
-            #     plantoid_number,
-            #     'create_seed_metadata',
-            # )
-            
-            # create_seed_metadata(network, token_Id)
             print("calling create seed metadata with network = ", network, " and tokenId = ", token_Id)
             plantoid.create_seed_metadata(network, token_Id)
-
 
             enable_seed_reveal(network, token_Id)
 
@@ -243,9 +249,36 @@ def process_previous_tx(plantoid, network):
    
 
 
+
 def check_for_deposits(web3obj):
 
-    # get the event filter
+    # try indexer first
+    indexer = gettattr(webobj, 'indexer', None)
+    if indexer is not None:
+
+        try:
+            # read existing minted.db to build the exclude list
+            minted_path = web3obj.plantoid_path + '/minted_' + str(web3ojb.name) + '.db'
+            processed = set()
+            if os.path.exists(minted_path):
+                with open(minted_path, 'r') as f:
+                    for line in f:
+                        if line.strip():
+                            processed.add(line.strip())
+
+            deposit = indexer.fetch_oldest_new_deposit(processed)
+            if deposit is None:
+                return None
+
+            indexer.max_processed_token_id = max(indexer.max_processed_token_id, int(deposit['tokenId']))
+            print(f"[indexer] new deposit: token={deposit['tokenId']} amount={deposit['amount']} tx={deposit['txHash']}")
+            return (deposit['tokenId'], deposit['amount'])
+
+        except IndexerUnavailable as e:
+            print(f"[indexer] unavailable, falling back to RPC: {e}")
+
+
+    # RPC fallback (old behavior)
     event_filter = web3obj.event_filter
 
     try:
