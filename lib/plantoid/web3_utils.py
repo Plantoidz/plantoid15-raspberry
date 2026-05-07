@@ -174,7 +174,7 @@ def setup(
         )
     # prime the cursor from minted.db
     minted_path = plantoid_path + '/minted_' + name + '.db'
-    if os.path.exits(minted_path):
+    if os.path.exists(minted_path):
         with open(minted_path, 'r') as f:
             ids = [int(line.strip()) for line in f if line.strip()]
             if ids:
@@ -256,16 +256,8 @@ def check_for_deposits(web3obj):
     if indexer is not None:
 
         try:
-            # read existing minted.db to build the exclude list
-            minted_path = web3obj.plantoid_path + '/minted_' + str(web3ojb.name) + '.db'
-            processed = set()
-            if os.path.exists(minted_path):
-                with open(minted_path, 'r') as f:
-                    for line in f:
-                        if line.strip():
-                            processed.add(line.strip())
 
-            deposit = indexer.fetch_oldest_new_deposit(processed)
+            deposit = indexer.fetch_oldest_new_deposit()
             if deposit is None:
                 return None
 
