@@ -13,7 +13,10 @@ def setup_serial(PORT="/dev/ttyACM0", baud_rate=115200):
         if PORT is None: raise Exception('No Serial Port Provided!')
 
         # configure the serial connections (the parameters differs on the device you are connecting to)
-        ser = serial.Serial(port=PORT, baudrate=baud_rate)
+        ser = serial.Serial(port=PORT, 
+                            baudrate=baud_rate,
+                            timeout=1,          # read timeout already implied, explicit now
+                            write_timeout=2,    # write timeout is new, raises if buffer doesn't drain in 2s
 
         print("Serial port " + PORT + " opened  Baudrate " + str(baud_rate))
 
@@ -115,8 +118,6 @@ def wait_for_arduino(ser, timeout_seconds=30):
 
     """ Returns True if Arduino acknowledged within timeout, False otherwise."""
 
-    print("sending RESET signal")
-    send_to_arduino(ser, "RESET")
     print(f"Waiting for Arduino to reset (up to {timeout_seconds}s)")
 
     msg = ""
@@ -126,8 +127,14 @@ def wait_for_arduino(ser, timeout_seconds=30):
         if time.time() > deadline:
             print(f"WARNING: Arduino did not respond within {timeout_seconds}s")
             return False
-        
-        send_to_arduino(ser, "RESET")
+
+        try:
+            print("Sending reset signal to arduino ...")    
+            send_to_arduino(ser, "RESET")
+        except Exception as e:
+            # write blocked or failed; let the dealdine handle it
+            print(f" .    *write failed: {type(e).__name__}: {e}")
+            
         msg = check_received_arduino_signal(ser)
 
         if not (msg == 'XXX'):
