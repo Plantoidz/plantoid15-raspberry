@@ -17,14 +17,13 @@ def setup_serial(PORT="/dev/ttyACM0", baud_rate=115200):
                             baudrate=baud_rate,
                             timeout=1,          # read timeout already implied, explicit now
                             write_timeout=2,    # write timeout is new, raises if buffer doesn't drain in 2s
-
+                            )
         print("Serial port " + PORT + " opened  Baudrate " + str(baud_rate))
 
         return ser
         #waitForArduino()
 
     except serial.SerialException:
-
         raise Exception('Cannot access provided serial port!')
 
 
@@ -134,7 +133,7 @@ def wait_for_arduino(ser, timeout_seconds=30):
         except Exception as e:
             # write blocked or failed; let the dealdine handle it
             print(f" .    *write failed: {type(e).__name__}: {e}")
-            
+
         msg = check_received_arduino_signal(ser)
 
         if not (msg == 'XXX'):
