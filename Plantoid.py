@@ -104,7 +104,7 @@ def plantoid_event_listen(
 
             def _check_safely(network_key, setup_fn):
 
-                if not webconfig.get(f"use_{network_key}"):
+                if not web3config.get(f"use_{network_key}"):
                     return
 
                 print(f'checking if fed on {network_key}...')
