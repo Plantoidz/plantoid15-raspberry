@@ -586,15 +586,6 @@ class Plantony:
             # create the seed metadata
             self.create_seed_metadata(network, token_Id)
 
-
-            # web3_utils.create_seed_metadata(network, token_Id)
-            # create_seed_metadata = behavior_selector.get_plantoid_function(
-            #     self.plantoid_number,
-            #     'create_seed_metadata',
-            # )
-            
-            # create_seed_metadata(network, token_Id)
-
             # pin the metadata to IPFS and enable reveal link via metatransaction
             web3_utils.enable_seed_reveal(network, token_Id)
 
@@ -606,18 +597,6 @@ class Plantony:
         else:
 
             print("sorry, no deposits detected. try later.")
-
-            # # listen for audio
-            # audiofile = self.listen()
-            # tID = '0xABC'
-            # amount = 0.001
-
-            # # generate the oracle
-            # self.generate_oracle(network, audiofile, tID, amount)
-
-            # # create the metadata
-            # web3_utils.create_seed_metadata(network, tID)
-            
             return 0
 
 

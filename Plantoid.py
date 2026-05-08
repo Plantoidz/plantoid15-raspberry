@@ -96,35 +96,70 @@ def plantoid_event_listen(
 
             # only check every 1 second
             time.sleep(1)
-
             
             # increase counter and only check for deposits events every 10 seconds
             counter = counter + 1
             if(counter % 10):   continue   
 
+
+            def _check_safely(network_key, setup_fn):
+
+                if not webconfig.get(f"use_{network_key}"):
+                    return
+
+                print(f'checking if fed on {network_key}...')
+
+                try:
+                    plantony.check_if_fed(web3config[network_key])
+
+                except Exception as e:
+                    # indexer is the primary path, error here means transient RPC issues
+                    import traceback
+                    print(f"******* check_if_fed ({network_key}) failed: {type(e).__name__}: {e}")
+                    traceback.print_exc()
+
+                    # only attempt RPC reconnect if it's clearly a websocket/connection issue
+                    # and we actually have a RPC filter to talk to
+                    msg = str(e).lower()
+                    looks_network = any(s in msg for s in ('websocket', 'connection', '429', 'timed out', 'timeout'))
+                    has_rpc_fallback = getattr(webconfig[network_key], 'event_filter', None) is not None
+
+                    if looks_necwork and has_rpc_fallback:
+                        print(f"[{network_key}] looks like a network error, backing off 30s before reconnect")
+                        time.sleep(30)
+                        try:
+                            web3config[network_key] = setup_fn(web3_config)
+                        except Exception as e2:
+                            print(f"[{network_key}] recconect failed: {e2}")
+                            sys.exit(0) # kill the process, so that it restarts via systemctl
             
-            if(web3config["use_goerli"]):
-                print('checking if fed on GOERLI...')
+            _check_safely("goerli", web3_setup_loop_goerli)
+            _check_safely("mainnet", web3_setup_loop_mainnet)
+
+
+
+            # if(web3config["use_goerli"]):
+            #     print('checking if fed on GOERLI...')
  
-                try:
-                    plantony.check_if_fed(web3config["goerli"])
+            #     try:
+            #         plantony.check_if_fed(web3config["goerli"])
 
-                except Exception as e:
-                    print("********* ERROR on websocket: ", e)
-                    web3config["goerli"] = web3_setup_loop_goerli(web3config)
-                    # sys.exit(0)
+            #     except Exception as e:
+            #         print("********* ERROR on websocket: ", e)
+            #         web3config["goerli"] = web3_setup_loop_goerli(web3config)
+            #         # sys.exit(0)
             
             
-            if(web3config["use_mainnet"]):
-                print('checking if fed on MAINNET...')
+            # if(web3config["use_mainnet"]):
+            #     print('checking if fed on MAINNET...')
 
-                try:
-                    plantony.check_if_fed(web3config["mainnet"])
+            #     try:
+            #         plantony.check_if_fed(web3config["mainnet"])
 
-                except Exception as e:
-                    print("********* ERROR on websocket: ", e)
-                    web3config["mainnet"] = web3_setup_loop_mainnet(web3config)
-                    # sys.exit(0)
+            #     except Exception as e:
+            #         print("********* ERROR on websocket: ", e)
+            #         web3config["mainnet"] = web3_setup_loop_mainnet(web3config)
+            #         # sys.exit(0)
 
     
         

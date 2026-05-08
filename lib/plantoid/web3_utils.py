@@ -132,29 +132,15 @@ def setup(
         websocket_timeout=10000,
         websocket_kwargs={'timeout': 10000}
     ))
-
-    
-    # print("DEBUG", network.w3.manager._provider.counter)
-
-    # for k, v in network.w3.manager.items():
-    #     print("DEBUG", k, v.__dict__)
-
     print('w3 is', network.w3)
-    print('is connected', network.w3.is_connected())
 
     # checksum the address
     address = Web3.to_checksum_address(addr)
     print('address is', address)
 
-    # get the balance of the address
-    # eth_balance_wei = network.w3.eth.get_balance(address)
-    # eth_balance = network.w3.from_wei(eth_balance_wei, 'ether')
-    # print('eth balance:', eth_balance)
-    
     abifile = open(path + '/abi', 'r')
     o = abifile.read()
     abi = o.replace('\n', '')
-    # print(abi)
     abifile.close()
 
     # network name
@@ -170,10 +156,6 @@ def setup(
     network.plantoid_contract = network.w3.eth.contract(address=address, abi=abi)
     print('plantoid contract === ', network.plantoid_contract)
 
-    # instantiate the event filter
-    network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=start_block)
-    print('event filter:', network.event_filter)
-    
     # set the path
     network.path = path
     network.plantoid_path = plantoid_path
@@ -186,6 +168,14 @@ def setup(
 
     # set the failsafe
     network.failsafe = failsafe
+
+
+    # INFURA event filter (in a try section so that the program doesn't die if Infura is overloaded)
+    try:
+        network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=start_block)
+        print('event filter:', network.event_filter)
+    except Exception as e:
+        print(f"create_filter failed: {e}")
 
     # INDEXER 
     network.indexer = None
@@ -251,6 +241,10 @@ def process_previous_tx(plantoid, network):
 
     # 2. try the event filter if indexer has failed
     if event_token_ids is None:
+        
+        if network.event_filter is None:
+            print("[!!!] no indexer and no RPC filter - skipping historical scan")
+            return
         try:
             event_list = event_filter.get_all_entries()
             event_token_ids = [str(e.args.tokenId) for e in event_list]
@@ -298,6 +292,9 @@ def check_for_deposits(web3obj):
 
     # RPC fallback (old behavior)
     event_filter = web3obj.event_filter
+
+    if event_filter is None:
+        return None # indexer is our only path; nothing to do with this poll
 
     try:
         events = event_filter.get_new_entries()
