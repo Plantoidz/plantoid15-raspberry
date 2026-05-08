@@ -108,34 +108,35 @@ def use_serial_pattern(use_raspberry):
 
 #==================
 
-def wait_for_arduino(ser):
+def wait_for_arduino(ser, timeout_seconds=30):
 
     # wait until the Arduino sends 'Arduino is ready' - allows time for Arduino reset
     # it also ensures that any bytes left over from a previous message are discarded
 
+    """ Returns True if Arduino acknowledged within timeout, False otherwise."""
+
     print("sending RESET signal")
-    
     send_to_arduino(ser, "RESET")
-    
-    print("Waiting for Arduino to reset")
+    print(f"Waiting for Arduino to reset (up to {timeout_seconds}s)")
 
     msg = ""
-
-#    start_signal = "<>".encode()
-#    serialPort.read_until(start_signal)
+    deadline = time.time() + timeout_seconds
 
     while msg.find("Arduino is ready") == -1:
-
+        if time.time() > deadline:
+            print(f"WARNING: Arduino did not respond within {timeout_seconds}s")
+            return False
+        
         send_to_arduino(ser, "RESET")
-
         msg = check_received_arduino_signal(ser)
 
         if not (msg == 'XXX'):
-
             print("[",msg,"]")
+        time.sleep(0.1) # don't hot-loop the CPU and the serial bus
 
     ser.flushInput()
     print("ARDUINO IS READY")
+    return True
 
 
 

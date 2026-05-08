@@ -274,10 +274,24 @@ def main():
     if use_serial:
         PORT = plantoid_cfg.get('SERIAL_PORT', os.environ.get('SERIAL_PORT_OUTPUT')) # first look at the configuration.toml, otherwise check the ENV variable
         print("PORT ==== ", PORT)
-        io = serial_utils.setup_serial(PORT=PORT, baud_rate = 9600 if plantoid_number == "14" else 115200) # ugly - this should go into configuration.toml
-        serial_utils.wait_for_arduino(io)
-        serial_utils.send_to_arduino(io, "awake")
-    
+
+        try:
+            io = serial_utils.setup_serial(PORT=PORT, baud_rate = 9600 if plantoid_number == "14" else 115200) # ugly - this should go into configuration.toml
+            if serial_utils.wait_for_arduino(io, timeout_seconds=30):
+                serial_utils.send_to_arduino(io, "awake")
+            else:
+                print("WARNING: Arduino unresponsive - disabling serial for this run only")
+                try:
+                    io.close()
+                except Exception:
+                    pass
+                io = None
+                use_serial = False
+        except Exception as e:
+            print(f"WARNING: serial setup failed ({type(e).__name__}: {e})") - disabling serial for this run only")
+            io = None
+            use_serial = False
+            
     if use_gpio:
         global gpio_utils
         import lib.plantoid.gpio_utils as gpio_utils

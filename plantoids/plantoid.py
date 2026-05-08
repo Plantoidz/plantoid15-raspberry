@@ -23,6 +23,14 @@ class Plantony:
             self.use_serial = 1
             self.use_gpio = 0
             self.serial_connector = io
+        elif io is None:
+            # serial init failed at runtime (e.g. wedged Arduino)
+            # run headless without input. Indexer-driven flow still works
+            self.use_serial = 0
+            self.use_gpio = 0
+            self.serial_connector = None
+            print("Plantony: running without input (serial/gpio both unavailable)")
+
         else:
             import lib.plantoid.gpio_utils as PlantoidGPIO
             self.use_serial = 0
