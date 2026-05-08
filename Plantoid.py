@@ -288,10 +288,10 @@ def main():
                 io = None
                 use_serial = False
         except Exception as e:
-            print(f"WARNING: serial setup failed ({type(e).__name__}: {e})") - disabling serial for this run only")
+            print(f"WARNING: serial setup failed ({type(e).__name__}: {e}) - disabling serial for this run only")
             io = None
             use_serial = False
-            
+
     if use_gpio:
         global gpio_utils
         import lib.plantoid.gpio_utils as gpio_utils
