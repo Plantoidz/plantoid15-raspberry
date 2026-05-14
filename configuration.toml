@@ -24,16 +24,16 @@ PATTERN = "<Touched>"
 PERSONALITY="./prompt_context/plantony_context-18.txt"
 LLM_MODEL="qwen/qwen3.5-35b-a3b"
 
-[17.mainnet]
+[18.mainnet]
 ACTIVE = "True"
 FAILSAFE = 0
-BLOCKCHAIN_ADDRESS = "0xc4332e6b9a7d04ed20fec9e2f15927e8e26ca154"
+BLOCKCHAIN_ADDRESS = "0xB289bf1c845392f142902732C40325AfefB77C07"
 METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
-[17.goerli]
+[18.goerli]
 ACTIVE = "True"
 FAILSAFE = 0
-BLOCKCHAIN_ADDRESS = "0xdd05e577e1b0a7f1ec75e4f764f35fadab249ae7" ### This is the sepolia address
+BLOCKCHAIN_ADDRESS = "0x3845241362e007daa52219722d0a60dc4dabe7b3" ### This is the sepolia address
 METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 
