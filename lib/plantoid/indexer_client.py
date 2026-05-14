@@ -65,7 +65,9 @@ class IndexerClient:
 
 
     def fetch_oldest_unprocessed_deposit(self):
-      
+
+        self._ensure_initialized()
+
         query = """
           query NextSeed($plantoidId: String!, $afterTokenId: BigInt!) {
             seeds(
