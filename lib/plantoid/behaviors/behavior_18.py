@@ -68,7 +68,7 @@ def create_seed_metadata(plantoid, network, tID):
 
     behaviors.generic_metadata(plantoid, network, tID, db, None,
         behaviors.glitchbox_build_video_scheduler(
-            lora="anglels-xl,pixel-xl",
+            lora="angels-xl,pixel-xl",
             fps=10,
             strength=0.7,
             cn_scale=0.55,
