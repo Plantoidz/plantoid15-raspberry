@@ -495,6 +495,7 @@ def plantoid_video_scheduler(
     crf: int = 23,
     preset: str = "medium",
     seed: Optional[int] = None,
+    video_set: Optional[str] = None,
     server: str = DEFAULT_SERVER,
     output_dir="/tmp",
     poll_interval: float = 2.0,
@@ -567,6 +568,8 @@ def plantoid_video_scheduler(
             data.append(("final_prompts_b", p))
         if seed is not None:
             data.append(("seed", str(seed)))
+        if video_set is not None:
+            data.appent(("video_set", video_set))
 
         url = f"{server.rstrip('/')}/api/installations/plantoid16"
         print(f"[plantoid16] POST {url}")

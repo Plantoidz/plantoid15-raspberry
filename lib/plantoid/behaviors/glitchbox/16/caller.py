@@ -300,6 +300,10 @@ def main() -> None:
     parser.add_argument("--poll-interval", type=float, default=2.0)
     parser.add_argument("--no-wait", action="store_true",
                         help="Submit and exit without polling.")
+    parser.add_argument("--video-set", type=str, default=None,
+                        help="Library-mode only: video pool to draw from. "
+                            "Server default 'default'. Use 'p18' to draw "
+                            "from server_assets/ltx_videos/p18/.")
     args = parser.parse_args()
 
     idx = load_lora_index()
@@ -444,6 +448,8 @@ def main() -> None:
             data.append(("clip_num", str(args.clip_num)))
         elif args.clip_name is not None:
             data.append(("clip_name", args.clip_name))
+        if args.video_set is not None:
+            data.append(("video_set", args.video_set))
     for p in init_image_prompts:
         data.append(("init_image_prompts", p))
     for p in final_prompts_a:
