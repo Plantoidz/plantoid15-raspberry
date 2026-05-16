@@ -1,6 +1,6 @@
-import lib.plantoid.behaviors.behavior_16 as behavior_18
+import lib.plantoid.behaviors.behavior_18 as behavior_18
 import lib.plantoid.behaviors.behavior_17 as behavior_17
-import lib.plantoid.behaviors.behavior_17 as behavior_16
+import lib.plantoid.behaviors.behavior_16 as behavior_16
 import lib.plantoid.behaviors.behavior_15 as behavior_15
 import lib.plantoid.behaviors.behavior_14 as behavior_14
 
