@@ -42,7 +42,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     
     # create a song with 11LABS
     style = {
-        'positive_global_styles': ['French chanson', 'vintage 1960s', 'deep contralto female vocal', 'smoky and grounded', 'warm analog recording', 'sparse acoustic arrangement', 'upright bass', 'brushed drums', 'tape warmth']
+        'positive_global_styles': ['French chanson', 'vintage 1960s', 'deep contralto female vocal', 'smoky and grounded', 'warm analog recording', 'sparse acoustic arrangement', 'upright bass', 'brushed drums', 'tape warmth'],
         'negative_global_styles': ['electronic', 'heavy percussion', 'modern synth', 'rock'],
         'positive_local_styles': ['intimate', 'melancholic'],
         'negative_local_styles': ['heavy brass', 'percussion', 'electronic sounds'],       
