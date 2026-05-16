@@ -329,7 +329,7 @@ def main():
     # invoke_plantony(plantony, goerli)
 
     # add listener
-    plantony.add_listener('Touched', invoke_plantony)
+    # plantony.add_listener('Touched', invoke_plantony)
     
     # FIX FIX FIX
     # plantony.trigger('Touched', plantony, web3_config["goerli"], max_rounds=max_rounds)  ## @@ FAKING A TRIGGER
