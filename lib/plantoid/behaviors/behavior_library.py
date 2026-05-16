@@ -84,7 +84,7 @@ def print_response(plantoid, network, tID, text):
 
 
 
-def generate_song(text, credits): ### NB: text is an array of lyrics
+def generate_song_11labs(text, style, credits): ### NB: text is an array of lyrics
     
     credits = credits + 2
     if(credits > 6): credits = 6
@@ -96,13 +96,13 @@ def generate_song(text, credits): ### NB: text is an array of lyrics
     )
 
     composition_plan = {
-    'positive_global_styles': ['bel canto', 'early 19th-century Italian opera', 'classical aria', 'lyrical', 'woodwinds', 'strings', 'delicate orchestration'],
-    'negative_global_styles': ['electronic', 'heavy percussion', 'modern synth', 'rock'],
+    'positive_global_styles': style['positive_global_styles'],
+    'negative_global_styles': style['negative_global_styles'],
     'sections': [
         {
             "section_name": 'Aria', 
-            'positive_local_styles': ['long lyrical vocal lines', 'soprano', 'delicate woodwinds', 'string accompaniment'], 
-            'negative_local_styles': ['heavy brass', 'percussion', 'electronic sounds'], 
+            'positive_local_styles': style['positive_local_styles'], 
+            'negative_local_styles': style['negative_local_styles'], 
             'duration_ms': 10000 * credits, 
             'lines':  text 
         }

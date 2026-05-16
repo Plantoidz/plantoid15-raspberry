@@ -39,10 +39,19 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     # print response on the LP printer
     behaviors.print_response(plantoid, network, tID, response)
     
-    # create a song
-    style = "bel canto, early 19th-century Italian opera, classical aria, lyrical female soprano, long lyrical vocal lines, delicate woodwinds, no music, only voice. No electronic beats, no heavy percussion, no modern synth, no rock, no heavy brass."
-    # audiofile = behaviors.generate_song(lines, credits)
-    audiofile = behaviors.generate_song_suno(lines, style, credits)
+    # create a song with 11Labs
+    style = {
+        'positive_global_styles': ['bel canto', 'early 19th-century Italian opera', 'classical aria', 'lyrical', 'woodwinds', 'strings', 'delicate orchestration'],
+        'negative_global_styles': ['electronic', 'heavy percussion', 'modern synth', 'rock'],
+        'positive_local_styles': ['long lyrical vocal lines', 'soprano', 'delicate woodwinds', 'string accompaniment'], 
+        'negative_local_styles': ['heavy brass', 'percussion', 'electronic sounds'],       
+    }
+    audiofile = behaviors.generate_song_11labs(lines, style, credits)
+
+
+    # create a song with SUNO
+    # style = "bel canto, early 19th-century Italian opera, classical aria, lyrical female soprano, long lyrical vocal lines, delicate woodwinds, no music, only voice. No electronic beats, no heavy percussion, no modern synth, no rock, no heavy brass."
+    # audiofile = behaviors.generate_song_suno(lines, style, credits)
 
 
     plantoid.send_serial_message("awake")

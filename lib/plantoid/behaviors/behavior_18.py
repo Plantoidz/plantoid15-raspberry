@@ -38,11 +38,23 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
 
     # print response on the LP printer
     behaviors.print_response(plantoid, network, tID, response)
+
     
-    # create a song
-    style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth"
-    # audiofile = behaviors.generate_song(lines, credits)
-    audiofile = behaviors.generate_song_suno(lines, style, credits)
+    # create a song with 11LABS
+    style = {
+        'positive_global_styles': ['French chanson', 'vintage 1960s', 'deep contralto female vocal', 'smoky and grounded', 'warm analog recording', 'sparse acoustic arrangement', 'upright bass', 'brushed drums', 'tape warmth']
+        'negative_global_styles': ['electronic', 'heavy percussion', 'modern synth', 'rock'],
+        'positive_local_styles': ['intimate', 'melancholic'],
+        'negative_local_styles': ['heavy brass', 'percussion', 'electronic sounds'],       
+    }
+    audiofile = behaviors.generate_song_11labs(lines, style, credits)
+
+
+
+
+    # create a song with SUNO
+    # style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth"
+    # audiofile = behaviors.generate_song_suno(lines, style, credits)
 
 
     plantoid.send_serial_message("awake")
