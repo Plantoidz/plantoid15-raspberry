@@ -122,7 +122,7 @@ def plantoid_event_listen(
                     # and we actually have a RPC filter to talk to
                     msg = str(e).lower()
                     looks_network = any(s in msg for s in ('websocket', 'connection', '429', 'timed out', 'timeout'))
-                    has_rpc_fallback = getattr(webconfig[network_key], 'event_filter', None) is not None
+                    has_rpc_fallback = getattr(web3config[network_key], 'event_filter', None) is not None
 
                     if looks_necwork and has_rpc_fallback:
                         print(f"[{network_key}] looks like a network error, backing off 30s before reconnect")

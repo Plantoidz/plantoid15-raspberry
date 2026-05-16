@@ -9,33 +9,42 @@ def get_plantoid_function(plantoid_number, fn_name):
 
     print("PLANTOID NUMBER == ", plantoid_number)
     
-    if plantoid_number == 17:
+    if plantoid_number == 18:
+        fn_dict {
+            'create_seed_metadata': behavior_18.create_seed_metadata,
+            'ingurgitate_crypto': behavior_18.ingurgitate_crypto
+        }
+    
+    elif plantoid_number == 17:
 
         fn_dict = {
                 'create_seed_metadata': behavior_17.create_seed_metadata,
                 'ingurgitate_crypto': behavior_17.ingurgitate_crypto
         }
 
-    if plantoid_number == 16:
+    elif plantoid_number == 16:
 
         fn_dict = {
             'create_seed_metadata': behavior_16.create_seed_metadata,
             'ingurgitate_crypto': behavior_16.ingurgitate_crypto
         }
 
-    if plantoid_number == 15:
+    elif plantoid_number == 15:
 
         fn_dict = {
             'create_seed_metadata': behavior_15.create_seed_metadata,
             'ingurgitate_crypto': behavior_15.ingurgitate_crypto
         }
 
-    if plantoid_number == 14:
+    elif plantoid_number == 14:
         fn_dict = {
             'create_seed_metadata': behavior_14.create_seed_metadata,
             'ingurgitate_crypto': behavior_14.ingurgitate_crypto
         }
 
-    selected_function = fn_dict[fn_name]
+    else:
+        raise ValueError(f"No behavior dict defined for plantoid {plantoid_number}")
 
-    return selected_function
+    
+    return fn_dict[fn_name]
+
