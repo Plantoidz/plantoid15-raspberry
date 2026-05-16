@@ -9,6 +9,17 @@ from plantoids.plantoid import Plantony
 from utils.util import load_config, get_working_path, str_to_bool
 from dotenv import load_dotenv
 import regex_spm
+import requests
+import websockets.exceptions
+
+NETWORK_EXCEPTIONS = (
+    ConnectionError,
+    TimeoutError,
+    OSError, # also cover socket-level errors
+    requests.exceptions.RequestException,
+    websockets.exceptions.WebSocketException,
+    ValueError, #web3 manage raises this on RPC erros like {'code' : -32000}
+)
 
 
 def invoke_plantony(plantony: Plantony, network, max_rounds=4):
@@ -104,15 +115,15 @@ def plantoid_event_listen(
 
             def _check_safely(network_key, setup_fn):
 
-                if not web3config.get(f"use_{network_key}"):
-                    return
-
+                if not web3config.get(f"use_{network_key}"): return
                 print(f'checking if fed on {network_key}...')
 
                 try:
                     plantony.check_if_fed(web3config[network_key])
 
-                except Exception as e:
+                except NETWORK_EXCEPTIONS as e:
+                    # genunine network/RPC issues - maybe reconnect
+
                     # indexer is the primary path, error here means transient RPC issues
                     import traceback
                     print(f"******* check_if_fed ({network_key}) failed: {type(e).__name__}: {e}")
@@ -120,18 +131,24 @@ def plantoid_event_listen(
 
                     # only attempt RPC reconnect if it's clearly a websocket/connection issue
                     # and we actually have a RPC filter to talk to
-                    msg = str(e).lower()
-                    looks_network = any(s in msg for s in ('websocket', 'connection', '429', 'timed out', 'timeout'))
-                    has_rpc_fallback = getattr(web3config[network_key], 'event_filter', None) is not None
+                    # msg = str(e).lower()
+                    # looks_network = any(s in msg for s in ('websocket', 'connection', '429', 'timed out', 'timeout'))
+                    has_rpc_fallback = getattr(webconfig[network_key], 'event_filter', None) is not None
 
-                    if looks_necwork and has_rpc_fallback:
-                        print(f"[{network_key}] looks like a network error, backing off 30s before reconnect")
+                    if has_rpc_fallback:
+                        print(f"[{network_key}] backing off 30s before reconnect")
                         time.sleep(30)
                         try:
                             web3config[network_key] = setup_fn(web3_config)
                         except Exception as e2:
                             print(f"[{network_key}] recconect failed: {e2}")
                             sys.exit(0) # kill the process, so that it restarts via systemctl
+                
+                except Exception as e:
+                    # logic bug - log loudly and don't recconect in this case !
+                    import traceback
+                    print(f"[{network_key}] !!!! LOGIC ERROR in check_if_fed (not a network issue): {type(e).__name__}: {e}")
+                    traceback.print_exc()
             
             _check_safely("goerli", web3_setup_loop_goerli)
             _check_safely("mainnet", web3_setup_loop_mainnet)
@@ -288,7 +305,7 @@ def main():
                 io = None
                 use_serial = False
         except Exception as e:
-            print(f"WARNING: serial setup failed ({type(e).__name__}: {e}) - disabling serial for this run only")
+            print(f"WARNING: serial setup failed ({type(e).__name__}: {e})) - disabling serial for this run only")
             io = None
             use_serial = False
 
@@ -329,7 +346,7 @@ def main():
     # invoke_plantony(plantony, goerli)
 
     # add listener
-    # plantony.add_listener('Touched', invoke_plantony)
+    plantony.add_listener('Touched', invoke_plantony)
     
     # FIX FIX FIX
     # plantony.trigger('Touched', plantony, web3_config["goerli"], max_rounds=max_rounds)  ## @@ FAKING A TRIGGER

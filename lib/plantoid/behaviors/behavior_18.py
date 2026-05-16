@@ -17,7 +17,7 @@ PINATA_JWT = os.environ.get('PINATA_JWT')
 
 def ingurgitate_crypto(plantoid, network, tID, amount):
 
-    question = "What is the song that you're weaving into being through your life?"
+    question = "What is your deepest belief that you cherrish in your heart?"
     user_speech = behaviors.ask_transcript(plantoid, network, tID, question)
 
 

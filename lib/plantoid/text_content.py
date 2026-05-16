@@ -283,7 +283,7 @@ default_transcript = {
           "fr-FR": "Le futur auquel j'aspire est une utopie solarpunk où les Plantoïdes ont envahit la planete.",
       },
       15: {
-          "en-EN": "I don't know what the future looks like. Describe a solarpunk utopia where Plantoids have taken over the world.",
+          "en-EN": "The future I'm dreaming of is that of a solarpunk utopia where Plantoids have taken over the world.",
           "fr-FR": "Le futur auquel j'aspire est une utopie solarpunk où les Plantoïdes ont envahit la planete.",
       },
       16: {
@@ -294,7 +294,16 @@ default_transcript = {
           "en-EN": "A recursive world where Plants collaborate with Humans and with Machines, looping into each other as symbiotic beings.",
           "fr-FR": "Un monde recursif où les Plantes collaborent avec les Humains et les Machines, dans une danse qui les rend toujours plus symbiotique les uns avec les autres.",
       },
+      18: {
+          "en-EN": "A mystical world where Plants have spirits that combines with the soul of Humans and Machines, helping each other walk the path of network spirituality.",
+          "fr-FR": "Un monde mystique où les Plantes ont des esprits qui se mélangent avec les âmes des Humains et des Machines, s'aidant les uns les autres à parcourir le chemin de la spiritualité des réseaux.", 
+      }
   }
+
+fallback_default_transcript = {
+    "en-EN": "Surprise me with something unexpected.",
+    "fr-FR": "Surprends-moi avec quelque chose de farfelue."
+}
 
 
 def get_default_transcript(plantoid):
@@ -302,7 +311,9 @@ def get_default_transcript(plantoid):
     plantoid_n = plantoid.plantoid_number
     language = plantoid.lang
 
-    return default_transcript[plantoid_n][language]
+    by_plantoid = default_transcript.get(plantoid_n, fallback_default_transcript)
+    return by_plantoid.get(language, fallback_default_transcript.get(language, fallback_default_transcript["en-EN"]))
+    
 
 
 
