@@ -10,7 +10,7 @@ def get_plantoid_function(plantoid_number, fn_name):
     print("PLANTOID NUMBER == ", plantoid_number)
     
     if plantoid_number == 18:
-        fn_dict {
+        fn_dict = {
             'create_seed_metadata': behavior_18.create_seed_metadata,
             'ingurgitate_crypto': behavior_18.ingurgitate_crypto
         }
