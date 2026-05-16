@@ -123,7 +123,7 @@ def generate_song(text, credits): ### NB: text is an array of lyrics
     return audio_file_path
     
 
-def generate_song_suno(text, credits): ### NB: text is an array of lyrics
+def generate_song_suno(text, style, credits): ### NB: text is an array of lyrics
 
     print("generating a SONG with SUNO, credits = ", credits)
 
@@ -135,12 +135,7 @@ def generate_song_suno(text, credits): ### NB: text is an array of lyrics
 
     r = requests.post(base, headers=headers, json={
         "lyrics": lyrics,
-        "style": (
-            "bel canto, early 19th-century Italian opera, classical aria, "
-            "lyrical female soprano, long lyrical vocal lines, delicate woodwinds, "
-            "no music, only voice. No electronic beats, no heavy percussion, "
-            "no modern synth, no rock, no heavy brass."
-        ),
+        "style": style, 
         "title": "Opera",
     })
     r.raise_for_status()

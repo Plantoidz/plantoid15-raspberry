@@ -40,8 +40,9 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     behaviors.print_response(plantoid, network, tID, response)
     
     # create a song
+    style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth"
     # audiofile = behaviors.generate_song(lines, credits)
-    audiofile = behaviors.generate_song_suno(lines, credits)
+    audiofile = behaviors.generate_song_suno(lines, style, credits)
 
 
     plantoid.send_serial_message("awake")
@@ -59,7 +60,7 @@ def create_seed_metadata(plantoid, network, tID):
 
     db = dict()
     db['name'] = tID
-    db['description'] = "Plantoid #16 - Seed #" + tID
+    db['description'] = "Plantoid #18 - Seed #" + tID
     db['external_url'] = "http://plantoid.org"
     db['image'] = "https://ipfs.io/ipfs/bafybeig3v2fag3tdlszyfgidpcgf24atvrkpwase3wekeu45jev4aourym"
 
@@ -67,7 +68,7 @@ def create_seed_metadata(plantoid, network, tID):
 
     behaviors.generic_metadata(plantoid, network, tID, db, None,
         behaviors.glitchbox_build_video_scheduler(
-            lora="21",
+            lora="anglels-xl,pixel-xl",
             fps=10,
             strength=0.7,
             cn_scale=0.55,

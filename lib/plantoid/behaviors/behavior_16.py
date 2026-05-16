@@ -40,8 +40,9 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     behaviors.print_response(plantoid, network, tID, response)
     
     # create a song
+    style = "bel canto, early 19th-century Italian opera, classical aria, lyrical female soprano, long lyrical vocal lines, delicate woodwinds, no music, only voice. No electronic beats, no heavy percussion, no modern synth, no rock, no heavy brass."
     # audiofile = behaviors.generate_song(lines, credits)
-    audiofile = behaviors.generate_song_suno(lines, credits)
+    audiofile = behaviors.generate_song_suno(lines, style, credits)
 
 
     plantoid.send_serial_message("awake")
