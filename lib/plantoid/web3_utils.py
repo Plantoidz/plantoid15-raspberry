@@ -175,7 +175,7 @@ def setup(
         network.event_filter = network.plantoid_contract.events.Deposit.create_filter(fromBlock=start_block)
         print('event filter:', network.event_filter)
     except Exception as e:
-        print(f"create_filter failed: {e}")
+        print(f"create_filter failed: {e!r}")
 
     # INDEXER 
     network.indexer = None
