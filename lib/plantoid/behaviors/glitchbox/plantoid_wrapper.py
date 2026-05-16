@@ -569,7 +569,7 @@ def plantoid_video_scheduler(
         if seed is not None:
             data.append(("seed", str(seed)))
         if video_set is not None:
-            data.appent(("video_set", video_set))
+            data.append(("video_set", video_set))
 
         url = f"{server.rstrip('/')}/api/installations/plantoid16"
         print(f"[plantoid16] POST {url}")
