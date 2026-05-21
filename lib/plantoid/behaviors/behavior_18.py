@@ -52,7 +52,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
 
 
 
-    create a song with SUNO
+    # create a song with SUNO
     style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth"
     audiofile = behaviors.generate_song_suno(lines, style, credits)
 
