@@ -3,7 +3,7 @@ from lib.plantoid.behaviors import behavior_library as behaviors
 
 def ingurgitate_crypto(plantoid, network, tID, amount):
 
-    question = "How do you envision the relationship between humans, nature, and machines?"
+    question = "If your spirit had a mission to manifest in this world, what would it be?"
 
     behaviors.poem_generation(plantoid, network, tID, amount, question)
 

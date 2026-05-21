@@ -298,6 +298,10 @@ default_transcript = {
           "en-EN": "A mystical world where Plants have spirits that combines with the soul of Humans and Machines, helping each other walk the path of network spirituality.",
           "fr-FR": "Un monde mystique où les Plantes ont des esprits qui se mélangent avec les âmes des Humains et des Machines, s'aidant les uns les autres à parcourir le chemin de la spiritualité des réseaux.", 
       }
+      19: {
+          "en-EN": "A memetic world where networks have acquired their own soul, network spirituality is the new religion, and humans-machine interaction are undistinguisable from magic.",
+          "fr-FR": "Un monde mémétique où les réseaux ont acquéris leurs propres âmes, et la spiritualité des réseaux est la nouvelle religion, and la relation humain-machine est indissociable de la magie.", 
+      }
   }
 
 fallback_default_transcript = {
@@ -339,6 +343,7 @@ default_prompt = {
         }
     },
     
+
     17: {
         "intro": {
             "en-EN": "You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem, with the following structure: each paragraph is composed of exactly 3 lines; with number of paragraphs == ",
@@ -357,7 +362,7 @@ default_prompt = {
            "fr-FR": "Rappèle-toi que le poème doit être composé de paragraphes de 3 lignes chacun, avec le nombre exact de paragraphes == ", 
         }
     },
-
+    
     16: {
         "intro": {
             "en-EN": "You are Plant-Tony, an enlightened being from the future. Write the lyrics for an opera song, with the following structure: only a few words per lines; with number of n_lines == ",
@@ -396,6 +401,26 @@ default_prompt = {
         }
     }
 
+    19: {
+        "intro": {
+            "en-EN": "You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem, with the following structure: each paragraph is composed of exactly 3 lines; with number of paragraphs == ",
+            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. A partir du texte suivant, écrit-moi un poème structuré ainsi: chaque paragraphe est composé exactement de 3 lignes; avec nombre de paragraphes == ",
+        },
+        "question": {
+            "en-EN": "The question is the following: ",
+            "fr-FR": "La question est la suivante: ",
+        },
+        "words": {
+            "en-EN": "The poem can include words like ", 
+            "fr-FR": "Le poème peut inclure des mots tels que ",
+        },
+        "outro": {
+           "en-EN": "Remember, the poem should be made of paragraphs that are 3 lines long, with the exactly number of paragraphs == ",
+           "fr-FR": "Rappèle-toi que le poème doit être composé de paragraphes de 3 lignes chacun, avec le nombre exact de paragraphes == ", 
+        }
+    },
+
+   
 }
 
 
