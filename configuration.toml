@@ -24,13 +24,13 @@ PATTERN = "<Touched>"
 PERSONALITY="./prompt_context/plantony_context-p19-network_spirituality.txt"
 LLM_MODEL="qwen/qwen3.5-35b-a3b"
 
-[18.mainnet]
+[19.mainnet]
 ACTIVE = "True"
 FAILSAFE = 0
 BLOCKCHAIN_ADDRESS = "0x93f74b7edba30e42b3b005989a95a3e0210502bf"
 METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
-[18.goerli]
+[19.goerli]
 ACTIVE = "True"
 FAILSAFE = 0
 BLOCKCHAIN_ADDRESS = "0xcc657dff69806d1f4483531622c3185fdd069ef0" ### This is the sepolia address
