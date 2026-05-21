@@ -1,5 +1,5 @@
 [general]
-PLANTOID=18
+PLANTOID=19
 
 MAINNET_START_BLOCK = 22000000
 TESTNET_START_BLOCK = 10741539
@@ -15,13 +15,13 @@ threshold_bias=0
 
 
 [18]
-VOICE_ID="logina"
+VOICE_ID="trevor"
 max_rounds=4
 USE_GPIO = {led = 10, touch = 26}
 USE_SERIAL = "False"
 LANG="en-EN"
 PATTERN = "<Touched>"
-PERSONALITY="./prompt_context/plantony_context-18.txt"
+PERSONALITY="./prompt_context/plantony_context-p19-network_spirituality.txt"
 LLM_MODEL="qwen/qwen3.5-35b-a3b"
 
 [18.mainnet]
