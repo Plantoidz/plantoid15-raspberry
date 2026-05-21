@@ -14,8 +14,32 @@ device_bias=-100
 threshold_bias=0
 
 
-[18]
+[19]
 VOICE_ID="trevor"
+max_rounds=4
+USE_GPIO = {led = 10, touch = 26}
+USE_SERIAL = "False"
+LANG="en-EN"
+PATTERN = "<Touched>"
+PERSONALITY="./prompt_context/plantony_context-p19-network_spirituality.txt"
+LLM_MODEL="qwen/qwen3.5-35b-a3b"
+
+[18.mainnet]
+ACTIVE = "True"
+FAILSAFE = 0
+BLOCKCHAIN_ADDRESS = "0x93f74b7edba30e42b3b005989a95a3e0210502bf"
+METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
+
+[18.goerli]
+ACTIVE = "True"
+FAILSAFE = 0
+BLOCKCHAIN_ADDRESS = "0xcc657dff69806d1f4483531622c3185fdd069ef0" ### This is the sepolia address
+METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
+
+
+
+[18]
+VOICE_ID="logina"
 max_rounds=4
 USE_GPIO = {led = 10, touch = 26}
 USE_SERIAL = "False"
