@@ -49,7 +49,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     # audiofile = behaviors.generate_song_11labs(lines, style, credits)
 
 
-    create a song with SUNO
+    #create a song with SUNO
     style = "bel canto, early 19th-century Italian opera, classical aria, lyrical female soprano, long lyrical vocal lines, delicate woodwinds, no music, only voice. No electronic beats, no heavy percussion, no modern synth, no rock, no heavy brass."
     audiofile = behaviors.generate_song_suno(lines, style, credits)
 
