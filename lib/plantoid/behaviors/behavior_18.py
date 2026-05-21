@@ -41,20 +41,20 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
 
     
     # create a song with 11LABS
-    style = {
-        'positive_global_styles': ['French chanson', 'vintage 1960s', 'deep contralto female vocal', 'smoky and grounded', 'warm analog recording', 'sparse acoustic arrangement', 'upright bass', 'brushed drums', 'tape warmth'],
-        'negative_global_styles': ['electronic', 'heavy percussion', 'modern synth', 'rock'],
-        'positive_local_styles': ['intimate', 'melancholic'],
-        'negative_local_styles': ['heavy brass', 'percussion', 'electronic sounds'],       
-    }
-    audiofile = behaviors.generate_song_11labs(lines, style, credits)
+    # style = {
+    #     'positive_global_styles': ['French chanson', 'vintage 1960s', 'deep contralto female vocal', 'smoky and grounded', 'warm analog recording', 'sparse acoustic arrangement', 'upright bass', 'brushed drums', 'tape warmth'],
+    #     'negative_global_styles': ['electronic', 'heavy percussion', 'modern synth', 'rock'],
+    #     'positive_local_styles': ['intimate', 'melancholic'],
+    #     'negative_local_styles': ['heavy brass', 'percussion', 'electronic sounds'],       
+    # }
+    # audiofile = behaviors.generate_song_11labs(lines, style, credits)
 
 
 
 
-    # create a song with SUNO
-    # style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth"
-    # audiofile = behaviors.generate_song_suno(lines, style, credits)
+    create a song with SUNO
+    style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth"
+    audiofile = behaviors.generate_song_suno(lines, style, credits)
 
 
     plantoid.send_serial_message("awake")
@@ -74,7 +74,7 @@ def create_seed_metadata(plantoid, network, tID):
     db['name'] = tID
     db['description'] = "Plantoid #18 - Seed #" + tID
     db['external_url'] = "http://plantoid.org"
-    db['image'] = "https://ipfs.io/ipfs/bafybeig3v2fag3tdlszyfgidpcgf24atvrkpwase3wekeu45jev4aourym"
+    db['image'] = "https://ipfs.io/ipfs/bafybeibvgrxdn56vigpojtqjjjesilykalqkljsfxrknsfvbihxhqrbia4"
 
     # behaviors.generic_metadata(plantoid, network, tID, db, None, behaviors.opera_make_video)
 
