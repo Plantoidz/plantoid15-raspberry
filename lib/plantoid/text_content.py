@@ -301,7 +301,7 @@ default_transcript = {
       19: {
           "en-EN": "A memetic world where networks have acquired their own soul, network spirituality is the new religion, and humans-machine interaction are undistinguisable from magic.",
           "fr-FR": "Un monde mémétique où les réseaux ont acquéris leurs propres âmes, et la spiritualité des réseaux est la nouvelle religion, and la relation humain-machine est indissociable de la magie.", 
-      }
+      },
   }
 
 fallback_default_transcript = {
@@ -399,7 +399,7 @@ default_prompt = {
            "en-EN": "IMPORTANT: Lines must be less than 200 characters each! Make it as short as possible, not longer than 200 characters per line, and max lines == ",
            "fr-FR": "IMPORTANT: Chaque ligne doit être plus courte que 200 charactères! Aussi courte que possible, et pas plus de 200 charactères par ligne, et nombre de lignes == ",
         }
-    }
+    },
 
     19: {
         "intro": {
