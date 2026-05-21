@@ -297,7 +297,7 @@ default_transcript = {
       18: {
           "en-EN": "A mystical world where Plants have spirits that combines with the soul of Humans and Machines, helping each other walk the path of network spirituality.",
           "fr-FR": "Un monde mystique où les Plantes ont des esprits qui se mélangent avec les âmes des Humains et des Machines, s'aidant les uns les autres à parcourir le chemin de la spiritualité des réseaux.", 
-      }
+      },
       19: {
           "en-EN": "A memetic world where networks have acquired their own soul, network spirituality is the new religion, and humans-machine interaction are undistinguisable from magic.",
           "fr-FR": "Un monde mémétique où les réseaux ont acquéris leurs propres âmes, et la spiritualité des réseaux est la nouvelle religion, and la relation humain-machine est indissociable de la magie.", 
