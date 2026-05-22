@@ -32,7 +32,7 @@ def create_seed_metadata(plantoid, network, tID):
             target_frames=150,
             trigger="Vintage collage art featuring",
             strength=0.85,
-            cn_scale=0.45,
+            cn_scale=0.35,
             controlnet=True,
             mode="img2img",
         ),
