@@ -1,11 +1,14 @@
 from lib.plantoid.behaviors import behavior_library as behaviors
-
+from lib.plantoid.text_content import default_intro_question
 
 def ingurgitate_crypto(plantoid, network, tID, amount):
 
-    question = "If your spirit had a mission to manifest in this world, what would it be?"
+    #question = "If your spirit had a mission to manifest in this world, what would it be?"
+    question = default_intro_question[plantoid.plantoid_number][plantoid.lang]
 
-    behaviors.poem_generation(plantoid, network, tID, amount, question)
+    user_speech = behaviors.ask_transcript(plantoid, network, tID, question)
+
+    behaviors.poem_generation(plantoid, network, tID, amount, user_speech)
 
 
 def create_seed_metadata(plantoid, network, tID):

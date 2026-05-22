@@ -42,6 +42,7 @@ def get_text_content(lang):
 
 
 
+
     word_categories = {
         "en-EN": [
         {
@@ -320,7 +321,21 @@ def get_default_transcript(plantoid):
     
 
 
+default_intro_question = {
+    14: {
+        "en-EN": "Since you have just fed me, I will now translate your dreams into an artwork. What is the future you are dreaming of?"
+    },
+    19: {
+        "en-EN": "Since you have just fed me, I will now incarnate your spirit into an artwork. If your spirit had a mission to manifest in this world, what would it be?"
+    },
+}
 
+nft_ready_lines = {
+        "en-EN":
+        [
+            "I'm sorry, I have to go now. But you can collect my digital seed as a NFT incorporating the artwork we have just co-created. Scan the QR code to discover it..."
+        ]
+}
 
 default_prompt = {
 
@@ -424,17 +439,18 @@ default_prompt = {
 }
 
 
-default_video_prompt = {
 
-    14: {
-        "pre": "Drawing by M. C. Escher with a strong solar-punk flavor representing: ",
-        "post":  "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
-        },
-    17: {
-        "pre":  "Ethereal figure dissolving into smoke particles representing: ",
-        "post": "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
-    },
-}
+# default_video_prompt = {
+
+#     14: {
+#         "pre": "Drawing by M. C. Escher with a strong solar-punk flavor representing: ",
+#         "post":  "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
+#         },
+#     17: {
+#         "pre":  "Ethereal figure dissolving into smoke particles representing: ",
+#         "post": "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
+#     },
+# }
 
 
 
@@ -556,25 +572,25 @@ def get_video_prompt(sermon, n_prompt):
     #     outfile.write(descri1)
     #     outfile.write(descri)
 
-def process_video_prompts(plantoid, descri):
+# def process_video_prompts(plantoid, descri):
 
-    lines = re.split("\d.", descri)
+#     lines = re.split("\d.", descri)
 
-    prompts = []
+#     prompts = []
 
-    for ln in lines:
-        line = ln.strip()
-        line = line.replace("\n", "")
-        print("["+line+"]")
+#     for ln in lines:
+#         line = ln.strip()
+#         line = line.replace("\n", "")
+#         print("["+line+"]")
 
-        if (line):
+#         if (line):
 
-            line = default_video_prompt[plantoid.plantoid_number]["pre"] + line + default_video_prompt[plantoid.plantoid_number]["post"] 
-            # line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line + ". Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration"
-            # line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line
-            # line = line + " Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined."
-            prompts.append(line)
+#             line = default_video_prompt[plantoid.plantoid_number]["pre"] + line + default_video_prompt[plantoid.plantoid_number]["post"] 
+#             # line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line + ". Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration"
+#             # line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line
+#             # line = line + " Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined."
+#             prompts.append(line)
 
-    print("PROMPTS: ----> ", prompts)
+#     print("PROMPTS: ----> ", prompts)
 
-    return prompts
+#     return prompts

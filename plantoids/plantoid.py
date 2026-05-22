@@ -14,6 +14,8 @@ import lib.plantoid.speech as PlantoidSpeech
 import lib.plantoid.serial_utils as PlantoidSerial
 import lib.plantoid.web3_utils as web3_utils
 
+from lib.plantoid.text_content import nft_ready_lines
+
 class Plantony:
 
     def __init__(self, io, llm_model, voice_id, plantoid_number, path, lang, personality, pattern):
@@ -53,6 +55,8 @@ class Plantony:
         self.opening = ""
         self.closing = ""
         self.prompt_text = ""
+
+        self.prompt_seed = ""
 
         # LLM model to use
         self.llm_model = llm_model
@@ -189,7 +193,7 @@ class Plantony:
     def say(self):
 
         self.send_serial_message("speaking")
-        PlantoidSpee.stream_response(self, "stream_response", self.voice_id)
+        PlantoidSpeech.stream_response(self, "stream_response", self.voice_id)
         self.send_serial_message("awake")
 
 
@@ -204,6 +208,31 @@ class Plantony:
         safe_playsound(self.outroduction)
 
         self.send_serial_message("asleep") ## REMOVE
+
+
+
+    # def introduce_and_ask(self, question):
+
+    #     self.send_serial_message("speaking")
+    #     safe_playsound(self.introduction)
+    #     PlantoidSpeech.stream_response(self, question, self.voice_id)
+ 
+    #     user_answer = self.listen()
+    #     self.seed_prompt = user_answer
+
+    #     # seed the first conversational round with the user's answer
+    #     # self.create_round()
+    #     # self.append_turn_to_round(self.USER, user_answer)
+    #     return user_answer
+
+
+    def terminate_ready(self):
+       self.send_serial_message("speaking") 
+       ready_lines = nft_ready_line[self.plantoid_number][self.lang]
+       PlantoidSpeech.stream_response(self, random.choice(ready_lines), self.voice_id)
+       #self.send_serial_message("asleep")
+
+
 
 
     def listen(self):
@@ -243,9 +272,10 @@ class Plantony:
         background_music_path = self.path+"/media/ambient3.mp3" 
         self.play_background_music(background_music_path)
 
-        if len(user_message) == "":
-                print('no text heard, using default text')
-                user_message = "Tell me more..."
+        # if len(user_message) == "":
+        #         print('no text heard, using default text')
+        #         user_message = "Tell me more..."
+                
 
         # append the user's turn to the latest round
         self.append_turn_to_round(self.USER, user_message) 
@@ -591,13 +621,44 @@ class Plantony:
             self.ingurgitate_crypto(network, token_Id, amount)
             print("ingugitated.")
 
+
+            # kick off the slow artwork generation in a background thread
+            gen_done = threading.Event()
+            gen_err = []
+
+            def _gen():
+                try:
+                    self.create_seed_metadata(network, token_Id)
+                except Exception as e:
+                    gen_err.append(e)
+                finally:
+                    gen_done.set()
+            
+            threading.Thread(target=_gen, daemon=True).start()
+
+            # converse until the artwork is done - never interrupt a round mid-listen/speech
+            self.weaving("Now let's have a little chat while I generate the artwork.. Tell me something about you.")
+            while not gen_done.is_set():
+                self.create_round()
+                self.respond(self.listen())
+
+            if gen_err:
+                raise gen_err[0]
+
             # create the seed metadata
-            self.create_seed_metadata(network, token_Id)
+            # self.create_seed_metadata(network, token_Id)
+
+            # closing
+            self.terminate_ready()
+            
+            self.reset_rounds()
+            self.reset_prompt()
+
 
             # pin the metadata to IPFS and enable reveal link via metatransaction
             web3_utils.enable_seed_reveal(network, token_Id)
 
-            # self.send_serial_message("asleep")
+            self.send_serial_message("asleep")
             
             return 1
 

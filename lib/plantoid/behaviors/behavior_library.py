@@ -631,6 +631,10 @@ def get_media_duration(file_path):
 
 def ask_transcript(plantoid, network, tID, question):
 
+    # plantoid introduces itsef
+    self.send_serial_message("speaking")
+    safe_playsound(plantoid.introduction)
+
     # ask an initial question
     plantoid.weaving(question)
 
@@ -644,7 +648,7 @@ def ask_transcript(plantoid, network, tID, question):
 
 
 
-def poem_generation(plantoid, network, tID, amount, question):
+def poem_generation(plantoid, network, tID, amount, user_speech):
 
 
     # ask an initial question
@@ -656,7 +660,7 @@ def poem_generation(plantoid, network, tID, amount, question):
     #print("I heard ..", user_speech)
     #archive("text", "transcript", user_speech, tID, network)
 
-    user_speech = ask_transcript(plantoid, network, tID, question)
+    # user_speech = ask_transcript(plantoid, network, tID, question)
     
 
 
@@ -769,52 +773,52 @@ def poem_make_SDXLprompts(plantoid, sermon, audio_file):
     return prompts
 
 
-def poem_make_prompts(plantoid, sermon, audio_file):
+# def poem_make_prompts(plantoid, sermon, audio_file):
 
-    from mutagen.mp3 import MP3
+#     from mutagen.mp3 import MP3
     
-    # generate prompt from the response text 
-    duration = MP3(audio_file).info.length
-    fps = 20
-    n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
+#     # generate prompt from the response text 
+#     duration = MP3(audio_file).info.length
+#     fps = 20
+#     n_prompt = max(2, int(duration / 3)) # 3 seconds per prompt
 
-    prompt = get_video_prompt(sermon, n_prompt)
-    response = PlantoidSpeech.GPTmagic(prompt, trim=False)
-    prompts = process_video_prompts(plantoid, response)
-    return prompts
+#     prompt = get_video_prompt(sermon, n_prompt)
+#     response = PlantoidSpeech.GPTmagic(prompt, trim=False)
+#     prompts = process_video_prompts(plantoid, response)
+#     return prompts
 
 
 
-def poem_make_video(path, sermon, audio_file, prompts):
+# def poem_make_video(path, sermon, audio_file, prompts):
     
-    from mutagen.mp3 import MP3
-    duration = MP3(audio_file).info.length
+#     from mutagen.mp3 import MP3
+#     duration = MP3(audio_file).info.length
 
-    print("Generative NEW video with Glitchbox for --> POEM")
+#     print("Generative NEW video with Glitchbox for --> POEM")
 
-    init_img = path + "./init_img.jpg"
-    init_strength = 0.75
-    fps = 20
-    loras = 28 # NO LORA
-    return glitchbox_video_journey(prompts, duration, fps, init_img, init_strength, loras)
+#     init_img = path + "./init_img.jpg"
+#     init_strength = 0.75
+#     fps = 20
+#     loras = 28 # NO LORA
+#     return glitchbox_video_journey(prompts, duration, fps, init_img, init_strength, loras)
 
 
-def opera_make_video(path, sermon, audio_file, prompts):
+# def opera_make_video(path, sermon, audio_file, prompts):
 
-    from mutagen.mp3 import MP3
-    duration = MP3(audio_file).info.length
+#     from mutagen.mp3 import MP3
+#     duration = MP3(audio_file).info.length
 
-    print("Generative NEW video with Glitchbox for --> OPERA")
+#     print("Generative NEW video with Glitchbox for --> OPERA")
 
-    init_img = path + '/../lib/plantoid/behaviors/glitchbox/' + 'input2.jpg'
-    init_strength = 0.9
-    # fps = "15" # calculate it based on the length of the song, otherwise it might be too many
-    target_frames = 300
-    fps = str(max(1, min(15, int(target_frames / duration ))))
-    loras = "21" # twisted bodies & water
+#     init_img = path + '/../lib/plantoid/behaviors/glitchbox/' + 'input2.jpg'
+#     init_strength = 0.9
+#     # fps = "15" # calculate it based on the length of the song, otherwise it might be too many
+#     target_frames = 300
+#     fps = str(max(1, min(15, int(target_frames / duration ))))
+#     loras = "21" # twisted bodies & water
 
-    return glitchbox_video_scheduler(audio_file, duration, fps, init_img, init_strength, loras)
-    # os.system('python3.10 ' + glitchbox_path + f"grpc_prompt_journey.py --server {glitchbox_server} --scheduler --fps {fps} --init-image {init_img} --audio {audio_mp3} --duration {duration} --curation {loras} --output {movie_path}" )
+#     return glitchbox_video_scheduler(audio_file, duration, fps, init_img, init_strength, loras)
+#     # os.system('python3.10 ' + glitchbox_path + f"grpc_prompt_journey.py --server {glitchbox_server} --scheduler --fps {fps} --init-image {init_img} --audio {audio_mp3} --duration {duration} --curation {loras} --output {movie_path}" )
 
 
 # def poem_metadata(plantoid, network, tID, db, prompts):
