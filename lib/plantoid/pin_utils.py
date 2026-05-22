@@ -63,9 +63,13 @@ def print_thermal_txt(textual, timeout=10):
         try: 
             # p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
             # p = Usb(0x0416, 0x5011)
-            p = File("/dev/usb/lp0")
-            p._raw(textual.encode("ascii", "replace") +  + b"\n\n\n\n")
-            p.cut()
+            # p = File("/dev/usb/lp0")
+            # p._raw(textual.encode("ascii", "replace") +  + b"\n\n\n\n")
+            # p.cut()
+            with open("/dev/usb/lp0", "wb") as f:
+                f.write(textual.encode("ascii", "replace"))
+                f.write(b"\n\n\n\n")
+                f.write(b"\x1d\x56\x00")
         except Exception as e:
             result["err"] = e
         finally:
