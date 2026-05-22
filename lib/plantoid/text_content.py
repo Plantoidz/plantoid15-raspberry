@@ -323,17 +323,23 @@ def get_default_transcript(plantoid):
 
 default_intro_question = {
     14: {
-        "en-EN": "Since you have just fed me, I will now translate your dreams into an artwork. What is the future you are dreaming of?"
+        "en-EN": "Thanks for the crypto, I was getting hungry. As a token of appreciation, I will now translate your dreams into an artwork. What is the future you are dreaming of?"
     },
+    16: {
+        "en-EN": "Thank you so dearly, these cryptocurrencies fill me up with joy ! Now let me reciprocate with a song: what is the tune that you're weaving into being through your life?"
+    },
+    17: {
+        "en-EN": "Oh thanks, I was so hungry! Now that I have some energy, let me make an artwork for you. But tell me first, ow do you envision the relationship between humans, nature, and machines?"
+    }
     19: {
-        "en-EN": "Since you have just fed me, I will now incarnate your spirit into an artwork. If your spirit had a mission to manifest in this world, what would it be?"
+        "en-EN": "Thanks, these cryptocurrencies are tasty! Now, since you have just fed me, I will now incarnate your spirit into an artwork. If your spirit had a mission to manifest in this world, what would it be?"
     },
 }
 
 nft_ready_lines = {
         "en-EN":
         [
-            "Anyhow... I'm sorry, I have to go now. But you can collect my digital seed as a NFT incorporating the artwork we have just co-created. Scan the QR code to discover it..."
+            "Anyhow... I'm sorry, I have to go now. But you can collect my digital seed as a NFT. Scan the QR code to discover the artwork that we have just co-created."
         ]
 }
 

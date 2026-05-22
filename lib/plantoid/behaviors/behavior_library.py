@@ -706,7 +706,7 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
         movie_path = video_file
 
     elif os.path.isfile(audio_file):
-        plantoid.send_serial_message("thinking")
+        # plantoid.send_serial_message("thinking")
 
         # retrieve the generated text to include in the movie
         with open(path + "/responses/" + network.name + "/" + tID + "_response.txt", "r") as f:

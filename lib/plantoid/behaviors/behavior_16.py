@@ -17,7 +17,8 @@ PINATA_JWT = os.environ.get('PINATA_JWT')
 
 def ingurgitate_crypto(plantoid, network, tID, amount):
 
-    question = "What is the song that you're weaving into being through your life?"
+    #question = "What is the song that you're weaving into being through your life?"
+    question = default_intro_question[plantoid.plantoid_number][plantoid.lang]
     user_speech = behaviors.ask_transcript(plantoid, network, tID, question)
 
 
@@ -54,7 +55,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     audiofile = behaviors.generate_song_suno(lines, style, credits)
 
 
-    plantoid.send_serial_message("awake")
+    # plantoid.send_serial_message("awake")
     
     # save and play the song
     behaviors.save_and_play_audio(plantoid, network, tID, audiofile)

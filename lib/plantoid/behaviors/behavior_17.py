@@ -3,9 +3,10 @@ from lib.plantoid.behaviors import behavior_library as behaviors
 
 def ingurgitate_crypto(plantoid, network, tID, amount):
 
-    question = "How do you envision the relationship between humans, nature, and machines?"
-
-    behaviors.poem_generation(plantoid, network, tID, amount, question)
+    #question = "How do you envision the relationship between humans, nature, and machines?"
+    question = default_intro_question[plantoid.plantoid_number][plantoid.lang]
+    user_speech = behaviors.ask_transcript(plantoid, network, tID, question)
+    behaviors.poem_generation(plantoid, network, tID, amount, user_speech)
 
 
 def create_seed_metadata(plantoid, network, tID):
