@@ -631,8 +631,10 @@ def get_media_duration(file_path):
 
 def ask_transcript(plantoid, network, tID, question):
 
+    from plantoids.plantoid import safe_playsound
+    
     # plantoid introduces itsef
-    self.send_serial_message("speaking")
+    plantoid.send_serial_message("speaking")
     safe_playsound(plantoid.introduction)
 
     # ask an initial question
