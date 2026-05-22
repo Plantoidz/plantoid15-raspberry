@@ -62,8 +62,8 @@ def print_thermal_txt(textual, timeout=10):
 
         try: 
             # p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
-            p = Usb(0x0416, 0x5011)
-            #p = File("/dev/usb/lp0")
+            # p = Usb(0x0416, 0x5011)
+            p = File("/dev/usb/lp0")
             p.text(textual)
             p.cut()
         except Exception as e:
@@ -101,8 +101,8 @@ def print_thermal_img(image_file, timeout=10):
 
         try:
             # p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
-            p = Usb(0x0416, 0x5011)        
-
+            #p = Usb(0x0416, 0x5011)        
+            p = File("/dev/usb/lp0")
             img = Image.open(image_file)
             img = img.resize((400, 400))
 
