@@ -214,7 +214,7 @@ def save_and_play_audio(plantoid, network, tID, audiofile):
     time.sleep(1)
 
     print('audio play completed!')
-    plantoid.send_serial_message("awake")
+    # plantoid.send_serial_message("awake")
     
     
     
@@ -632,7 +632,7 @@ def get_media_duration(file_path):
 def ask_transcript(plantoid, network, tID, question):
 
     from plantoids.plantoid import safe_playsound
-    
+
     # plantoid introduces itsef
     plantoid.send_serial_message("speaking")
     safe_playsound(plantoid.introduction)

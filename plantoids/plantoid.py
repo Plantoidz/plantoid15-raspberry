@@ -639,7 +639,7 @@ class Plantony:
 
             # wait for the playback of the poem/song to be done in save_and_play_audio, 
             # before starting the conversation, while the artwork is being generated
-            while pygame.mixer.get_init() and pygame_mixer.music.get_busy():
+            while pygame.mixer.get_init() and pygame.mixer.music.get_busy():
                 time.sleep(1)
 
             # converse until the artwork is done - never interrupt a round mid-listen/speech
