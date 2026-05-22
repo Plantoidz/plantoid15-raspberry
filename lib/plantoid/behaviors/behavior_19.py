@@ -30,8 +30,8 @@ def create_seed_metadata(plantoid, network, tID):
             # **defaults
             lora="18", # melies
             target_frames=150,
-            trigger="Vintage collage art featuring",
-            strength=0.85,
+            trigger="Vintage collage art featuring an angel with ",
+            strength=0.65,
             cn_scale=0.35,
             controlnet=True,
             mode="img2img",
