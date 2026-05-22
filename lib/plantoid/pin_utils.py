@@ -6,6 +6,8 @@ from escpos.printer import Usb
 import qrcode
 from PIL import Image
 
+from escpos.printer import Usb, File
+
 import threading
 
 load_dotenv()
@@ -56,6 +58,7 @@ def print_thermal_txt(textual, timeout=10):
     result = {"err": None}
 
     def _work():
+        p = None
 
         try: 
             # p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
@@ -63,7 +66,6 @@ def print_thermal_txt(textual, timeout=10):
             p = File("/dev/usb/lp0")
             p.text(textual)
             p.cut()
-            p.close()
         except Exception as e:
             result["err"] = e
         finally:
@@ -95,6 +97,8 @@ def print_thermal_img(image_file, timeout=10):
 
     def _work():
 
+        p = None
+
         try:
             # p = Usb(0x0416, 0x5011, in_ep=0x81, out_ep=0x03)
             p = Usb(0x0416, 0x5011)        
@@ -104,7 +108,6 @@ def print_thermal_img(image_file, timeout=10):
 
             p.image(img)
             p.cut()
-            p.close()
         except Exception as e:
             result["err"] = e
         finally:
