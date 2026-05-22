@@ -228,7 +228,7 @@ class Plantony:
 
     def terminate_ready(self):
        self.send_serial_message("speaking") 
-       ready_lines = nft_ready_lines[self.plantoid_number][self.lang]
+       ready_lines = nft_ready_lines[self.lang]
        PlantoidSpeech.stream_response(self, random.choice(ready_lines), self.voice_id)
        #self.send_serial_message("asleep")
 

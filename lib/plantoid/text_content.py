@@ -333,7 +333,7 @@ default_intro_question = {
 nft_ready_lines = {
         "en-EN":
         [
-            "I'm sorry, I have to go now. But you can collect my digital seed as a NFT incorporating the artwork we have just co-created. Scan the QR code to discover it..."
+            "Anyhow... I'm sorry, I have to go now. But you can collect my digital seed as a NFT incorporating the artwork we have just co-created. Scan the QR code to discover it..."
         ]
 }
 
