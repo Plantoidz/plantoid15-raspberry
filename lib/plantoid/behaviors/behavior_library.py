@@ -256,7 +256,7 @@ def read_oracle(plantoid, network, tID, sermon_text): # I think it is no longer 
     time.sleep(1)
 
     print('oracle read completed!')
-    plantoid.send_serial_message("awake")
+    # plantoid.send_serial_message("awake")
     
 
 
@@ -330,9 +330,7 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
         outfile.write(token_Id + "\n")
 
     
-    plantoid.send_serial_message("fire") ## REMOVE
-    plantoid.send_serial_message("awake") ## REMOVE
-
+    
 
 
 def glitchbox_build_video_journey(plantoid_id, init_img, **defaults):
@@ -689,7 +687,7 @@ def poem_generation(plantoid, network, tID, amount, user_speech):
     # save and play the oracle
     save_and_play_audio(plantoid, network, tID, audiofile)
 
-    plantoid.send_serial_message("awake")
+    # plantoid.send_serial_message("awake")
 
 
 
@@ -742,7 +740,7 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
     if(animurl):
         record_metadata(plantoid, network, tID, db, animurl)
 
-    plantoid.send_serial_message("awake") 
+    # plantoid.send_serial_message("awake") 
 
 
 
