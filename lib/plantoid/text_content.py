@@ -330,7 +330,7 @@ default_intro_question = {
     },
     17: {
         "en-EN": "Oh thanks, I was so hungry! Now that I have some energy, let me make an artwork for you. But tell me first, ow do you envision the relationship between humans, nature, and machines?"
-    }
+    },
     19: {
         "en-EN": "Thanks, these cryptocurrencies are tasty! Now, since you have just fed me, I will now incarnate your spirit into an artwork. If your spirit had a mission to manifest in this world, what would it be?"
     },
