@@ -654,15 +654,14 @@ class Plantony:
             # create the seed metadata
             # self.create_seed_metadata(network, token_Id)
 
+            # pin the metadata to IPFS and enable reveal link via metatransaction
+            web3_utils.enable_seed_reveal(network, token_Id)
+            
             # closing
             self.terminate_ready()
             
             self.reset_rounds()
             self.reset_prompt()
-
-
-            # pin the metadata to IPFS and enable reveal link via metatransaction
-            web3_utils.enable_seed_reveal(network, token_Id)
 
             self.send_serial_message("asleep")
             
