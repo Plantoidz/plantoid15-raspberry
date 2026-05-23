@@ -68,7 +68,8 @@ class GPIOLEDController:
                 elif self.current_state == "listening":
                     self._listening_animation()
                 elif self.current_state == "thinking":
-                    self._thinking_animation()
+                    #self._thinking_animation()
+                    self._theater_chase_animation()
                 elif self.current_state == "speaking":
                     self._speaking_animation()
                 else:
@@ -175,6 +176,19 @@ class GPIOLEDController:
         else:
             pos -= 170
             return (0, pos * 3, 255 - pos * 3)
+
+
+    def _theater_chase_animation(self, color=(127, 127, 127)):
+    """Marquee-style chase"""
+    for q in range(3):
+        if self.current_state != "thinking":   # or whichever state
+            return
+        for i in range(0, self.led_count, 3):
+            self.pixels[i + q] = color
+        self.pixels.show()
+        time.sleep(0.05)
+        for i in range(0, self.led_count, 3):
+            self.pixels[i + q] = (0, 0, 0)
     
     def cleanup(self):
         """Stop animations and turn off LEDs"""
@@ -228,7 +242,7 @@ def check_if_talk(gpio):
 
     # Initialize on first call
     if not _button_initialized:
-        print("------------------------ GPIO TOUCH INITIALISATION")
+        #print("------------------------ GPIO TOUCH INITIALISATION")
         _button_pin = gpio['touch']
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(_button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -238,11 +252,11 @@ def check_if_talk(gpio):
     
     # Read current state
     current_state = GPIO.input(_button_pin)
-    print("checking button press ..............................")
+    #print("checking button press ..............................")
 
     # Check if state changed
     if current_state != _last_button_state:
-        print("button state changed :)))))")
+        #print("button state changed :)))))")
 
         # State has changed! But is it noise? Wait a moment and check again.
         time.sleep(_debounce_time)
