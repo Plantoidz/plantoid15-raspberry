@@ -179,16 +179,16 @@ class GPIOLEDController:
 
 
     def _theater_chase_animation(self, color=(127, 127, 127)):
-    """Marquee-style chase"""
-    for q in range(3):
-        if self.current_state != "thinking":   # or whichever state
-            return
-        for i in range(0, self.led_count, 3):
-            self.pixels[i + q] = color
-        self.pixels.show()
-        time.sleep(0.05)
-        for i in range(0, self.led_count, 3):
-            self.pixels[i + q] = (0, 0, 0)
+        """Marquee-style chase"""
+        for q in range(3):
+            if self.current_state != "thinking":   # or whichever state
+                return
+            for i in range(0, self.led_count, 3):
+                self.pixels[i + q] = color
+            self.pixels.show()
+            time.sleep(0.05)
+            for i in range(0, self.led_count, 3):
+                self.pixels[i + q] = (0, 0, 0)
     
     def cleanup(self):
         """Stop animations and turn off LEDs"""
