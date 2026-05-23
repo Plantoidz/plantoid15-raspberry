@@ -8,16 +8,19 @@
 
 shorthands:
 - angels-xl
+- crystal-xl
 - dwellers-input
 - dwellers-input-merge
 - dwellers-output
 - dwellers-output-merge
+- fire-xl
 - glitch-xl
 - mannequin-0-xl
 - mannequin-anime-xl
 - mannequin-xl
 - melies-bw-xl
 - melies-col-xl
+- origami-xl
 - papercut-xl
 - pixel-art-xl
 - pixel-xl
@@ -25,7 +28,7 @@ shorthands:
 - queepybeep-xl
 - robwood-xl
 - san-xl
-- shaman-xl
+- sand-xl
 - smoke-xl
 - twisted-bodies-xl
 - water-xl
@@ -74,6 +77,10 @@ presets:
   - dwellers-input-merge
   - dwellers-output-merge
   '27':
-  - shaman-xl
-  - angels-xl
-  '28': []
+  - sand-xl
+  '28':
+  - fire-xl
+  '29':
+  - origami-xl
+  '30':
+  - crystal-xl
