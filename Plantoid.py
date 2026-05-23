@@ -101,7 +101,7 @@ def plantoid_event_listen(
                 
                 # Trigger plantony interaction
                 print("Button was pressed, Invoking Plantony!")
-                # plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
+                plantony.trigger('Touched', plantony, web3config["goerli"], max_rounds=max_rounds)  ## FIX ME
 
 
 
