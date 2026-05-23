@@ -251,6 +251,7 @@ def check_if_talk(gpio):
         if current_state == new_current_state:
             print("Button WAS ACTUALLY PRESSED")
             _last_button_state = current_state
+            _button_initialized = None ## dirty hack to handle the situation with press-release buttons
             return True  # State changed!
     
     return False  # No change
