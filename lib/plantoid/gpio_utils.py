@@ -62,8 +62,7 @@ class GPIOLEDController:
         while self.running:
             try:
                 if self.current_state == "asleep":
-                    #self._asleep_animation()
-                    self._theater_chase_animation()
+                    self._asleep_animation()
                 elif self.current_state == "awake":
                     self._awake_animation()
                 elif self.current_state == "listening":
