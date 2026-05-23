@@ -76,13 +76,15 @@ class GPIOLEDController:
                 else:
                     time.sleep(0.1)
             except Exception as e:
-                print(f"Animation error: {e}")
+                print(f"Animation error: {type(e).__name__}: {e!r}")
                 time.sleep(0.5)
     
     def _asleep_animation(self):
         """Green breathing - asleep/idle state"""
+        initial_state = self.current_state
+
         for i in range(40):
-            if self.current_state != "asleep":
+            if self.current_state != initial_state:
                 return
             # Calculate brightness 0.0 to 1.0
             brightness = abs((i % 40) - 20) / 20.0
@@ -95,8 +97,10 @@ class GPIOLEDController:
     
     def _awake_animation(self):
         """Cyan breathing - awake/ready state"""
+        initial_state = self.current_state
+
         for i in range(40):
-            if self.current_state != "awake":
+            if self.current_state != initial_state:
                 return
             # Calculate brightness 0.0 to 1.0
             brightness = abs((i % 40) - 20) / 20.0
@@ -110,8 +114,10 @@ class GPIOLEDController:
     
     def _listening_animation(self):
         """Fire flickering effect - listening state"""
+        initial_state = self.current_state
+
         for _ in range(30):
-            if self.current_state != "listening":
+            if self.current_state != initial_state:
                 return
             for i in range(self.led_count):
                 flicker = random.randint(100, 255)
@@ -120,9 +126,11 @@ class GPIOLEDController:
             time.sleep(0.033)
     
     def _thinking_animation(self):
+        initial_state = self.current_state
+
         """Police strobe - thinking/processing state"""
         for _ in range(8):
-            if self.current_state != "thinking":
+            if self.current_state != initial_state:
                 return
             # Red flash
             self.pixels.fill((255, 0, 0))
@@ -140,10 +148,12 @@ class GPIOLEDController:
             time.sleep(0.08)
     
     def _speaking_animation(self):
+        initial_state = self.current_state
+
         """Red scanner/larson - speaking state"""
         # Forward scan
         for i in range(self.led_count):
-            if self.current_state != "speaking":
+            if self.current_state != initial_state:
                 return
             self.pixels.fill((0, 0, 0))
             self.pixels[i] = (255, 0, 0)  # Red
@@ -181,15 +191,18 @@ class GPIOLEDController:
 
     def _theater_chase_animation(self, color=(127, 127, 127)):
         """Marquee-style chase"""
+        initial_state = self.current_state
         for q in range(3):
-            if self.current_state != "asleep":   # or whichever state
+            if self.current_state != initial_state
                 return
             for i in range(0, self.led_count, 3):
-                self.pixels[i + q] = color
+                if i + q < self.led_count:
+                    self.pixels[i + q] = color
             self.pixels.show()
             time.sleep(0.05)
             for i in range(0, self.led_count, 3):
-                self.pixels[i + q] = (0, 0, 0)
+                if i + q < self.led_count:
+                    self.pixels[i + q] = (0, 0, 0)
     
     def cleanup(self):
         """Stop animations and turn off LEDs"""
