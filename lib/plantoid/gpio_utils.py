@@ -192,8 +192,9 @@ class GPIOLEDController:
     def _theater_chase_animation(self, color=(127, 127, 127)):
         """Marquee-style chase"""
         initial_state = self.current_state
+
         for q in range(3):
-            if self.current_state != initial_state
+            if self.current_state != initial_state:
                 return
             for i in range(0, self.led_count, 3):
                 if i + q < self.led_count:
