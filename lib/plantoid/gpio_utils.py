@@ -63,9 +63,7 @@ class GPIOLEDController:
             try:
                 if self.current_state == "asleep":
                     #self._asleep_animation()
-                    #self._theater_chase_animation()
-                    #self._listening_animation()
-                    self._awake_animation()
+                    self._theater_chase_animation()
                 elif self.current_state == "awake":
                     self._awake_animation()
                 elif self.current_state == "listening":
@@ -184,7 +182,7 @@ class GPIOLEDController:
     def _theater_chase_animation(self, color=(127, 127, 127)):
         """Marquee-style chase"""
         for q in range(3):
-            if self.current_state != "thinking":   # or whichever state
+            if self.current_state != "asleep":   # or whichever state
                 return
             for i in range(0, self.led_count, 3):
                 self.pixels[i + q] = color
