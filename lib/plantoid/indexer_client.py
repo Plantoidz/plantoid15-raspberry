@@ -12,7 +12,7 @@ class IndexerClient:
     One instance per network (mainnet / sepolia) 
     """
 
-    def __init__(self, url, plantoid_address, minted_db_path, request_timeout=5.0):
+    def __init__(self, url, plantoid_address, minted_db_path, request_timeout=1.0):
         self.url = url.rstrip("/") + "/graphql"
         self.plantoid_address = plantoid_address.lower()
         self.minted_db_path = minted_db_path
