@@ -223,9 +223,12 @@ _debounce_time = 0.05 # 50 milisec
     
 def check_if_talk(gpio):
     global _button_initialized, _last_button_state, _button_pin
-   
+
+
+
     # Initialize on first call
     if not _button_initialized:
+        print("------------------------ GPIO TOUCH INITIALISATION")
         _button_pin = gpio['touch']
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(_button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -235,10 +238,12 @@ def check_if_talk(gpio):
     
     # Read current state
     current_state = GPIO.input(_button_pin)
-    
+    print("checking button press ..............................")
+
     # Check if state changed
     if current_state != _last_button_state:
-        
+        print("button state changed :)))))")
+
         # State has changed! But is it noise? Wait a moment and check again.
         time.sleep(_debounce_time)
         new_current_state = GPIO.input(_button_pin)
