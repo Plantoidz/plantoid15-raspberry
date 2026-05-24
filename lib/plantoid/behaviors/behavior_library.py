@@ -699,7 +699,7 @@ def song_generation(plantoid, network, tID, amount, user_speech, style):
     audiofile = generate_song_suno(lines, style, credits)
 
     # save and play the song
-    save_and_play(plantoid, network, tID, audiofile)
+    save_and_play_audio(plantoid, network, tID, audiofile)
 
 
 def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video, audio_merge=True):
