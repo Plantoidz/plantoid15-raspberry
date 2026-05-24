@@ -685,7 +685,7 @@ def song_generation(plantoid, network, tID, amount, user_speech, style):
 
     credits = int(amount / network.min_amount)
 
-    lines = get_song_prompts(plantoid. user_speech, credits)
+    lines = get_song_prompts(plantoid, user_speech, credits)
     response = '\n'.join(lines)
     print('fixed response text: ', response)
 
