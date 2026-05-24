@@ -696,7 +696,7 @@ def song_generation(plantoid, network, tID, amount, user_speech, style):
 
 
     # create a song with SUNO in <style>
-    audiofile = behaviors.generate_song_suno(lines, style, credits)
+    audiofile = generate_song_suno(lines, style, credits)
 
     # save and play the song
     save_and_play(plantoid, network, tID, audiofile)
