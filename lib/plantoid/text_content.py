@@ -340,7 +340,7 @@ default_intro_question = {
     },
     20: {
         "en-EN": "Great, I am well-fed now, thanks to you. Would you like me to sing you a song? But tell me first: what is the calling from your inner voice that you never listen to?"
-    }
+    },
     21: {
         "en-EN": "These cryptocurriences are delicious! Thank you. As a sign of gratitude, I will produce a song for you. But first tell me: wat is your deepest belief that you cherrish in your heart?"
     }
