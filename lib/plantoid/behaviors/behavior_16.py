@@ -1,5 +1,5 @@
 from lib.plantoid.behaviors import behavior_library as behaviors
-
+from lib.plantoid.text_content import default_intro_question
 import lib.plantoid.speech as PlantoidSpeech
 
 import os
