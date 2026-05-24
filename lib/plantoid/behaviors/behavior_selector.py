@@ -1,5 +1,6 @@
 
 import lib.plantoid.behaviors.behavior_21 as behavior_21
+import lib.plantoid.behaviors.behavior_20 as behavior_20
 import lib.plantoid.behaviors.behavior_19 as behavior_19
 import lib.plantoid.behaviors.behavior_17 as behavior_17
 import lib.plantoid.behaviors.behavior_16 as behavior_16
@@ -16,6 +17,12 @@ def get_plantoid_function(plantoid_number, fn_name):
         fn_dict = {
             'create_seed_metadata': behavior_21.create_seed_metadata,
             'ingurgitate_crypto': behavior_21.ingurgitate_crypto
+    }
+
+    elif plantoid_number == 20:
+        fn_dict = {
+            'create_seed_metadata': behavior_20.create_seed_metadata,
+            'ingurgitate_crypto': behavior_20.ingurgitate_crypto
     }
 
     elif plantoid_number == 19:
