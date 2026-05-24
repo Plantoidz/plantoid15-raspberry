@@ -22,7 +22,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     user_speech = behaviors.ask_transcript(plantoid, network, tID, question)
 
 
-    style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth" 
+    style = "Deep Tibetan Buddhist throat singing, multiphonic undertone, guttural ritual chant, low fundamental frequency,  slow drone composition, no melody, no rhythm, sustained ominous resonance, glitches"
     behaviors.song_generation(plantoid, network, tID, amount, user_speech, style)
 
     # Generate response  ..
@@ -76,15 +76,15 @@ def create_seed_metadata(plantoid, network, tID):
 
     db = dict()
     db['name'] = tID
-    db['description'] = "Plantoid #21 - Seed #" + tID
+    db['description'] = "Plantoid #20 - Seed #" + tID
     db['external_url'] = "http://plantoid.org"
-    db['image'] = "https://ipfs.io/ipfs/bafybeigrpwmjloh4wm5pcbgxch6yy4ffz25jhmp6nlw2kwabwdgnw6ld6u"
+    db['image'] = "https://ipfs.io/ipfs/bafybeid7ijkuk22zptyqr7jyjynvq2gwkjvngj5f76sghioidsv7fvzb7e"
 
     # behaviors.generic_metadata(plantoid, network, tID, db, None, behaviors.opera_make_video)
 
     behaviors.generic_metadata(plantoid, network, tID, db, None,
         behaviors.glitchbox_build_video_scheduler(
-            lora="glitch-xl,smoke-xl",
+            lora="robwood-xl,sand-xl",
             fps=10,
             strength=0.9,
             cn_scale=0.55,
