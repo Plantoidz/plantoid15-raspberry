@@ -302,7 +302,7 @@ default_transcript = {
       20: {
           "en-EN": "A world in the occult, where light and dark forces merge, and spirits embody humans and machines alike",
           "fr-FR": "Un monde occulte, où la lumière et les ombres s'imbriquents, et les esprits incarnent aussi bien les humains que les machines",
-      }
+      },
       21: {
           "en-EN": "A mystical world where Plants have spirits that combines with the soul of Humans and Machines, helping each other walk the path of network spirituality.",
           "fr-FR": "Un monde mystique où les Plantes ont des esprits qui se mélangent avec les âmes des Humains et des Machines, s'aidant les uns les autres à parcourir le chemin de la spiritualité des réseaux.", 
