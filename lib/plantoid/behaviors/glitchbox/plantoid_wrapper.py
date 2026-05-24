@@ -490,6 +490,7 @@ def plantoid_video_scheduler(
     mode: str = "img2img",
     h_smoothing: bool = False,
     audio_band: str = "treble",
+    audio_alpha_mode: str = "band",
     audio_reaction_output_gain: float = 1.0,
     n_rungs: int = 2,
     crf: int = 23,
@@ -549,6 +550,7 @@ def plantoid_video_scheduler(
         data = [
             ("lora", lora),
             ("audio_band", audio_band),
+            ("audio_alpha_mode", audio_alpha_mode),
             ("audio_reaction_output_gain", str(audio_reaction_output_gain)),
             ("n_rungs", str(n_rungs)),
             ("crf", str(crf)),

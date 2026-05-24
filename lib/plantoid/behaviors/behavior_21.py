@@ -22,7 +22,8 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
     user_speech = behaviors.ask_transcript(plantoid, network, tID, question)
 
 
-    style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth" 
+    #style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth" 
+    style = "Deep female contralto vocal, dark siren song with lyrics, a cappella, low register, haunted and gloomy delivery, slow ritual incantation, gothic and oceanic, abyssal atmosphere, no instruments, no percussion, no backing music, layered low harmonies, sepulchral choral textures, dirge-like pacing"
     behaviors.song_generation(plantoid, network, tID, amount, user_speech, style)
 
     # Generate response  ..

@@ -207,6 +207,10 @@ def main() -> None:
                              "Defaults to 20 in keyframes mode.")
     parser.add_argument("--audio-band", default="treble",
                         choices=["bass", "low_mid", "mid", "treble"])
+    parser.add_argument("--audio-alpha-mode",
+                        choices=["band", "excitation"],
+                        default = "band",
+                        help="Alpha-channel rendering mode: 'band' = frequency band, 'excitation' = excitation-based")
     parser.add_argument("--mode", default="img2img",
                         choices=["img2img", "txt2img"],
                         help="Final-stage diffusion mode. Pregen always "

@@ -84,12 +84,12 @@ def create_seed_metadata(plantoid, network, tID):
 
     behaviors.generic_metadata(plantoid, network, tID, db, None,
         behaviors.glitchbox_build_video_scheduler(
-            lora="robwood-xl,sand-xl",
+            lora="water-xl,robwood-xl",
             fps=10,
             strength=0.9,
             cn_scale=0.55,
-            video_set="dancing_shutterstock",
-            audio_band="mid",
+            video_set="tribal_shutterstock",
+            audio_band="bass",
         ),
         audio_merge=False,
     )
