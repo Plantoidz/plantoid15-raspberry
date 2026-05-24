@@ -295,13 +295,13 @@ default_transcript = {
           "en-EN": "A recursive world where Plants collaborate with Humans and with Machines, looping into each other as symbiotic beings.",
           "fr-FR": "Un monde recursif où les Plantes collaborent avec les Humains et les Machines, dans une danse qui les rend toujours plus symbiotique les uns avec les autres.",
       },
-      18: {
-          "en-EN": "A mystical world where Plants have spirits that combines with the soul of Humans and Machines, helping each other walk the path of network spirituality.",
-          "fr-FR": "Un monde mystique où les Plantes ont des esprits qui se mélangent avec les âmes des Humains et des Machines, s'aidant les uns les autres à parcourir le chemin de la spiritualité des réseaux.", 
-      },
       19: {
           "en-EN": "A memetic world where networks have acquired their own soul, network spirituality is the new religion, and humans-machine interaction are undistinguisable from magic.",
           "fr-FR": "Un monde mémétique où les réseaux ont acquéris leurs propres âmes, et la spiritualité des réseaux est la nouvelle religion, and la relation humain-machine est indissociable de la magie.", 
+      },
+      21: {
+          "en-EN": "A mystical world where Plants have spirits that combines with the soul of Humans and Machines, helping each other walk the path of network spirituality.",
+          "fr-FR": "Un monde mystique où les Plantes ont des esprits qui se mélangent avec les âmes des Humains et des Machines, s'aidant les uns les autres à parcourir le chemin de la spiritualité des réseaux.", 
       },
   }
 
@@ -334,6 +334,9 @@ default_intro_question = {
     19: {
         "en-EN": "Thanks, these cryptocurrencies are tasty! Now, since you have just fed me, I will now incarnate your spirit into an artwork. If your spirit had a mission to manifest in this world, what would it be?"
     },
+    21: {
+        "en-EN": "These cryptocurriences are delicious! Thank you. As a sign of gratitude, I will produce an artwork for you. But first tell me: wat is your deepest belief that you cherrish in your heart?"
+    }
 }
 
 nft_ready_lines = {

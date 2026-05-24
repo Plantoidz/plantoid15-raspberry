@@ -651,19 +651,6 @@ def ask_transcript(plantoid, network, tID, question):
 def poem_generation(plantoid, network, tID, amount, user_speech):
 
 
-    # ask an initial question
-    # plantoid.weaving(question)
-
-    # listen for audio and obtain the transcript
-    #user_speech = plantoid.listen() or get_default_transcript(plantoid)
-
-    #print("I heard ..", user_speech)
-    #archive("text", "transcript", user_speech, tID, network)
-
-    # user_speech = ask_transcript(plantoid, network, tID, question)
-    
-
-
     # Generate response
     plantoid.send_serial_message("thinking")
 
@@ -680,16 +667,39 @@ def poem_generation(plantoid, network, tID, amount, user_speech):
 
     # generate audio file
     audiofile = PlantoidSpeech.stream_response(plantoid, response_text, plantoid.voice_id, save_to_file=f"/tmp/output_oracle{plantoid.plantoid_number}.wav")
-    # convert to MP#
+    # convert to MP3
     mp3_file = f"/tmp/output_oracle{plantoid.plantoid_number}.mp3"
     subprocess.run(["ffmpeg", "-y", "-i", audiofile, mp3_file])
     audiofile = mp3_file
+
     # save and play the oracle
     save_and_play_audio(plantoid, network, tID, audiofile)
 
     # plantoid.send_serial_message("awake")
 
 
+def song_generation(plantoid, network, tID, amount, user_speech, style):
+
+    # Generate response
+    plantoid.send_serial_message("thinking")
+
+    credits = int(amount / network.min_amount)
+
+    lines = get_song_prompts(plantoid. user_speech, credits)
+    response = '\n'.join(lines)
+    print('fixed response text: ', response)
+
+    archive("text", "response", response, tID, network)
+
+    # print lyrecs on the LP printer
+    print_response(plantoid, network, tID, response)
+
+
+    # create a song with SUNO in <style>
+    audiofile = behaviors.generate_song_suno(lines, style, credits)
+
+    # save and play the song
+    save_and_play(plantoid, network, tID, audiofile)
 
 
 def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video, audio_merge=True):
