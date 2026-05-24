@@ -205,8 +205,8 @@ def save_and_play_audio(plantoid, network, tID, audiofile):
     
     subprocess.run(["cp", audiofile, f"{songs_path_network}/{tID}_audio.mp3"])
 
-    # stop the background music
-    plantoid.stop_background_music()
+    # # stop the background music
+    # plantoid.stop_background_music()
 
     # play the oracle
     plantoid.send_serial_message("speaking")
@@ -653,6 +653,7 @@ def poem_generation(plantoid, network, tID, amount, user_speech):
 
     # Generate response
     plantoid.send_serial_message("thinking")
+    plantoid.play_background_music(plantoid.path + "/media/ambient3.mp3")
 
     credits = int(amount / network.min_amount)
     
@@ -681,7 +682,10 @@ def poem_generation(plantoid, network, tID, amount, user_speech):
 def song_generation(plantoid, network, tID, amount, user_speech, style):
 
     # Generate response
+    
+    # start thinking 
     plantoid.send_serial_message("thinking")
+    plantoid.play_background_music(plantoid.path + "/media/ambient3.mp3")
 
     credits = int(amount / network.min_amount)
 
@@ -697,6 +701,9 @@ def song_generation(plantoid, network, tID, amount, user_speech, style):
 
     # create a song with SUNO in <style>
     audiofile = generate_song_suno(lines, style, credits)
+
+     # stop the background music
+    plantoid.stop_background_music()
 
     # save and play the song
     save_and_play_audio(plantoid, network, tID, audiofile)
