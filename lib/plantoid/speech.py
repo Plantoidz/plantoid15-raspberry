@@ -91,6 +91,7 @@ voice_ids["trevor"] = "KRzS7KO2TLlh1BRPgHnB"
 voice_ids["primavera"] = "txtf1EDouKke753vN8SL"
 voice_ids["iannis"] = "ejJ1ETWS2ohLMMeCu1H3"
 voice_ids["sofi"] = "RILOU7YmBhvwJGDGjNmP"
+voice_ids["logina"] = "uIZsnBL0YK1S5j69bAih"
 
 
 
