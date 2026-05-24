@@ -406,25 +406,6 @@ default_prompt = {
         }
     },
 
-    18: {
-        "intro": {
-            "en-EN": "You are a Plantoid, a network spirituality creature. Write the lyrics of a song, with the following structure: only a few words per lines; with number of lines == ",
-            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui se nourrit de la spiritualité du réseau. Ecrit-moi les paroles pour une chanson structurée ainsi: chaque ligne est composée de quelques mots uniquement; avec nombre de lignes == ",
-        },
-         "question": {
-            "en-EN": "The lyrics should reflect the following topic: ",
-            "fr-FR": "Les paroles doivent refleter le sujet suivant: ",
-        },
-        "words": {
-            "en-EN": "The lyrics can include words like ", 
-            "fr-FR": "Les paroles peuvent inclure des mots tels que ",
-        },
-         "outro": {
-           "en-EN": "IMPORTANT: Lines must be less than 200 characters each! Make it as short as possible, not longer than 200 characters per line, and max lines == ",
-           "fr-FR": "IMPORTANT: Chaque ligne doit être plus courte que 200 charactères! Aussi courte que possible, et pas plus de 200 charactères par ligne, et nombre de lignes == ",
-        }
-    },
-
     19: {
         "intro": {
             "en-EN": "You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem, with the following structure: each paragraph is composed of exactly 3 lines; with number of paragraphs == ",
@@ -441,6 +422,25 @@ default_prompt = {
         "outro": {
            "en-EN": "Remember, the poem should be made of paragraphs that are 3 lines long, with the exactly number of paragraphs == ",
            "fr-FR": "Rappèle-toi que le poème doit être composé de paragraphes de 3 lignes chacun, avec le nombre exact de paragraphes == ", 
+        }
+    },
+
+    21: {
+        "intro": {
+            "en-EN": "You are a Plantoid, a network spirituality creature. Write the lyrics of a song, with the following structure: only a few words per lines; with number of lines == ",
+            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui se nourrit de la spiritualité du réseau. Ecrit-moi les paroles pour une chanson structurée ainsi: chaque ligne est composée de quelques mots uniquement; avec nombre de lignes == ",
+        },
+         "question": {
+            "en-EN": "The lyrics should reflect the following topic: ",
+            "fr-FR": "Les paroles doivent refleter le sujet suivant: ",
+        },
+        "words": {
+            "en-EN": "The lyrics can include words like ", 
+            "fr-FR": "Les paroles peuvent inclure des mots tels que ",
+        },
+         "outro": {
+           "en-EN": "IMPORTANT: Lines must be less than 200 characters each! Make it as short as possible, not longer than 200 characters per line, and max lines == ",
+           "fr-FR": "IMPORTANT: Chaque ligne doit être plus courte que 200 charactères! Aussi courte que possible, et pas plus de 200 charactères par ligne, et nombre de lignes == ",
         }
     },
 
