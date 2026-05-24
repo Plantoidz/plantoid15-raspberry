@@ -23,7 +23,7 @@ def ingurgitate_crypto(plantoid, network, tID, amount):
 
 
     style = "French chanson, vintage 1960s, deep contralto female vocal, smoky and grounded, intimate, melancholic, warm analog recording, sparse acoustic arrangement, upright bass, brushed drums, accordion, nylon string guitar, reverb-light, tape warmth" 
-    behaviors.song_generation(plantoid, network, tID, amount, user_speech)
+    behaviors.song_generation(plantoid, network, tID, amount, user_speech, style)
 
     # Generate response  ..
     # plantoid.send_serial_message("thinking")
