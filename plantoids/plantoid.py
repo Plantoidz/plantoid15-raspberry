@@ -84,10 +84,10 @@ class Plantony:
 
         self.path = path #os.getcwd()
 
-        # Load the sounds
+        # Load the sounds - NB: samples are organised by voice_id
         self.acknowledgements = [
-            f"{self.path}/samples/{plantoid_number}/hmm1.mp3",
-            f"{self.path}/samples/{plantoid_number}/hmm2.mp3",
+            f"{self.path}/samples/{self.voice_id}/hmm1.mp3",
+            f"{self.path}/samples/{self.voice_id}/hmm2.mp3",
         ]
 
         self.beep_start = self.path+"/media/beep_start.wav"
@@ -95,9 +95,9 @@ class Plantony:
         self.cleanse = self.path+"/media/cleanse.mp3"
        
         # Load the recorded audios
-        self.introduction = f"{self.path}/samples/{plantoid_number}/{self.lang}/intro.mp3"
-        self.outroduction = f"{self.path}/samples/{plantoid_number}/{self.lang}/outro.mp3"
-        self.reflection = f"{self.path}/samples/{plantoid_number}/{self.lang}/initiation.mp3"
+        self.introduction = f"{self.path}/samples/{self.voice_id}/{self.lang}/intro.mp3"
+        self.outroduction = f"{self.path}/samples/{self.voice_id}/{self.lang}/outro.mp3"
+        self.reflection = f"{self.path}/samples/{self.voice_id}/{self.lang}/initiation.mp3"
 
     # def ambient_background(self, music, stop_event):
 
