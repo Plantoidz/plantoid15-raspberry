@@ -1,5 +1,5 @@
 [general]
-PLANTOID=21
+PLANTOID=20
 
 MAINNET_START_BLOCK = 22000000
 TESTNET_START_BLOCK = 10741539
@@ -12,6 +12,7 @@ TESTNET_START_BLOCK = 10741539
 [audio]
 device_bias=-100
 threshold_bias=0
+
 
 
 
@@ -37,6 +38,30 @@ FAILSAFE = 0
 BLOCKCHAIN_ADDRESS = "0xabe90a00ded9fc03bb99570811dde2123b2cad95" ### This is the sepolia address
 METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
+
+
+
+[20]
+VOICE_ID="plantony"
+max_rounds=4
+USE_GPIO = {led = 10, touch = 26}
+USE_SERIAL = "False"
+LANG="en-EN"
+PATTERN = "<Touched>"
+PERSONALITY="./prompt_context/plantony_context-p19-network_spirituality.txt"
+LLM_MODEL="qwen/qwen3.5-35b-a3b"
+
+[20.mainnet]
+ACTIVE = "True"
+FAILSAFE = 0
+BLOCKCHAIN_ADDRESS = "0xec735325e8562803e23ab6a15836d05950b69648"
+METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
+
+[20.goerli]
+ACTIVE = "True"
+FAILSAFE = 0
+BLOCKCHAIN_ADDRESS = "0xc651817ef97775802b950eeeaa22b13d4e21107b" ### This is the sepolia address
+METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 
 [19]
