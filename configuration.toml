@@ -1,5 +1,5 @@
 [general]
-PLANTOID=20
+PLANTOID=21
 
 MAINNET_START_BLOCK = 22000000
 TESTNET_START_BLOCK = 10741539
@@ -23,7 +23,7 @@ USE_GPIO = {led = 10, touch = 26}
 USE_SERIAL = "False"
 LANG="en-EN"
 PATTERN = "<Touched>"
-PERSONALITY="./prompt_context/plantony_context-p19-network_spirituality.txt"
+PERSONALITY="./prompt_context/plantony_context-p21-lunarpunk_singer.txt"
 LLM_MODEL="qwen/qwen3.5-35b-a3b"
 
 [21.mainnet]
@@ -48,7 +48,7 @@ USE_GPIO = {led = 10, touch = 26}
 USE_SERIAL = "False"
 LANG="en-EN"
 PATTERN = "<Touched>"
-PERSONALITY="./prompt_context/plantony_context-p19-network_spirituality.txt"
+PERSONALITY="./prompt_context/plantony_context-p20-techno_shaman.txt"
 LLM_MODEL="qwen/qwen3.5-35b-a3b"
 
 [20.mainnet]
