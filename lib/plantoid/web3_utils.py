@@ -308,16 +308,26 @@ def check_for_deposits(web3obj):
 
     if len(events) > 0:
 
+        # Load the set of already-minted token IDs for this network.
+        # Same source-of-truth that process_previous_tx and IndexerClient use.
+        minted_db_path = f"{web3obj.plantoid_path}/minted_{web3obj.name}.db"
+        minted = set()
+        if os.path.exists(minted_db_path):
+            with open(minted_db_path, 'r') as f:
+                minted = {ln.strip() for ln in f if ln.strip()}
+
         for event in events:
+            token_id = str(event.args.tokenId)
+            if token_id in minted:
+                print(f"[rpc-fallback] skipping already-minted token {token_id}")
+                continue
             print("new Deposit EVENT !! ")
             print("token id = " + str(event.args.tokenId))
             print("amount = " + str(event.args.amount))
 
-            return (str(event.args.tokenId), int(event.args.amount))  ### @@@@ need to fix this  :)
+            return (tokenId, int(event.args.amount))  ### @@@@ need to fix this  :)
 
-    else:
-
-        return None
+    return None
 
 
 
