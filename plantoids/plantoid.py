@@ -431,7 +431,8 @@ class Plantony:
     def reset_prompt(self):
 
         # load the personality of Plantony
-        self.prompt_text = open(self.path+self.personality).read().strip()
+        with open(self.path+self.personality, encoding='utf-8') as f:
+        self.prompt_text = f.read().strip()
 
         
     def weaving(self, msg=None):
