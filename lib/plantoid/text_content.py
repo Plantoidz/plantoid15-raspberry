@@ -434,8 +434,8 @@ default_prompt = {
 
     20: {
         "intro": {
-            "en-EN": "You are a Plantoid, a blockchain-based deity that is interested in the occult. Write the lyrics of a song, with the following structure: only a few words per lines; with number of lines == ",
-            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui est intéressée dans le occulte. Ecrit-moi les paroles pour une chanson structurée ainsi: chaque ligne est composée de quelques mots uniquement; avec nombre de lignes == ",
+            "en-EN": "You are a Plantoid, a blockchain-based deity that is interested in the occult. Write the lyrics of a song, with the following structure: only a few words per lines (between 3 and 7 words); with number of lines == ",
+            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui est intéressée dans le occulte. Ecrit-moi les paroles pour une chanson structurée ainsi: chaque ligne est composée de quelques mots uniquement (entre 3 et 7 mots); avec nombre de lignes == ",
         },
          "question": {
             "en-EN": "The lyrics should reflect the following topic: ",
@@ -453,8 +453,8 @@ default_prompt = {
 
     21: {
         "intro": {
-            "en-EN": "You are a Plantoid, a network spirituality creature. Write the lyrics of a song, with the following structure: only a few words per lines; with number of lines == ",
-            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui se nourrit de la spiritualité du réseau. Ecrit-moi les paroles pour une chanson structurée ainsi: chaque ligne est composée de quelques mots uniquement; avec nombre de lignes == ",
+            "en-EN": "You are a Plantoid, a network spirituality creature. Write the lyrics of a song, with the following structure: only a few words per lines (between 3 and 7 words); with number of lines == ",
+            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui se nourrit de la spiritualité du réseau. Ecrit-moi les paroles pour une chanson structurée ainsi: chaque ligne est composée de quelques mots uniquement (entre 3 et 7 mots); avec nombre de lignes == ",
         },
          "question": {
             "en-EN": "The lyrics should reflect the following topic: ",
