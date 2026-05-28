@@ -392,7 +392,19 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
         return out
 
     def play_streaming_tts(resp, default_sr=24000):
+        
+        import numpy as np
+        GAIN = 2.0  # 2x; distortion creeps in above ~3x
+
+        def _amplify(buf):
+            if len(buf) % 2:                       # keep 16-bit alignment
+                buf = buf[:-1]
+            s = np.frombuffer(bytes(buf), dtype=np.int16).astype(np.float32) * GAIN
+            return np.clip(s, -32768, 32767).astype(np.int16).tobytes()
+        
         ring, lock, done = bytearray(), threading.Lock(), False
+
+
 
         def cb(in_data, frames, t, status):
             n = frames * 2
@@ -419,7 +431,7 @@ def stream_response(plantoid, agent_message, voiceid="plantony", save_to_file=No
             # print(f"[TTS DEBUG] chunk={len(chunk)} bytes, pcm={len(pcm)} bytes, ring={len(ring)} bytes")
 
             if pcm:
-                with lock: ring.extend(pcm)
+                with lock: ring.extend(_amplify(pcm))
             if not stream_out and sr and len(ring) >= 48000:
                 stream_out = p.open(format=pyaudio.paInt16, channels=1, rate=sr,
                                     output=True, frames_per_buffer=2048, stream_callback=cb)
