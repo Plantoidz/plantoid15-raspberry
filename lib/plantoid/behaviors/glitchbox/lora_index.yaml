@@ -8,7 +8,9 @@
 
 shorthands:
 - angels-xl
+- artfullytextual-xl
 - crystal-xl
+- disco-diffusion-xl
 - dwellers-input
 - dwellers-input-merge
 - dwellers-output
@@ -20,10 +22,12 @@ shorthands:
 - mannequin-xl
 - melies-bw-xl
 - melies-col-xl
+- abstract-painting-xl
 - origami-xl
 - papercut-xl
 - pixel-art-xl
 - pixel-xl
+- quantized-glitch-xl
 - queepybeep-anime-xl
 - queepybeep-xl
 - robwood-xl

@@ -295,6 +295,10 @@ default_transcript = {
           "en-EN": "A recursive world where Plants collaborate with Humans and with Machines, looping into each other as symbiotic beings.",
           "fr-FR": "Un monde recursif où les Plantes collaborent avec les Humains et les Machines, dans une danse qui les rend toujours plus symbiotique les uns avec les autres.",
       },
+      18: {
+          "en-EN": "A futuristic world where plants and technology lives in symbiosis, cyber-animism is the new religion, and humans live in harmony with both nature and technology.",
+          "fr-FR": "Un monde futuriste où les plantes et la technologie vivent en symbiose, et le cyber-animisme est la nouvelle religion, and les humans vivent en harmonie avec la technologie et la nature.", 
+      }, 
       19: {
           "en-EN": "A memetic world where networks have acquired their own soul, network spirituality is the new religion, and humans-machine interaction are undistinguisable from magic.",
           "fr-FR": "Un monde mémétique où les réseaux ont acquéris leurs propres âmes, et la spiritualité des réseaux est la nouvelle religion, and la relation humain-machine est indissociable de la magie.", 
@@ -334,6 +338,9 @@ default_intro_question = {
     },
     17: {
         "en-EN": "Oh thanks, I was so hungry! Now that I have some energy, let me make an artwork for you. But tell me first, ow do you envision the relationship between humans, nature, and machines?"
+    },
+    18: {
+        "en-EN": "Hmmm, thank you my dear, I needed just that amount of cryptocurrencies! As a reward, I will produce a song for you, as one of my digital seeds. I need to know one thing first: what is your most unfathomable dream?"
     },
     19: {
         "en-EN": "Thanks, these cryptocurrencies are tasty! Now, since you have just fed me, I will now incarnate your spirit into an artwork. If your spirit had a mission to manifest in this world, what would it be?"
@@ -413,9 +420,28 @@ default_prompt = {
         }
     },
 
+    18: {
+        "intro": {
+            "en-EN": "You are a Plantoid, a blockchain-based lifeform merging technology with nature. Write the lyrics of a song, with the following structure: only a few words per lines (between 3 and 7 words); with number of lines == ",
+            "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui mélange nature et technologie. Ecrit-moi les paroles pour une chanson structurée ainsi: chaque ligne est composée de quelques mots uniquement (entre 3 et 7 mots); avec nombre de lignes == ",
+        },
+         "question": {
+            "en-EN": "The lyrics should reflect the following topic: ",
+            "fr-FR": "Les paroles doivent refleter le sujet suivant: ",
+        },
+        "words": {
+            "en-EN": "The lyrics can include words like ", 
+            "fr-FR": "Les paroles peuvent inclure des mots tels que ",
+        },
+         "outro": {
+           "en-EN": "IMPORTANT: Lines must be less than 200 characters each! Make it as short as possible, not longer than 200 characters per line, and max lines == ",
+           "fr-FR": "IMPORTANT: Chaque ligne doit être plus courte que 200 charactères! Aussi courte que possible, et pas plus de 200 charactères par ligne, et nombre de lignes == ",
+        }
+    },
+
     19: {
         "intro": {
-            "en-EN": "You are Plant-Tony, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem, with the following structure: each paragraph is composed of exactly 3 lines; with number of paragraphs == ",
+            "en-EN": "You are Plantoid, an enlightened being from the future. Answer the following qestion in the form of a thoughtful poem, with the following structure: each paragraph is composed of exactly 3 lines; with number of paragraphs == ",
             "fr-FR": "Tu es Plantoïde, une forme de vie fondée sur la blockchain qui détient des connaissances inouïes sur le future. A partir du texte suivant, écrit-moi un poème structuré ainsi: chaque paragraphe est composé exactement de 3 lignes; avec nombre de paragraphes == ",
         },
         "question": {
@@ -474,18 +500,6 @@ default_prompt = {
 }
 
 
-
-# default_video_prompt = {
-
-#     14: {
-#         "pre": "Drawing by M. C. Escher with a strong solar-punk flavor representing: ",
-#         "post":  "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
-#         },
-#     17: {
-#         "pre":  "Ethereal figure dissolving into smoke particles representing: ",
-#         "post": "Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined.",
-#     },
-# }
 
 
 
@@ -554,7 +568,7 @@ def get_plantoid_sig(network, tID, lang):
     
     plantoid_sig = {
             "en-EN" : "\n\nYou can reclaim your NFT by connecting to " + network.reclaim_url + " and pressing the Reveal button for seed #" + tID + " \n",
-            "fr-FR" : "\n\nCe poeme est une oeuvre de Plantoid 15, une forme de vie sur la blockchain. Reclamez votre NFT sur " + network.reclaim_url + " and appuyez sur le bouton Reveal pour la grained #" + tID + " \n"
+            "fr-FR" : "\n\nReclamez votre NFT sur " + network.reclaim_url + " and appuyez sur le bouton Reveal pour la grained #" + tID + " \n"
             }
 
     return plantoid_sig[lang]
@@ -570,62 +584,3 @@ def get_video_prompt(sermon, n_prompt):
     prompt += f"Can you generate {n} short sentences that illustrates the lyrics of the poem in a very graphical manner. Be highly descritive, ideally with a particular style that is reminescent of solar-punk vibes. Each sentence needs to be numbered (1., 2., etc.) in such a way as to follow the chronology of the poem. These descriptions will be used to generate a video illustrating the poem.  "
 
     return prompt
-
-    # prompt = "I need to illustrate this poem. "
-    # prompt = prompt + "Can you generate " + str_n_prompts_n + " sentences (not more than " + str_n_prompts_n + " sentences) that illustrate the poem, presented chronologically based on the phrasing of the poem. "
-    # prompt = prompt + "I don't wont a summary of the plot, I want a graphical description that illustrates the statements of the poem. "
-    # prompt = prompt + "These descriptions will be used to generate a video illustrating the poem. "
-    # prompt = prompt + "Every sentence needs to be a self-contained descriptive illustration, that does not refer to the previous or following sentences. "
-    # prompt = prompt + "Be highly descritive, ideally with a particular style that is reminescent of solar-punk vibes. "
-    # prompt = prompt + "You can mention colors but only in one of these descriptions, and no reference to colors must be present in the first sentence. "
-    # prompt = prompt + "Draft your answer with each line starting with the number of the line, followed by a dot, a space, and then the actual description. "
-    # prompt = prompt + "Here's the poem which I'd like you to litterally illustrate: " + stri
-
-    # print("PROOOOOOOOOOOOOOOOMPT: ", prompt)
-
-    # response1 = openai.Completion.create(
-    #         engine=model_id,
-    #         prompt=prompt1,
-    #         max_tokens=max_tokens
-    # )
-
-    # response = openai.Completion.create(
-    #     engine=model_id,
-    #     prompt=prompt,
-    #     max_tokens=max_tokens
-    # )
-    
-    # descri1 = response1.choices[0].text
-    # descri = response.choices[0].text
-
-    # generate descriptions dir
-    # if not os.path.exists(path + "/descriptions"):
-    #     os.makedirs(path + "/descriptions");
-
-    # # write descriton to file
-    # with open(path + "/descriptions/" + seed + "_description.txt", "w") as outfile:
-    #     outfile.write(descri1)
-    #     outfile.write(descri)
-
-# def process_video_prompts(plantoid, descri):
-
-#     lines = re.split("\d.", descri)
-
-#     prompts = []
-
-#     for ln in lines:
-#         line = ln.strip()
-#         line = line.replace("\n", "")
-#         print("["+line+"]")
-
-#         if (line):
-
-#             line = default_video_prompt[plantoid.plantoid_number]["pre"] + line + default_video_prompt[plantoid.plantoid_number]["post"] 
-#             # line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line + ". Neat lines, extreme detailed illustration, highly detailed linework, sf, intricate artwork masterpiece, ominous, intricate, epic, vibrant, ultra high quality model, solar-punk illustration"
-#             # line = "Drawing by M. C. Escher with a strong solar-punk flavor representing: " + line
-#             # line = line + " Hyper realistic, detailed, intricate, best quality, hyper detailed, ultra realistic, sharp focus, delicate and refined."
-#             prompts.append(line)
-
-#     print("PROMPTS: ----> ", prompts)
-
-#     return prompts
