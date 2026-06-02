@@ -243,6 +243,15 @@ def _submit_job(
 
 def _poll_job(server: str, job_id: str, poll_interval: float) -> str:
     """Poll until terminal. Returns run_id on success, raises on failure."""
+
+    # NEW: switch GuiTion to WORKING + progress bar
+    try:
+        from lib.plantoid.guition import show_working, report_progress
+        show_working(hide_bar=False)
+    except Exception as e:
+        print(f"[guition] not available: {e}")
+        def report_progress(*_): pass
+
     job_url = f"{server.rstrip('/')}/api/jobs/{job_id}"
     print(f"[plantoid] polling {job_url}")
     last_stage = None
@@ -259,6 +268,11 @@ def _poll_job(server: str, job_id: str, poll_interval: float) -> str:
         if stage != last_stage or frame != last_frame:
             print(f"  [{j['status']}] stage={stage}  frame {frame}/{total}")
             last_stage, last_frame = stage, frame
+
+        # NEW: drive the GuiTion bar from real frame count
+        if total > 0:
+            report_progress(int(100 * frame / total))
+
         if j["status"] in ("complete", "failed", "cancelled"):
             print(f"[plantoid] terminal: {j['status']}  return_code={j.get('return_code')}")
             if j["status"] != "complete":
