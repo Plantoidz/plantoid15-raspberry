@@ -262,7 +262,7 @@ def main():
     personality = plantoid_cfg['PERSONALITY'] # load the personality prompt context
     pattern = plantoid_cfg['PATTERN'] # load the pattern for the "Touched" regex
     
-    guition_port = plantoid_cfg.get(["GUITION_PORT"],  os.environ.get("GUITION_PORT"))
+    guition_port = plantoid_cfg.get("GUITION_PORT",  os.environ.get("GUITION_PORT"))
     guition = guition_utils.setup(guition_port)
 
     plantoid_goerli_cfg = plantoid_cfg["goerli"]
