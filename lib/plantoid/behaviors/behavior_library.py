@@ -655,6 +655,10 @@ def poem_generation(plantoid, network, tID, amount, user_speech):
     plantoid.send_serial_message("thinking")
     plantoid.play_background_music(plantoid.path + "/media/ambient3.mp3")
 
+    # NEW : spinner-only WORKING screen while we generate text + audio
+    import lib.plantoid.guition as guition
+    guition.show_working(hide_bar=True)
+
     credits = int(amount / network.min_amount)
     
     prompt = make_prompt(plantoid, user_speech, credits)
@@ -673,6 +677,9 @@ def poem_generation(plantoid, network, tID, amount, user_speech):
     subprocess.run(["ffmpeg", "-y", "-i", audiofile, mp3_file])
     audiofile = mp3_file
 
+    # NEW : audio is ready - drop WORKING screen before the plantoid plays
+    guition.show_idle()
+
     # save and play the oracle
     save_and_play_audio(plantoid, network, tID, audiofile)
 
@@ -686,6 +693,11 @@ def song_generation(plantoid, network, tID, amount, user_speech, style):
     # start thinking 
     plantoid.send_serial_message("thinking")
     plantoid.play_background_music(plantoid.path + "/media/ambient3.mp3")
+
+    # NEW : spinner-only WORKING screen while we generate text + audio
+    import lib.plantoid.guition as guition
+    guition.show_working(hide_bar=True)
+
 
     credits = int(amount / network.min_amount)
 
@@ -704,6 +716,10 @@ def song_generation(plantoid, network, tID, amount, user_speech, style):
 
      # stop the background music
     plantoid.stop_background_music()
+
+
+    # NEW : audio is ready - drop WORKING screen before the plantoid plays
+    guition.show_idle()
 
     # save and play the song
     save_and_play_audio(plantoid, network, tID, audiofile)

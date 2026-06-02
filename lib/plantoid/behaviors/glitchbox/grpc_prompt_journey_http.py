@@ -192,7 +192,14 @@ def set_params(server_ip, port, **params):
 
 def poll_until_done(server_ip, port, stuck_timeout=30):
     """Poll journey status until completed. Returns (frame_count, output_file)."""
-    
+
+    # NEW: switch to WORKING with progress bar, then update each poll
+    try:
+        from lib.plantoid.guition import show_working, report_progress
+        show_working(hide_bar=False) # bar visible from frame 0
+    except Exception:
+        report_progress = lamba *_: None
+
     """NB: If current_frame stays at total_frames for `stuck_timeout` seconds without
       `completed` flipping True, assume the server finished but failed to flip the
       flag, and return anyway so the caller can try to download the file.
@@ -209,6 +216,10 @@ def poll_until_done(server_ip, port, stuck_timeout=30):
             total = status["total_frames"] if status["total_frames"] > 0 else "?"
             current = status["current_frame"]
             print(f"  Frame {current}/{total} generated...", end="\r")
+
+            # NEW: drive the GuiTion bar from real frame content
+            if isinstance(total, int) and total > 0:
+                report_progress(int(100 * current / total))
             
             if status["completed"]:
                 print(f"\n\n[Server] Generation complete: {status['current_frame']} frames")

@@ -18,7 +18,7 @@ from lib.plantoid.text_content import nft_ready_lines
 
 class Plantony:
 
-    def __init__(self, io, llm_model, voice_id, plantoid_number, path, lang, personality, pattern):
+    def __init__(self, io, llm_model, voice_id, plantoid_number, path, lang, personality, pattern, guition=None):
 
         # instantaite i/o communication: serial vs gpio
         if isinstance(io, serial.Serial):
@@ -39,6 +39,8 @@ class Plantony:
             self.use_gpio = 1
             self.gpio = PlantoidGPIO.GPIOLEDController(io['led'])
             # self.touch = PlantoidGPIO.setup_button(io['touch'])
+
+        self.guition = guition # no-op object if there is no Guition device
 
 
         # instantiate plantoid number
@@ -161,6 +163,10 @@ class Plantony:
         elif self.use_gpio:
             import lib.plantoid.gpio_utils as PlantoidGPIO
             PlantoidGPIO.LEDs_control(self.gpio, message)
+
+        # NEW: also drive the GuiTion display
+        if self.guition:
+            self.guition.state_changed(message)
 
 
     def play_background_music(self, filename, loops=-1):
@@ -657,7 +663,14 @@ class Plantony:
 
             # pin the metadata to IPFS and enable reveal link via metatransaction
             web3_utils.enable_seed_reveal(network, token_Id)
-            
+
+            # NEW: drive the GuiTion through the reveal sequence
+            if self.guition:
+                # 1. play the generated NFT video 
+                video_file = (network.plantoid_path + "/videos/" + network.name + "/" + f"{self.plantoid_number}_{network.name}_{token_Id}_movie.mp4"
+                self.guition.stream_video(video_file, fps=5)
+
+           
             # closing
             self.terminate_ready()
             
@@ -665,6 +678,20 @@ class Plantony:
             self.reset_prompt()
 
             self.send_serial_message("asleep")
+
+            # NEW
+            # 2. show the reveal QR for 60s (auto-returns to IDLE)
+            import json
+            metadata_path = (network.plantoid_path + "/metadata/" + network.name + "/" + str(token_Id) + ".json")
+            try:
+                with open(metadata_path) as f:
+                    meta = json.load(f)
+                reveal_url = meta.get("animation_url") or meta.get("image")
+                if reveal_url:
+                    self.guition.show_ready(reveal_url)
+            except Exception as e:
+                print(f"[guition] couldn't read metadata for reveal: {e}")
+         
             
             return 1
 

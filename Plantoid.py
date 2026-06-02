@@ -5,6 +5,7 @@ import re
 # import lib.plantoid.gpio_utils as gpio_utils
 import lib.plantoid.serial_utils as serial_utils
 import lib.plantoid.web3_utils as web3_utils
+import lib.plantoid.guition as guition_utils
 from plantoids.plantoid import Plantony
 from utils.util import load_config, get_working_path, str_to_bool
 from dotenv import load_dotenv
@@ -260,6 +261,9 @@ def main():
     lang = plantoid_cfg['LANG'] # check if a particular language is set
     personality = plantoid_cfg['PERSONALITY'] # load the personality prompt context
     pattern = plantoid_cfg['PATTERN'] # load the pattern for the "Touched" regex
+    
+    guition_port = plantoid_cfg.get(["GUITION_PORT"],  os.environ.get("GUITION_PORT"))
+    guition = guition_utils.setup(guition_port)
 
     plantoid_goerli_cfg = plantoid_cfg["goerli"]
     plantoid_mainnet_cfg = plantoid_cfg["mainnet"]
@@ -334,7 +338,7 @@ def main():
 
 
     # instantiate plantony (with serial)
-    plantony = Plantony(io, llm_model, voice_id, int(plantoid_number), path, lang, personality, pattern)
+    plantony = Plantony(io, llm_model, voice_id, int(plantoid_number), path, lang, personality, pattern, guition=guition)
 
     # setup plantony
     plantony.setup()

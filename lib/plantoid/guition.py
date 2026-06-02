@@ -23,36 +23,32 @@ import serial
 
 SYNC = b"\xAA\x55"
 
-# Mapping from Plantony's existing serial messages to GuiTion screens
+# Only fall-back conversation states map automatically. WORKING is driven
+# explicitly from poem_generation / song_generation / video poll loop, so
+# we deliberately ignore listening / thinking / speaking here.
 SCREEN_FROM_STATE = {
-    "asleep":    "idle",
-    "awake":     "idle",
-    "thinking":  "working",
-    "listening": "working",
-    "speaking":  "working",
+    "asleep": "idle",
+    "awake":  "idle",
 }
 
 
 class Guition:
     """Thread-safe client. All writes go through a lock so video streaming
-    and state changes from other threads don't interleave their bytes."""
+    and state changes from other threads don't interleave their bytes.
 
-    def __init__(self, port: str | None, baud: int = 921600):
+    Construction opens the serial port; if it can't be opened the constructor
+    raises. Use the module-level `setup()` factory if you want a clean
+    "returns None on failure" wrapper.
+    """
+
+    def __init__(self, port: str, baud: int = 921600):
         self.port = port
-        self.ser: serial.Serial | None = None
         self.lock = threading.Lock()
-        if port:
-            try:
-                self.ser = serial.Serial(port, baud, timeout=1)
-                print(f"[guition] connected on {port}")
-            except Exception as e:
-                print(f"[guition] failed to open {port}: {e}")
-                self.ser = None
+        self.ser = serial.Serial(port, baud, timeout=1)
+        print(f"[guition] connected on {port}")
 
     # ---- low level ----
     def _send(self, type_byte: bytes, payload: bytes = b"") -> None:
-        if not self.ser:
-            return
         msg = SYNC + type_byte + struct.pack("<I", len(payload)) + payload
         with self.lock:
             try:
@@ -68,6 +64,10 @@ class Guition:
     def set_progress(self, percent: float) -> None:
         p = max(0, min(100, int(percent)))
         self._send(b"P", bytes([p]))
+
+    def hide_progress(self) -> None:
+        """Spinner only — hide bar/percentage/caption on the WORKING screen."""
+        self._send(b"P", bytes([0xFF]))
 
     def state_changed(self, plantony_state: str) -> None:
         """Translate a Plantony serial message ('asleep', 'thinking', ...)
@@ -91,9 +91,6 @@ class Guition:
         to the GuiTion. Blocks for the duration of the clip. Audio is *not*
         sent — it should be played through the Pi's existing audio path
         (pygame mixer) in parallel."""
-        if not self.ser:
-            print("[guition] stream_video: not connected")
-            return
         mp4 = Path(mp4_path)
         if not mp4.exists():
             print(f"[guition] stream_video: missing {mp4}")
@@ -149,15 +146,60 @@ class Guition:
         return out
 
     def close(self) -> None:
-        if self.ser:
-            try:
-                self.ser.close()
-            except Exception:
-                pass
-            self.ser = None
+        try:
+            self.ser.close()
+        except Exception:
+            pass
 
 
-def setup(port: str | None) -> Guition:
-    """Convenience factory. Returns a Guition (possibly disconnected — all
-    methods become no-ops if the port couldn't be opened)."""
-    return Guition(port)
+def setup(port: str | None) -> Guition | None:
+    """Open a connection to the GuiTion display.
+
+    Returns a Guition instance on success, or None if `port` is empty or the
+    serial port couldn't be opened. Callers should gate calls with
+    `if self.guition: ...` so the screen integration is optional.
+    """
+    if not port:
+        return None
+    try:
+        g = Guition(port)
+        set_current(g)
+        return g
+    except Exception as e:
+        print(f"[guition] failed to open {port}: {e}")
+        return None
+
+
+# ---- module-level handle so deep callbacks (e.g. the Glitchbox poll loop
+# inside lib/plantoid/behaviors/glitchbox/) can report progress without
+# plumbing a `plantoid` argument through every layer. Set by setup(). ----
+_current: Guition | None = None
+
+
+def set_current(g: Guition | None) -> None:
+    global _current
+    _current = g
+
+
+def get_current() -> Guition | None:
+    return _current
+
+
+def report_progress(percent: float) -> None:
+    """Update the WORKING screen progress bar from anywhere in the codebase.
+    No-op if no GuiTion is connected."""
+    if _current:
+        _current.set_progress(percent)
+
+
+def show_working(hide_bar: bool = False) -> None:
+    """Switch to WORKING. Pass hide_bar=True for spinner-only (no bar)."""
+    if _current:
+        _current.set_screen("working")
+        if hide_bar:
+            _current.hide_progress()
+
+
+def show_idle() -> None:
+    if _current:
+        _current.set_screen("idle")
