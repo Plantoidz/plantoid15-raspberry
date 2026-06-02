@@ -635,6 +635,11 @@ class Plantony:
 
             def _gen():
                 try:
+                    # NEW: explicit screen + bar at 0% at the video generation
+                    if self.guition:
+                        self.guition.set_screen('working')
+                        self.guition.set_progress(0)
+
                     self.create_seed_metadata(network, token_Id)
                 except Exception as e:
                     gen_err.append(e)

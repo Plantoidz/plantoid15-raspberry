@@ -195,9 +195,12 @@ def poll_until_done(server_ip, port, stuck_timeout=30):
 
     # NEW: switch to WORKING with progress bar, then update each poll
     try:
-        from lib.plantoid.guition import show_working, report_progress
+        from lib.plantoid.guition import show_working, report_progress, get_current
+        print(f"[poll] guition current handle = {get_current()}")
         show_working(hide_bar=False) # bar visible from frame 0
-    except Exception:
+        print("[poll] show_working called ok")
+    except Exception as e:
+        print(f"[poll] guition import/call failed: {type(e).__name__}: {e}")
         report_progress = lambda *_: None
 
     """NB: If current_frame stays at total_frames for `stuck_timeout` seconds without

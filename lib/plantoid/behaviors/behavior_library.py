@@ -678,7 +678,7 @@ def poem_generation(plantoid, network, tID, amount, user_speech):
     audiofile = mp3_file
 
     # NEW : audio is ready - drop WORKING screen before the plantoid plays
-    guition.show_idle()
+    # guition.show_idle()
 
     # save and play the oracle
     save_and_play_audio(plantoid, network, tID, audiofile)
@@ -719,7 +719,7 @@ def song_generation(plantoid, network, tID, amount, user_speech, style):
 
 
     # NEW : audio is ready - drop WORKING screen before the plantoid plays
-    guition.show_idle()
+    # guition.show_idle()
 
     # save and play the song
     save_and_play_audio(plantoid, network, tID, audiofile)

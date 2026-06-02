@@ -23,13 +23,13 @@ import serial
 
 SYNC = b"\xAA\x55"
 
-# Only fall-back conversation states map automatically. WORKING is driven
-# explicitly from poem_generation / song_generation / video poll loop, so
-# we deliberately ignore listening / thinking / speaking here.
-SCREEN_FROM_STATE = {
-    "asleep": "idle",
-    "awake":  "idle",
-}
+# All screen changes are now explicit — see show_working/show_idle/show_ready.
+# The firmware returns to IDLE on its own:
+#   - 60s after SEED READY is shown
+#   - 3s after a video stream stops (videoPlaying timeout)
+#   - on boot (default screen)
+# so no Plantony state message needs to map to a screen.
+SCREEN_FROM_STATE = {}
 
 
 class Guition:
