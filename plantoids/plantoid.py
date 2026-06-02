@@ -675,7 +675,7 @@ class Plantony:
                 video_file = network.plantoid_path + "/videos/" + network.name + "/" + f"{self.plantoid_number}_{network.name}_{token_Id}_movie.mp4"
                 self.guition.stream_video(video_file, fps=5)
             
-            
+
             # 2. show the reveal QR for 60s (auto-returns to IDLE)
             import json
             metadata_path = (network.plantoid_path + "/metadata/" + network.name + "/" + str(token_Id) + ".json")
@@ -683,6 +683,10 @@ class Plantony:
                 with open(metadata_path) as f:
                     meta = json.load(f)
                 reveal_url = meta.get("animation_url") or meta.get("image")
+                if reveal_url and reveal_url.startswith("ipfs://"):
+                    reveal_url = "https://ipfs.io/ipfs/" + reveal_url[len("ipfs://"):]
+                
+                print(f"[guition] reveal_url = {reveal_url!r}")
                 if reveal_url:
                     self.guition.show_ready(reveal_url)
             except Exception as e:
