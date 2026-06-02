@@ -667,7 +667,7 @@ class Plantony:
             # NEW: drive the GuiTion through the reveal sequence
             if self.guition:
                 # 1. play the generated NFT video 
-                video_file = (network.plantoid_path + "/videos/" + network.name + "/" + f"{self.plantoid_number}_{network.name}_{token_Id}_movie.mp4"
+                video_file = network.plantoid_path + "/videos/" + network.name + "/" + f"{self.plantoid_number}_{network.name}_{token_Id}_movie.mp4"
                 self.guition.stream_video(video_file, fps=5)
 
            
