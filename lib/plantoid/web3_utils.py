@@ -130,8 +130,8 @@ def setup(
     # connect to the infura node
     network.w3 = Web3(Web3.WebsocketProvider(
         infura_websock, 
-        websocket_timeout=10000,
-        websocket_kwargs={'timeout': 10000}
+        websocket_timeout=10,
+        websocket_kwargs={'timeout': 10}
     ))
     print('w3 is', network.w3)
 
