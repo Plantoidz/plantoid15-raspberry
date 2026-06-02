@@ -198,7 +198,7 @@ def poll_until_done(server_ip, port, stuck_timeout=30):
         from lib.plantoid.guition import show_working, report_progress
         show_working(hide_bar=False) # bar visible from frame 0
     except Exception:
-        report_progress = lamba *_: None
+        report_progress = lambda *_: None
 
     """NB: If current_frame stays at total_frames for `stuck_timeout` seconds without
       `completed` flipping True, assume the server finished but failed to flip the
