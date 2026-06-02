@@ -44,6 +44,7 @@ class Web3Object:
     w3 = None
     plantoid_contract = None
     event_listener = None
+    event_filter = None
     path = None
     min_amount = None
     failsafe = None
