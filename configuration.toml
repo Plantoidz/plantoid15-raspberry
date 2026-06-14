@@ -1,5 +1,5 @@
 [general]
-PLANTOID=21
+PLANTOID=18
 
 MAINNET_START_BLOCK = 22000000
 TESTNET_START_BLOCK = 10741539
@@ -89,7 +89,7 @@ METADATA_ADDRESS = "0x580fdc17a820e3c0d17fbcd1137483c5332fceb6"
 
 
 [18]
-VOICE_ID="primavera"
+VOICE_ID="sofi"
 max_rounds=4
 USE_GPIO = {led = 10, touch = 26}
 USE_SERIAL = "False"
@@ -97,6 +97,8 @@ LANG="en-EN"
 PATTERN = "<Touched>"
 PERSONALITY="./prompt_context/plantony_context-p19-network_spirituality.txt"
 LLM_MODEL="qwen/qwen3.5-35b-a3b"
+GUITION_PORT = "/dev/guition" 
+
 
 [18.mainnet]
 ACTIVE = "True"
