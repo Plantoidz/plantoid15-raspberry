@@ -266,11 +266,11 @@ def check_if_talk(gpio):
     
     # Read current state
     current_state = GPIO.input(_button_pin)
-    #print("checking button press ..............................")
+    print("checking button press ..............................")
 
     # Check if state changed
     if current_state != _last_button_state:
-        #print("button state changed :)))))")
+        print("button state changed :)))))")
 
         # State has changed! But is it noise? Wait a moment and check again.
         time.sleep(_debounce_time)
