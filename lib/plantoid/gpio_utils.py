@@ -266,7 +266,8 @@ def check_if_talk(gpio):
     
     # Read current state
     current_state = GPIO.input(_button_pin)
-    print("checking button press ..............................")
+    print("checking button press ........................... == state = ", current_state)
+    print("last state ===> ", _last_button_state)
 
     # Check if state changed
     if current_state != _last_button_state:
