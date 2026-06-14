@@ -55,8 +55,17 @@ async def main(path: str) -> None:
             await ws.send(pcm[i:i + bytes_per_chunk])
             await asyncio.sleep(CHUNK / 16000)  # real-time pacing
 
+        # Append trailing silence so Smart-Turn detects end-of-turn and
+        # the server emits its transcription (live mic does this naturally
+        # when the speaker pauses). 2.5s of zeros.
+        silence = b"\x00" * bytes_per_chunk
+        for _ in range(int(2.5 * 16000 / CHUNK)):
+            await ws.send(silence)
+            await asyncio.sleep(CHUNK / 16000)
+
+        print("  ... sent speech + 2.5s silence, waiting up to 10s for transcription")
         # let the server flush its final transcription
-        await asyncio.sleep(3)
+        await asyncio.sleep(10)
         rtask.cancel()
 
 
