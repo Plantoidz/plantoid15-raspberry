@@ -256,7 +256,7 @@ def check_if_talk(gpio):
 
     # Initialize on first call
     if not _button_initialized:
-        #print("------------------------ GPIO TOUCH INITIALISATION")
+        print("------------------------ GPIO TOUCH INITIALISATION")
         _button_pin = gpio['touch']
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(_button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
