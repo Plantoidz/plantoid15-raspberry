@@ -43,18 +43,76 @@ class Guition:
 
     def __init__(self, port: str, baud: int = 921600):
         self.port = port
+        self.baud = baud
         self.lock = threading.Lock()
-        self.ser = serial.Serial(port, baud, timeout=1)
-        print(f"[guition] connected on {port}")
+        self.ser = None
+        self._stop = False
+        self._write_err_logged = False
+        # The GuiTion ESP32 enumerates on USB a few seconds AFTER the Pi
+        # launches Plantoid, and can re-enumerate (ACM0 -> ACM1) on a USB
+        # over-current blip. A one-shot open at startup loses the screen for
+        # the whole session, so open in the background and keep retrying.
+        self._connector = None
+        self._ensure_connector()
+
+    # ---- connection management ----
+    def _open_once(self) -> bool:
+        try:
+            # Hold DTR/RTS low BEFORE opening so we never pulse the ESP32 into
+            # reset on connect.
+            ser = serial.Serial()
+            ser.port = self.port
+            ser.baudrate = self.baud
+            ser.timeout = 1
+            ser.dtr = False
+            ser.rts = False
+            ser.open()
+        except Exception:
+            return False
+        with self.lock:
+            self.ser = ser
+            self._write_err_logged = False
+        print(f"[guition] connected on {self.port}")
+        return True
+
+    def _connect_loop(self) -> None:
+        delay, announced = 1.0, False
+        while not self._stop:
+            if self._open_once():
+                return
+            if not announced:
+                print(f"[guition] {self.port} not available yet, "
+                      f"retrying in background...")
+                announced = True
+            time.sleep(delay)
+            delay = min(delay * 1.5, 10.0)
+
+    def _ensure_connector(self) -> None:
+        """Start the background (re)connect thread if one isn't already
+        running. Only spawns a thread; safe to call with the lock held."""
+        if self._connector is None or not self._connector.is_alive():
+            self._connector = threading.Thread(
+                target=self._connect_loop, daemon=True)
+            self._connector.start()
 
     # ---- low level ----
     def _send(self, type_byte: bytes, payload: bytes = b"") -> None:
         msg = SYNC + type_byte + struct.pack("<I", len(payload)) + payload
         with self.lock:
+            if self.ser is None:
+                return  # not connected yet; background thread is retrying
             try:
                 self.ser.write(msg)
             except Exception as e:
-                print(f"[guition] write failed: {e}")
+                if not self._write_err_logged:  # log once per disconnect
+                    print(f"[guition] write failed, reconnecting: {e}")
+                    self._write_err_logged = True
+                try:
+                    self.ser.close()
+                except Exception:
+                    pass
+                self.ser = None
+                self._ensure_connector()
 
     # ---- high level ----
     def set_screen(self, name: str) -> None:
@@ -146,28 +204,30 @@ class Guition:
         return out
 
     def close(self) -> None:
-        try:
-            self.ser.close()
-        except Exception:
-            pass
+        self._stop = True
+        with self.lock:
+            if self.ser is not None:
+                try:
+                    self.ser.close()
+                except Exception:
+                    pass
+                self.ser = None
 
 
 def setup(port: str | None) -> Guition | None:
     """Open a connection to the GuiTion display.
 
-    Returns a Guition instance on success, or None if `port` is empty or the
-    serial port couldn't be opened. Callers should gate calls with
-    `if self.guition: ...` so the screen integration is optional.
+    Returns a Guition instance, or None only if `port` is empty. The actual
+    serial open happens in a background thread that retries until the device
+    appears (and reconnects if it later re-enumerates), so this never blocks
+    startup or fails just because the ESP32 hasn't booted yet. Callers still
+    gate on `if self.guition: ...` so the integration stays optional.
     """
     if not port:
         return None
-    try:
-        g = Guition(port)
-        set_current(g)
-        return g
-    except Exception as e:
-        print(f"[guition] failed to open {port}: {e}")
-        return None
+    g = Guition(port)
+    set_current(g)
+    return g
 
 
 # ---- module-level handle so deep callbacks (e.g. the Glitchbox poll loop
