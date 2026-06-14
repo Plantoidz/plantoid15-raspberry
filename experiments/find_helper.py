@@ -28,13 +28,19 @@ CANDIDATES = [4, 5, 6, 12, 13, 16, 17, 19, 20, 21, 22, 23, 24, 25, 27]
 HOLD_SECS = 1.5
 
 
-def reads_high(pin: int, secs: float) -> bool:
+def count_edges(pin: int, secs: float) -> int:
+    """Count rising edges (taps) over `secs`. The sensor pulses on touch, so
+    we must catch transitions, not a held level."""
     end = time.time() + secs
+    last = GPIO.input(pin)
+    edges = 0
     while time.time() < end:
-        if GPIO.input(pin) == 1:
-            return True
-        time.sleep(0.01)
-    return False
+        cur = GPIO.input(pin)
+        if cur == 1 and last == 0:
+            edges += 1
+        last = cur
+        time.sleep(0.005)
+    return edges
 
 
 def setup(pins) -> None:
@@ -46,35 +52,39 @@ def setup(pins) -> None:
 
 
 def main() -> None:
-    print(">>> HOLD THE BUTTON DOWN now and keep holding until the end <<<")
+    print(">>> TAP THE BUTTON REPEATEDLY and keep tapping until the end <<<")
     time.sleep(2.0)
     try:
         setup([TOUCH])
-        base = reads_high(TOUCH, HOLD_SECS)
-        print(f"baseline (26 alone): {'HIGH seen (already works!)' if base else 'stuck 0'}")
+        base = count_edges(TOUCH, HOLD_SECS)
+        print(f"baseline (26 alone): {base} taps detected "
+              f"{'(already works!)' if base else '(dead)'}")
 
         helpers = []
         for h in CANDIDATES:
             setup([TOUCH, h])
-            ok = reads_high(TOUCH, HOLD_SECS)
-            print(f"  26 + {h:>2}: {'HIGH ✓  <-- helper' if ok else 'stuck 0'}")
-            if ok:
+            n = count_edges(TOUCH, HOLD_SECS)
+            print(f"  26 + {h:>2}: {n} taps  {'<-- helper ✓' if n else ''}")
+            if n:
                 helpers.append(h)
 
         setup([TOUCH] + CANDIDATES)
-        full = reads_high(TOUCH, HOLD_SECS)
-        print(f"full batch: {'HIGH ✓' if full else 'stuck 0'}")
+        full = count_edges(TOUCH, HOLD_SECS)
+        print(f"full batch: {full} taps")
 
         print("\n=== result ===")
-        if helpers:
+        if base:
+            print("26 alone already detects taps -- earlier single-pin failures "
+                  "may have been timing; re-run button_test.py --pin 26.")
+        elif helpers:
             print(f"helper pin(s): {helpers}  -> sensor draws power/reference "
                   f"from there. Rewire sensor VCC to 3.3V, or drive that pin HIGH.")
         elif full:
             print("no single helper, but full batch works -> RPi.GPIO setup "
-                  "quirk; fix = set up a batch of pins at init.")
+                  "quirk; fix = set up a batch of pins at init (replicate scan).")
         else:
-            print("nothing made it read HIGH -- were you holding the button? "
-                  "re-run and keep it pressed the whole time.")
+            print("nothing detected -- were you tapping? re-run and tap "
+                  "continuously the whole time.")
     finally:
         GPIO.cleanup()
 
