@@ -853,24 +853,24 @@ def recognize_speech(filename, lang=None):
     import requests as req
 
     # 1. Try MacBook Whisper server
-    try:
-        with open(filename, 'rb') as f:
-            resp = req.post(
-                "http://100.67.155.96:8005/v1/audio/transcriptions",
-                  files={"file": f},
-                  timeout=20,
-            )
-            print("trying ASR MacBook with resp.status_code = ", resp.status_code) 
+    # try:
+    #     with open(filename, 'rb') as f:
+    #         resp = req.post(
+    #             "http://100.67.155.96:8005/v1/audio/transcriptions",
+    #               files={"file": f},
+    #               timeout=20,
+    #         )
+    #         print("trying ASR MacBook with resp.status_code = ", resp.status_code) 
 
-        if resp.status_code == 200:
-            text = resp.json().get("text", "").strip()
-            if text:
-                print("ASR - using MacBook Whisper")
-                return text
-            else: return ""
+    #     if resp.status_code == 200:
+    #         text = resp.json().get("text", "").strip()
+    #         if text:
+    #             print("ASR - using MacBook Whisper")
+    #             return text
+    #         else: return ""
     
-    except Exception as e:
-        print(f"MackBook ASR failed {e}")
+    # except Exception as e:
+    #     print(f"MackBook ASR failed {e}")
 
 
     # 2. Try GLITBOX Whisper server
