@@ -684,7 +684,8 @@ class Plantony:
                     meta = json.load(f)
                 reveal_url = meta.get("animation_url") or meta.get("image")
                 if reveal_url and reveal_url.startswith("ipfs://"):
-                    reveal_url = "https://ipfs.io/ipfs/" + reveal_url[len("ipfs://"):]
+                    #reveal_url = "https://ipfs.io/ipfs/" + reveal_url[len("ipfs://"):]
+                    reveal_url = "https://gateway.pinata.cloud/ipfs/"  + reveal_url[len("ipfs://"):]
                 
                 print(f"[guition] reveal_url = {reveal_url!r}")
                 if reveal_url:

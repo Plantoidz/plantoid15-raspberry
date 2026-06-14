@@ -290,7 +290,8 @@ def pin_movie(movie_path):
                 ipfsQmp3 = response['data']['IpfsHash']
                 print("recording the animation_url = " + ipfsQmp3)
 
-                url = "https://ipfs.io/ipfs/" + ipfsQmp3
+                #url = "https://ipfs.io/ipfs/" + ipfsQmp3
+                url = "https://gateway.pinata.cloud/ipfs/" + ipfsQmp3
                 qrcode = create_ipfs_qr(url, output_file="/tmp/ipfs_qrcode.png", size=10)
                 print_thermal_img(qrcode)
 
