@@ -150,6 +150,83 @@ def generate_song_suno(text, style, credits): ### NB: text is an array of lyrics
         print(f"suno status: {status}")
         
         if status == "complete":
+            # url = data["audio_url"]
+            # New API does not return audio_url, file served from a route derived from the job id
+            # New API requires API key like other route (so must pass 'heards' with bearer token)
+            url = f"{base}"/{job_id}/stream"
+
+            # probe actual format
+            # head = requests.head(url, allow_redirects=True, timeout=10)
+            # ctype = head.headers.get("Content-Type", "").split(";")[0].strip()
+            ext_map = {
+                # "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/x-m4a": "m4a",
+                # "audio/aac": "aac", "audio/wav": "wav", "audio/ogg": "ogg",
+                "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/m4a": "m4a",
+                "audio/x-m4a": "m4a", "audio/aac": "aac", "audio/wav": "wav",
+                "audio/ogg": "ogg",
+            }
+            # src_ext = ext_map.get(ctype, "m4a")
+            # src_path = f"/tmp/suno_raw.{src_ext}"
+            out_path = "/tmp/output_music.mp3"
+
+            # with requests.get(url, stream=True) as audio:
+            # NEW API: /stream does not answer HEAD, so read real Content-Type
+            # and pick the source extension from that
+            with requests.get(url, headers=headers, stream=True) as audio:
+                audio.raise_for_status()
+                ctype = audio.headers.get("Content-Type", "").split(";")[0].strip()
+                src_ext = ext_map.get(ctype, "m4a")
+                src_path = f"/tmp/suno_raw.{src_ext}"
+                
+                with open(src_path, "wb") as f:
+                    for chunk in audio.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+            
+            # transcode to mp3 so pygame/mpg123 can play it
+            if src_ext == "mp3":
+                subprocess.run(["cp", src_path, out_path], check=True)
+            else:
+                subprocess.run([
+                    "ffmpeg", "-y", "-loglevel", "error",
+                    "-i", src_path, "-codec:a", "libmp3lame", "-qscale:a", "2",
+                    out_path
+                    ], check=True)
+
+            return out_path
+
+        if status == "error":
+            raise RuntimeError(f"suno error: {data.get('error')}")
+        time.sleep(3)
+
+
+def generate_song_suno_old(text, style, credits): ### NB: text is an array of lyrics
+
+    print("generating a SONG with SUNO, credits = ", credits)
+
+    api_key = os.getenv("SUNO_API")
+    base = "https://api.suno.com/v0/audio"
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+
+    lyrics = "\n".join(text) if isinstance(text, list) else text
+
+    r = requests.post(base, headers=headers, json={
+        "lyrics": lyrics,
+        "style": style, 
+        "title": "Opera",
+    })
+    r.raise_for_status()
+    job_id = r.json()["id"]
+    print(f"suno submitted: {job_id}")
+
+    while True:
+        r = requests.get(f"{base}/{job_id}", headers=headers)
+        r.raise_for_status()
+        data = r.json()
+        status = data["status"]
+        print(f"suno status: {status}")
+        
+        if status == "complete":
             url = data["audio_url"]
 
             # probe actual format
