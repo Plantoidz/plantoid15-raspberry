@@ -153,7 +153,7 @@ def generate_song_suno(text, style, credits): ### NB: text is an array of lyrics
             # url = data["audio_url"]
             # New API does not return audio_url, file served from a route derived from the job id
             # New API requires API key like other route (so must pass 'heards' with bearer token)
-            url = f"{base}"/{job_id}/stream"
+            url = f"{base}/{job_id}/stream"
 
             # probe actual format
             # head = requests.head(url, allow_redirects=True, timeout=10)
@@ -177,7 +177,7 @@ def generate_song_suno(text, style, credits): ### NB: text is an array of lyrics
                 ctype = audio.headers.get("Content-Type", "").split(";")[0].strip()
                 src_ext = ext_map.get(ctype, "m4a")
                 src_path = f"/tmp/suno_raw.{src_ext}"
-                
+
                 with open(src_path, "wb") as f:
                     for chunk in audio.iter_content(chunk_size=8192):
                         if chunk:
