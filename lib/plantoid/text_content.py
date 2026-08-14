@@ -565,7 +565,10 @@ def make_prompt(plantoid, generated_transcript, credits):
 
 
 def get_plantoid_sig(network, tID, lang):
-    
+
+    if not network.reclaim_url:
+        return None
+
     plantoid_sig = {
             "en-EN" : "\n\nYou can reclaim your NFT by connecting to " + network.reclaim_url + " and pressing the Reveal button for seed #" + tID + " \n",
             "fr-FR" : "\n\nReclamez votre NFT sur " + network.reclaim_url + " and appuyez sur le bouton Reveal pour la grained #" + tID + " \n"
