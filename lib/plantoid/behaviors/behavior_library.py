@@ -21,7 +21,8 @@ from elevenlabs import play
 
 from pinata import Pinata
 
-from lib.plantoid.pin_utils import * 
+from lib.plantoid.pin_utils import *
+import lib.plantoid.http_utils as http_utils 
 
 from mutagen.mp3 import MP3
 import re
@@ -389,7 +390,10 @@ def record_metadata(plantoid, network, token_Id, db, ipfsQmp3):
     ### Create Metadata
  
     if ipfsQmp3 is not None:
-        db['animation_url'] = "ipfs://" + ipfsQmp3 # ipfsQwav
+        if ipfsQmp3.startswith("http"):
+            db['animation_url'] = ipfsQmp3
+        else:
+            db['animation_url'] = "ipfs://" + ipfsQmp3 # ipfsQwav
 
     path_meta = path + "/metadata/"
     path_meta_network = path + "/metadata/"+str(network.name)+"/"
@@ -846,8 +850,14 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
         else:
             movie_path = save_video(path, movie_path, tID, network.name)
 
-    # PIN movie to IPFS
-    animurl = pin_movie(movie_path)
+    # Publish the video : IPFS for on-chain networks, plantoid.org for http feeds
+    if getattr(network, "kind", "web3") == "http":
+        # Upload the movie to plantoid.org
+        animurl = http_utils.publish_video(network, tID, movie_path)
+    else:
+        # PIN movie to IPFS
+        animurl = pin_movie(movie_path)
+    
     if(animurl):
         record_metadata(plantoid, network, tID, db, animurl)
 

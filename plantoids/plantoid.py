@@ -13,6 +13,7 @@ from lib.plantoid.behaviors import behavior_selector
 import lib.plantoid.speech as PlantoidSpeech
 import lib.plantoid.serial_utils as PlantoidSerial
 import lib.plantoid.web3_utils as web3_utils
+import lib.plantoid.http_utils as http_utils
 
 from lib.plantoid.text_content import nft_ready_lines
 
@@ -609,8 +610,15 @@ class Plantony:
 
     def check_if_fed(self, network):
 
-        ### this returns the token ID and the amount of wei that plantoid has been fed with
-        latest_deposit  = web3_utils.check_for_deposits(network) 
+
+        ## THIS A DIRTY TRICK IN ORDER TO AVOID REWRITING EVERYTHING, while adding HTTP-fakefeed support ;)
+
+        if getattr(network, "kind", "web3") == "http": ## using "web3" as default so that we don't break the pipeline for objects that don't have the "kind" attribute
+            ## this is the fake html-feed counter check
+            latest_deposit = http_utils.check_for_deposits(network)
+        else:
+            ### this returns the token ID and the amount of wei that plantoid has been fed with
+            latest_deposit  = web3_utils.check_for_deposits(network) 
 
         # If Plantoid has been fed
         if latest_deposit is not None:  
@@ -666,8 +674,13 @@ class Plantony:
             # create the seed metadata
             # self.create_seed_metadata(network, token_Id)
 
-            # pin the metadata to IPFS and enable reveal link via metatransaction
-            web3_utils.enable_seed_reveal(network, token_Id)
+
+            # check that it's not a HTTP-feed, in which case no need to pin anything to IPFS
+            if getattr(network, "kind", "web3") != "http":
+                # pin the metadata to IPFS and enable reveal link via metatransaction
+                web3_utils.enable_seed_reveal(network, token_Id)
+
+
 
             # NEW: drive the GuiTion through the reveal sequence
             if self.guition:
@@ -676,22 +689,22 @@ class Plantony:
                 self.guition.stream_video(video_file, fps=5)
             
 
-            # 2. show the reveal QR for 60s (auto-returns to IDLE)
-            import json
-            metadata_path = (network.plantoid_path + "/metadata/" + network.name + "/" + str(token_Id) + ".json")
-            try:
-                with open(metadata_path) as f:
-                    meta = json.load(f)
-                reveal_url = meta.get("animation_url") or meta.get("image")
-                if reveal_url and reveal_url.startswith("ipfs://"):
-                    #reveal_url = "https://ipfs.io/ipfs/" + reveal_url[len("ipfs://"):]
-                    reveal_url = "https://gateway.pinata.cloud/ipfs/"  + reveal_url[len("ipfs://"):]
-                
-                print(f"[guition] reveal_url = {reveal_url!r}")
-                if reveal_url:
-                    self.guition.show_ready(reveal_url)
-            except Exception as e:
-                print(f"[guition] couldn't read metadata for reveal: {e}")
+                # 2. show the reveal QR for 60s (auto-returns to IDLE)
+                import json
+                metadata_path = (network.plantoid_path + "/metadata/" + network.name + "/" + str(token_Id) + ".json")
+                try:
+                    with open(metadata_path) as f:
+                        meta = json.load(f)
+                    reveal_url = meta.get("animation_url") or meta.get("image")
+                    if reveal_url and reveal_url.startswith("ipfs://"):
+                        #reveal_url = "https://ipfs.io/ipfs/" + reveal_url[len("ipfs://"):]
+                        reveal_url = "https://gateway.pinata.cloud/ipfs/"  + reveal_url[len("ipfs://"):]
+                    
+                    print(f"[guition] reveal_url = {reveal_url!r}")
+                    if reveal_url:
+                        self.guition.show_ready(reveal_url)
+                except Exception as e:
+                    print(f"[guition] couldn't read metadata for reveal: {e}")
          
 
            

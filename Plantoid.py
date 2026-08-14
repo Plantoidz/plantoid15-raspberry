@@ -5,6 +5,7 @@ import re
 # import lib.plantoid.gpio_utils as gpio_utils
 import lib.plantoid.serial_utils as serial_utils
 import lib.plantoid.web3_utils as web3_utils
+import lib.plantoid.http_utils as http_utils
 import lib.plantoid.guition as guition_utils
 from plantoids.plantoid import Plantony
 from utils.util import load_config, get_working_path, str_to_bool
@@ -153,6 +154,7 @@ def plantoid_event_listen(
             
             _check_safely("goerli", web3_setup_loop_goerli)
             _check_safely("mainnet", web3_setup_loop_mainnet)
+            _check_safely("http", http_utils.setup)
 
 
 
@@ -271,6 +273,8 @@ def main():
     use_mainnet = str_to_bool(plantoid_mainnet_cfg["ACTIVE"])
     print("mainnet == ", use_mainnet, " and goerli == ", use_goerli)
 
+    use_http = str_to_bool(plantoid_cfg.get("USE_HTTP", "False"))
+
    # path = cfg['PATH']
 
     web3_config = {
@@ -286,6 +290,7 @@ def main():
         'path': path,
         'plantoid_path': path + "/" + plantoid_number + "/",
         'plantoid_number': plantoid_number,
+        'use_http': use_http,
     }
 
     print("setting up i/o communication... with use_serial == ", use_serial)
@@ -336,6 +341,9 @@ def main():
         web3_config["mainnet"] = mainnet
         print(mainnet)
 
+    if use_http:
+        http = http_utils.setup(web3_config)
+        web3_config["http"] = http
 
     # instantiate plantony (with serial)
     plantony = Plantony(io, llm_model, voice_id, int(plantoid_number), path, lang, personality, pattern, guition=guition)
