@@ -127,7 +127,7 @@ def generate_song_11labs(text, style, credits): ### NB: text is an array of lyri
 def generate_song_suno(text, style, credits, duration=None): ### NB: text is an array of lyrics
 
     if duration is None:
-        duration = 30 * credits (30 sec per credits)
+        duration = 30 * credits #(30 sec per credits)
     print("generating a SONG with SUNO length = ", duration, "with credits = ", credits)
 
 
