@@ -124,9 +124,12 @@ def generate_song_11labs(text, style, credits): ### NB: text is an array of lyri
     return audio_file_path
     
 
-def generate_song_suno(text, style, credits): ### NB: text is an array of lyrics
+def generate_song_suno(text, style, credits, duration=None): ### NB: text is an array of lyrics
 
-    print("generating a SONG with SUNO, credits = ", credits)
+    if duration is None:
+        duration = 30 * credits (30 sec per credits)
+    print("generating a SONG with SUNO length = ", duration, "with credits = ", credits)
+
 
     api_key = os.getenv("SUNO_API")
     base = "https://api.suno.com/v0/audio"
@@ -134,11 +137,15 @@ def generate_song_suno(text, style, credits): ### NB: text is an array of lyrics
 
     lyrics = "\n".join(text) if isinstance(text, list) else text
 
-    r = requests.post(base, headers=headers, json={
+    payload = {
         "lyrics": lyrics,
-        "style": style, 
-        "title": "Opera",
-    })
+        "style": style,
+        "title": "Plantoid song"
+    }
+    if duration is not None:
+        payload["duration"] = int(duration) # API accepts 15-360 seconds
+
+    r = requests.post(base, headers=headers, json=payload)
     r.raise_for_status()
     job_id = r.json()["id"]
     print(f"suno submitted: {job_id}")
