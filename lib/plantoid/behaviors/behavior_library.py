@@ -861,8 +861,12 @@ def generic_metadata(plantoid, network, tID, db, callback_prompt, callback_video
     if getattr(network, "kind", "web3") == "http":
         # Upload the movie to plantoid.org
         animurl = http_utils.publish_video(network, tID, movie_path)
+        if animurl:
+            qrcode = create_ipfs_qr(animurl, output_file="/tmp/ipfs_qrcode.png", size=10)
+            print_thermal_img(qrcode)
+
     else:
-        # PIN movie to IPFS
+        # PIN movie to IPFS (and prints the QR internally)
         animurl = pin_movie(movie_path)
     
     if(animurl):
